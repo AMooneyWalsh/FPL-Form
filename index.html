@@ -9,6 +9,10 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
 ```
+html {
+  background-color: #0d0d1a;
+}
+
 body {
   background-color: #0d0d1a;
   color: #e8e8f0;
@@ -1038,23 +1042,26 @@ select option { background-color: #1a1a2e; color: #fff; }
       showError("Could not read the pasted data — make sure you copied it correctly from the shortcut."); return;
     }
 
-    // Support both combined {league: ..., transactions: ...} and plain league data
+    // Support multiple paste formats
     var leagueData, transactionData;
-    if (parsed.league_entries) {
-      leagueData = parsed;
-      transactionData = null;
-    } else if (parsed.league && parsed.league.league_entries) {
-      leagueData = parsed.league;
-      transactionData = parsed.transactions || null;
-    } else if (parsed.leagueData) {
+
+    // Format 1: combined {"leagueData": {...}, "transactionData": {...}}
+    if (parsed.leagueData && parsed.leagueData.league_entries) {
       leagueData = parsed.leagueData;
       transactionData = parsed.transactionData || null;
-    } else {
-      showError("Unrecognised data format. Make sure you're using the updated shortcut."); return;
     }
-
-    if (!leagueData.league_entries || !leagueData.matches) {
-      showError("Could not find league entries or match data."); return;
+    // Format 2: plain league data pasted directly
+    else if (parsed.league_entries && parsed.matches) {
+      leagueData = parsed;
+      transactionData = null;
+    }
+    // Format 3: {league: {...}, transactions: {...}}
+    else if (parsed.league && parsed.league.league_entries) {
+      leagueData = parsed.league;
+      transactionData = parsed.transactions || null;
+    }
+    else {
+      showError("Unrecognised data format. Try pasting just the league data for now."); return;
     }
 
     G.data = leagueData;
