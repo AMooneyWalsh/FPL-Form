@@ -1,669 +1,1114 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<!-- v2 -->
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FPL Draft · Form Table</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FPL Draft · Drafty In Here</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-  :root {
-    --purple: #38003c;
-    --green: #00ff87;
-    --pink: #ff2882;
-    --card: #1a1a2e;
-    --border: rgba(255,255,255,0.08);
-    --text: #e8e8f0;
-    --muted: rgba(255,255,255,0.45);
-  }
+```
+body {
+  background-color: #0d0d1a;
+  color: #e8e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  min-height: 100vh;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+header {
+  background-color: #38003c;
+  padding: 20px 16px;
+  text-align: center;
+  border-bottom: 3px solid #00ff87;
+}
 
-  body {
-    background: #0d0d1a;
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(56,0,60,0.6) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, rgba(0,255,135,0.08) 0%, transparent 50%);
-  }
+header h1 {
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
-  header {
-    padding: 2rem 1.5rem 1rem;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
+header h1 span { color: #00ff87; }
 
-  header::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 60px; height: 2px;
-    background: var(--green);
-  }
+header p {
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  margin-top: 4px;
+}
 
-  .logo {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    color: var(--green);
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-  }
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
 
-  h1 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    font-weight: 800;
-    line-height: 1;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: #fff;
-  }
+/* ── Landing ── */
+.landing-intro {
+  text-align: center;
+  margin-bottom: 24px;
+}
 
-  h1 span { color: var(--green); }
+.landing-intro h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
 
-  .panel {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
+.landing-intro p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+}
 
-  .input-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
+.card {
+  background-color: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
 
-  .step {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-  }
+.hint {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
 
-  .step-number {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--green);
-    background: rgba(0,255,135,0.1);
-    border: 1px solid rgba(0,255,135,0.2);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
+.hint strong { color: rgba(255,255,255,0.85); }
 
-  .step-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+textarea {
+  background-color: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 10px 12px;
+  width: 100%;
+  height: 110px;
+  resize: none;
+  display: block;
+}
 
-  .step-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+textarea:focus {
+  outline: none;
+  border-color: #00ff87;
+}
 
-  .gw-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
+textarea::placeholder { color: rgba(255,255,255,0.2); }
 
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
+.error {
+  background-color: rgba(255,40,130,0.15);
+  border: 1px solid rgba(255,40,130,0.4);
+  border-radius: 8px;
+  color: #ff6eb0;
+  font-size: 14px;
+  padding: 12px;
+  margin-bottom: 14px;
+  display: none;
+}
 
-  label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+.btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background-color: #00ff87;
+  color: #38003c;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
 
-  input, textarea {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    color: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 1rem;
-    padding: 0.65rem 0.75rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    width: 100%;
-  }
+.btn:active { background-color: #00cc6a; }
 
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(0,255,135,0.12);
-  }
+.btn-ghost {
+  background-color: transparent;
+  color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+  font-size: 14px;
+  padding: 10px;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
 
-  input::placeholder, textarea::placeholder {
-    color: rgba(255,255,255,0.2);
-  }
+.btn-ghost:active { background-color: rgba(255,255,255,0.05); }
 
-  textarea {
-    font-family: monospace;
-    font-size: 0.78rem;
-    height: 90px;
-    resize: none;
-    line-height: 1.4;
-  }
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
 
-  .paste-hint {
-    font-size: 0.75rem;
-    color: var(--muted);
-    line-height: 1.5;
-  }
+.tab {
+  background-color: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+}
 
-  .paste-hint strong {
-    color: var(--text);
-  }
+.tab.active {
+  background-color: #00ff87;
+  color: #38003c;
+  border-color: #00ff87;
+}
 
-  .divider {
-    height: 1px;
-    background: var(--border);
-  }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-  button {
-    width: 100%;
-    padding: 1rem;
-    background: var(--green);
-    color: var(--purple);
-    border: none;
-    border-radius: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-  }
+/* ── Section label ── */
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(0,255,135,0.35);
-  }
+.badge {
+  background-color: #00ff87;
+  color: #38003c;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
 
-  button:active { transform: translateY(0); }
+.badge-dim {
+  background-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.45);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
 
-  .error {
-    background: rgba(255,40,130,0.12);
-    border: 1px solid rgba(255,40,130,0.3);
-    border-radius: 8px;
-    color: var(--pink);
-    font-size: 0.875rem;
-    padding: 0.75rem 1rem;
-    display: none;
-  }
+/* ── GW picker (inline) ── */
+.gw-picker {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 16px;
+  background-color: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px;
+}
 
-  /* Results */
-  .results {
-    max-width: 900px;
-    margin: 0 auto 3rem;
-    padding: 0 1rem;
-    display: none;
-  }
+.gw-picker label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.4);
+  display: block;
+  margin-bottom: 5px;
+}
 
-  .section-title {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 1.4rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
+.gw-picker input {
+  background-color: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 10px;
+  width: 70px;
+  -webkit-appearance: none;
+  text-align: center;
+}
 
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+.gw-picker input:focus {
+  outline: none;
+  border-color: #00ff87;
+}
 
-  .gw-badge {
-    background: var(--green);
-    color: var(--purple);
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    letter-spacing: 0.1em;
-  }
+.gw-picker .btn-apply {
+  background-color: #00ff87;
+  color: #38003c;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+}
 
-  .reset-btn {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    font-size: 0.85rem;
-    padding: 0.5rem;
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.05em;
-  }
+.gw-picker .btn-apply:active { background-color: #00cc6a; }
 
-  .reset-btn:hover {
-    color: var(--text);
-    border-color: rgba(255,255,255,0.2);
-    box-shadow: none;
-    transform: none;
-  }
+/* ── Tables ── */
+.table-wrap {
+  background-color: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
-  .table-wrap {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 2rem;
-    overflow-x: auto;
-  }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 300px;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-    min-width: 380px;
-  }
+thead tr { background-color: rgba(255,255,255,0.05); }
 
-  thead tr { background: rgba(255,255,255,0.04); }
+th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.35);
+  padding: 10px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+}
 
-  th {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 0.75rem;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
+th.al { text-align: left; }
 
-  th.left { text-align: left; }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.06); }
+tbody tr:last-child { border-bottom: none; }
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-  }
+td {
+  padding: 11px 8px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 14px;
+}
 
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.03); }
+td.al { text-align: left; }
 
-  td {
-    padding: 0.85rem 0.75rem;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-  }
+.pos {
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.3);
+  width: 30px;
+}
 
-  td.left { text-align: left; }
+.gold   { color: #ffd700; }
+.silver { color: #c0c0c0; }
+.bronze { color: #cd7f32; }
 
-  .pos {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--muted);
-  }
+.name  { font-weight: 700; color: #fff; font-size: 14px; }
+.team  { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 2px; }
 
-  .pos.gold { color: #ffd700; }
-  .pos.silver { color: #c0c0c0; }
-  .pos.bronze { color: #cd7f32; }
+.pts       { font-size: 20px; font-weight: 800; color: #00ff87; }
+.pts-muted { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.55); }
 
-  .manager-name { font-weight: 600; color: #fff; }
-  .team-name { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+.gd-pos { color: #00ff87; }
+.gd-neg { color: #ff2882; }
 
-  .pts-cell {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: var(--green);
-  }
+.dots {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+}
 
-  .stat { font-size: 0.9rem; }
-  .gd-pos { color: var(--green); }
-  .gd-neg { color: var(--pink); }
+.dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-  .form-dots {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    align-items: center;
-  }
+.dot.W { background-color: #00c96e; color: #002a17; }
+.dot.D { background-color: #f5a623; color: #4a2f00; }
+.dot.L { background-color: #e8193c; color: #fff; }
 
-  .dot {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
-    font-size: 0.65rem;
-    font-weight: 800;
-    flex-shrink: 0;
-  }
+.delta-up   { color: #00ff87; font-weight: 700; }
+.delta-down { color: #ff2882; font-weight: 700; }
 
-  .dot.W { background: #00c96e; color: #003d20; }
-  .dot.D { background: #f5a623; color: #5a3a00; }
-  .dot.L { background: #e8193c; color: #fff; }
+/* ── H2H ── */
+.h2h-selectors {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
 
-  @media (max-width: 600px) {
-    th.hide-mobile, td.hide-mobile { display: none; }
-    .dot { width: 18px; height: 18px; font-size: 0.55rem; }
-    .form-dots { gap: 3px; }
-  }
-</style>
+.h2h-selectors .sel-group { flex: 1; }
 
+.sel-group label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.4);
+  display: block;
+  margin-bottom: 5px;
+}
+
+select {
+  background-color: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 30px 10px 10px;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='rgba(255,255,255,0.35)' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+select:focus { outline: none; border-color: #00ff87; }
+select option { background-color: #1a1a2e; color: #fff; }
+
+.btn-go {
+  background-color: #38003c;
+  color: #00ff87;
+  border: 1px solid #00ff87;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 18px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+}
+
+.btn-go:active { background-color: rgba(0,255,135,0.1); }
+
+.h2h-board {
+  background-color: #38003c;
+  border: 1px solid rgba(0,255,135,0.25);
+  border-radius: 10px;
+  padding: 20px 16px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.h2h-names {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.h2h-mgr { flex: 1; font-weight: 800; font-size: 15px; color: #fff; }
+.h2h-vs  { color: rgba(255,255,255,0.25); font-size: 12px; font-weight: 700; }
+
+.h2h-scores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.h2h-score { flex: 1; font-size: 52px; font-weight: 800; color: #00ff87; line-height: 1; }
+.h2h-score.loser { color: rgba(255,255,255,0.25); }
+.h2h-dash { color: rgba(255,255,255,0.15); font-size: 24px; font-weight: 800; }
+
+.h2h-sub {
+  color: rgba(255,255,255,0.35);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+/* ── Trades ── */
+.trades-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.trades-stat {
+  background-color: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+
+.trades-stat .stat-val {
+  font-size: 28px;
+  font-weight: 800;
+  color: #00ff87;
+  line-height: 1;
+}
+
+.trades-stat .stat-lbl {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.player-pill {
+  display: inline-block;
+  background-color: rgba(0,255,135,0.1);
+  border: 1px solid rgba(0,255,135,0.2);
+  border-radius: 20px;
+  color: #00ff87;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+}
+
+.player-pill.out {
+  background-color: rgba(255,40,130,0.1);
+  border-color: rgba(255,40,130,0.2);
+  color: #ff6eb0;
+}
+
+@media (max-width: 500px) {
+  .hide-sm { display: none; }
+  .dot { width: 18px; height: 18px; font-size: 9px; }
+  .dots { gap: 3px; }
+  .h2h-score { font-size: 40px; }
+  .h2h-mgr { font-size: 13px; }
+}
+```
+
+  </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">⚽ FPL Draft</div>
-  <h1>Form <span>&amp;</span> Standings</h1>
+  <h1>FPL Draft <span>Stats</span></h1>
+  <p>Drafty In Here · League 6573</p>
 </header>
 
-<div class="panel" id="inputPanel">
-  <div class="input-card">
+<div class="container">
 
-```
-<!-- Step 1 -->
-<div class="step">
-  <div class="step-number">1</div>
-  <div class="step-content">
-    <div class="step-label">Select Gameweek Range</div>
-    <div class="gw-row">
-      <div class="input-group">
-        <label>From GW</label>
-        <input type="number" id="fromGW" placeholder="e.g. 24" min="1" max="38">
-      </div>
-      <div class="input-group">
-        <label>To GW</label>
-        <input type="number" id="toGW" placeholder="e.g. 28" min="1" max="38">
-      </div>
+  <!-- ── Landing ── -->
+
+  <div id="landing">
+    <div class="landing-intro">
+      <h2>Welcome back 👋</h2>
+      <p>Run your <strong>FPL Form Table</strong> shortcut to copy your league data, then paste it below.</p>
     </div>
+    <div class="card">
+      <p class="hint">The shortcut fetches all the data you need and copies it to your clipboard automatically. Then long-press below and tap <strong>Paste</strong>.</p>
+      <textarea id="pasteArea" placeholder="Paste league data here…"></textarea>
+    </div>
+    <div class="error" id="errorBox"></div>
+    <button class="btn" onclick="go()">Load League</button>
   </div>
-</div>
 
-<div class="divider"></div>
+  <!-- ── Results ── -->
 
-<!-- Step 2 -->
-<div class="step">
-  <div class="step-number">2</div>
-  <div class="step-content">
-    <div class="step-label">Paste League Data</div>
-    <p class="paste-hint">Run your <strong>FPL Form Table</strong> shortcut first — it copies the data to your clipboard automatically. Then paste it below.</p>
-    <textarea id="pasteArea" placeholder="Paste data here…"></textarea>
-  </div>
-</div>
+  <div id="results" style="display:none">
 
-<div class="divider"></div>
-
-<div class="error" id="errorBox"></div>
-
-<button onclick="generate()">Generate Tables</button>
 ```
+<button class="btn btn-ghost" onclick="reset()">&#8592; Paste New Data</button>
 
-  </div>
+<div class="tabs">
+  <button class="tab active"  onclick="showTab('standings', this)">Standings</button>
+  <button class="tab"         onclick="showTab('form', this)">Form</button>
+  <button class="tab"         onclick="showTab('unlucky', this)">Unlucky</button>
+  <button class="tab"         onclick="showTab('h2h', this)">Head to Head</button>
+  <button class="tab"         onclick="showTab('trades', this)">Trades</button>
 </div>
 
-<div class="results" id="results">
-  <button class="reset-btn" onclick="reset()">← New Search</button>
-
-  <div class="section-title">
-    Form Table <span class="gw-badge" id="gwBadge"></span>
-  </div>
+<!-- STANDINGS -->
+<div id="tab-standings" class="tab-content active">
+  <div class="section-label">Overall Standings <span class="badge-dim">Full Season</span></div>
   <div class="table-wrap">
     <table>
-      <thead>
-        <tr>
-          <th class="left">Pos</th>
-          <th class="left">Manager</th>
-          <th class="hide-mobile">P</th>
-          <th class="hide-mobile">W</th>
-          <th class="hide-mobile">D</th>
-          <th class="hide-mobile">L</th>
-          <th class="hide-mobile">GF</th>
-          <th class="hide-mobile">GA</th>
-          <th class="hide-mobile">GD</th>
-          <th>Pts</th>
-          <th>Form</th>
-        </tr>
-      </thead>
-      <tbody id="formBody"></tbody>
-    </table>
-  </div>
-
-  <div class="section-title">
-    Overall Standings <span class="gw-badge">Full Season</span>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="left">Pos</th>
-          <th class="left">Manager</th>
-          <th class="hide-mobile">P</th>
-          <th class="hide-mobile">W</th>
-          <th class="hide-mobile">D</th>
-          <th class="hide-mobile">L</th>
-          <th class="hide-mobile">GF</th>
-          <th class="hide-mobile">GA</th>
-          <th class="hide-mobile">GD</th>
-          <th>Pts</th>
-        </tr>
-      </thead>
+      <thead><tr>
+        <th class="al">Pos</th><th class="al">Manager</th>
+        <th class="hide-sm">P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
+        <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th class="hide-sm">GD</th><th>Pts</th>
+      </tr></thead>
       <tbody id="standingsBody"></tbody>
     </table>
   </div>
 </div>
 
+<!-- FORM -->
+<div id="tab-form" class="tab-content">
+  <div class="gw-picker">
+    <div>
+      <label for="formFrom">From GW</label>
+      <input type="number" id="formFrom" placeholder="1" min="1" max="38">
+    </div>
+    <div>
+      <label for="formTo">To GW</label>
+      <input type="number" id="formTo" placeholder="38" min="1" max="38">
+    </div>
+    <button class="btn-apply" onclick="renderForm()">Apply</button>
+  </div>
+  <div class="section-label">Form Table <span class="badge" id="formBadge"></span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th class="al">Pos</th><th class="al">Manager</th>
+        <th class="hide-sm">P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
+        <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th class="hide-sm">GD</th>
+        <th>Pts</th><th>Form</th>
+      </tr></thead>
+      <tbody id="formBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- UNLUCKY -->
+<div id="tab-unlucky" class="tab-content">
+  <div class="gw-picker">
+    <div>
+      <label for="ulFrom">From GW</label>
+      <input type="number" id="ulFrom" placeholder="1" min="1" max="38">
+    </div>
+    <div>
+      <label for="ulTo">To GW</label>
+      <input type="number" id="ulTo" placeholder="38" min="1" max="38">
+    </div>
+    <button class="btn-apply" onclick="renderUnlucky()">Apply</button>
+  </div>
+  <div class="section-label">Unlucky Table <span class="badge" id="ulBadge"></span></div>
+  <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">
+    Ranked by total points scored. The <span style="color:#00ff87;font-weight:700;">&#916;</span> column shows how many places higher you should be based on scoring alone — a high positive number means you've been unlucky.
+  </p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th class="al">Pos</th><th class="al">Manager</th>
+        <th>GF</th><th>GA</th>
+        <th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
+        <th>Pts</th><th>&#916;</th>
+      </tr></thead>
+      <tbody id="unluckyBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- H2H -->
+<div id="tab-h2h" class="tab-content">
+  <div class="section-label">Head to Head <span class="badge-dim">Full Season</span></div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="h2h-selectors">
+      <div class="sel-group">
+        <label>Manager 1</label>
+        <select id="h2hM1"></select>
+      </div>
+      <div class="sel-group">
+        <label>Manager 2</label>
+        <select id="h2hM2"></select>
+      </div>
+      <button class="btn-go" onclick="renderH2H()">Go</button>
+    </div>
+  </div>
+  <div id="h2hResult" style="display:none">
+    <div class="h2h-board">
+      <div class="h2h-names">
+        <div class="h2h-mgr" id="h2hN1"></div>
+        <div class="h2h-vs">vs</div>
+        <div class="h2h-mgr" id="h2hN2"></div>
+      </div>
+      <div class="h2h-scores">
+        <div class="h2h-score" id="h2hS1"></div>
+        <div class="h2h-dash">—</div>
+        <div class="h2h-score" id="h2hS2"></div>
+      </div>
+      <div class="h2h-sub" id="h2hSub"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>GW</th>
+          <th id="h2hC1"></th>
+          <th id="h2hC2"></th>
+          <th>Result</th>
+        </tr></thead>
+        <tbody id="h2hBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TRADES -->
+<div id="tab-trades" class="tab-content">
+  <div class="section-label">Transfers <span class="badge-dim">Full Season</span></div>
+  <div id="tradesContent"></div>
+</div>
+```
+
+  </div>
+</div>
+
 <script>
-function showError(msg) {
-  const box = document.getElementById("errorBox");
-  box.textContent = msg;
-  box.style.display = "block";
-}
+  var G = { data: null, managers: {}, allFinished: [] };
 
-function clearError() {
-  document.getElementById("errorBox").style.display = "none";
-}
+  /* ── Utilities ── */
+  function showError(msg) {
+    var b = document.getElementById("errorBox");
+    b.textContent = msg; b.style.display = "block";
+  }
+  function clearError() {
+    var b = document.getElementById("errorBox");
+    b.style.display = "none"; b.textContent = "";
+  }
+  function posClass(p) {
+    return p===1?"gold":p===2?"silver":p===3?"bronze":"";
+  }
+  function gdStr(gd) { return gd>=0?"+"+gd:""+gd; }
 
-function posClass(pos) {
-  if (pos === 1) return "gold";
-  if (pos === 2) return "silver";
-  if (pos === 3) return "bronze";
-  return "";
-}
-
-function reset() {
-  document.getElementById("results").style.display = "none";
-  document.getElementById("inputPanel").style.display = "block";
-  document.getElementById("pasteArea").value = "";
-  clearError();
-}
-
-function generate() {
-  clearError();
-
-  const fromGW = parseInt(document.getElementById("fromGW").value);
-  const toGW = parseInt(document.getElementById("toGW").value);
-  const raw = document.getElementById("pasteArea").value.trim();
-
-  if (isNaN(fromGW) || isNaN(toGW)) { showError("Please enter both gameweek numbers."); return; }
-  if (fromGW > toGW) { showError("From GW must be ≤ To GW."); return; }
-  if (fromGW < 1 || toGW > 38) { showError("Gameweeks must be between 1 and 38."); return; }
-  if (!raw) { showError("Please paste the league data in step 2."); return; }
-
-  let data;
-  try {
-    data = JSON.parse(raw);
-    if (!data.league_entries || !data.matches) throw new Error();
-  } catch (e) {
-    showError("Couldn't read the pasted data — make sure you copied it from the shortcut.");
-    return;
+  function showTab(name, btn) {
+    document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
+    document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
+    document.getElementById("tab-"+name).classList.add("active");
+    btn.classList.add("active");
   }
 
-  // Build manager map
-  const managers = {};
-  data.league_entries.forEach(e => {
-    managers[e.id] = {
-      name: e.player_first_name + " " + e.player_last_name,
-      team: e.entry_name
-    };
-  });
-
-  // Filter & sort matches
-  const matches = data.matches
-    .filter(m => m.finished && m.event >= fromGW && m.event <= toGW)
-    .sort((a, b) => a.event - b.event);
-
-  if (matches.length === 0) {
-    showError(`No finished matches found between GW${fromGW} and GW${toGW}.`);
-    return;
+  function reset() {
+    document.getElementById("results").style.display = "none";
+    document.getElementById("landing").style.display = "block";
+    document.getElementById("pasteArea").value = "";
+    document.getElementById("h2hResult").style.display = "none";
+    clearError();
+    window.scrollTo(0,0);
   }
 
-  // Calculate form
-  const form = {};
-  Object.keys(managers).forEach(id => {
-    form[id] = { w: 0, d: 0, l: 0, gf: 0, ga: 0, results: [] };
-  });
+  /* ── Form calculation ── */
+  function calcForm(matches) {
+    var form = {};
+    Object.keys(G.managers).forEach(function(id){
+      form[id] = {w:0,d:0,l:0,gf:0,ga:0,results:[]};
+    });
+    matches.forEach(function(m){
+      var id1=m.league_entry_1.toString(), id2=m.league_entry_2.toString();
+      var p1=m.league_entry_1_points, p2=m.league_entry_2_points;
+      if(!form[id1]) form[id1]={w:0,d:0,l:0,gf:0,ga:0,results:[]};
+      if(!form[id2]) form[id2]={w:0,d:0,l:0,gf:0,ga:0,results:[]};
+      form[id1].gf+=p1; form[id1].ga+=p2;
+      form[id2].gf+=p2; form[id2].ga+=p1;
+      if(p1>p2){ form[id1].w++; form[id1].results.push("W"); form[id2].l++; form[id2].results.push("L"); }
+      else if(p2>p1){ form[id2].w++; form[id2].results.push("W"); form[id1].l++; form[id1].results.push("L"); }
+      else { form[id1].d++; form[id1].results.push("D"); form[id2].d++; form[id2].results.push("D"); }
+    });
+    return form;
+  }
 
-  matches.forEach(m => {
-    const id1 = m.league_entry_1.toString();
-    const id2 = m.league_entry_2.toString();
-    const p1 = m.league_entry_1_points;
-    const p2 = m.league_entry_2_points;
+  function buildRows(form) {
+    return Object.keys(form).map(function(id){
+      var f=form[id], mgr=G.managers[id]||{name:"Unknown",team:""};
+      return { id:id, name:mgr.name, team:mgr.team,
+        pts:f.w*3+f.d, gd:f.gf-f.ga, gf:f.gf, ga:f.ga,
+        played:f.w+f.d+f.l, w:f.w, d:f.d, l:f.l, results:f.results };
+    }).sort(function(a,b){
+      if(b.pts!==a.pts) return b.pts-a.pts;
+      if(b.gd!==a.gd) return b.gd-a.gd;
+      return b.gf-a.gf;
+    });
+  }
 
-    if (!form[id1]) form[id1] = { w: 0, d: 0, l: 0, gf: 0, ga: 0, results: [] };
-    if (!form[id2]) form[id2] = { w: 0, d: 0, l: 0, gf: 0, ga: 0, results: [] };
+  function assignPos(rows) {
+    var pos={}, i=0, dp=0, lp=null, lg=null;
+    rows.forEach(function(r){
+      i++;
+      if(r.pts!==lp||r.gd!==lg) dp=i;
+      lp=r.pts; lg=r.gd;
+      pos[r.id]=dp;
+    });
+    return pos;
+  }
 
-    form[id1].gf += p1; form[id1].ga += p2;
-    form[id2].gf += p2; form[id2].ga += p1;
+  function filterMatches(from, to) {
+    return G.allFinished.filter(function(m){ return m.event>=from && m.event<=to; })
+      .sort(function(a,b){ return a.event-b.event; });
+  }
 
-    if (p1 > p2) {
-      form[id1].w++; form[id1].results.push("W");
-      form[id2].l++; form[id2].results.push("L");
-    } else if (p2 > p1) {
-      form[id2].w++; form[id2].results.push("W");
-      form[id1].l++; form[id1].results.push("L");
-    } else {
-      form[id1].d++; form[id1].results.push("D");
-      form[id2].d++; form[id2].results.push("D");
+  function maxGW() {
+    var max=0;
+    G.allFinished.forEach(function(m){ if(m.event>max) max=m.event; });
+    return max;
+  }
+
+  /* ── Render: Standings ── */
+  function renderStandings() {
+    var body = document.getElementById("standingsBody");
+    body.innerHTML = "";
+    var rows = G.data.standings.slice().sort(function(a,b){ return a.rank-b.rank; });
+    rows.forEach(function(s){
+      var mgr=G.managers[s.league_entry]; if(!mgr) return;
+      var gd=s.points_for-s.points_against;
+      var played=s.matches_won+s.matches_drawn+s.matches_lost;
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td class="pos al '+posClass(s.rank)+'">'+s.rank+'</td>'+
+        '<td class="al"><div class="name">'+mgr.name+'</div><div class="team">'+mgr.team+'</div></td>'+
+        '<td class="hide-sm">'+played+'</td>'+
+        '<td class="hide-sm">'+s.matches_won+'</td>'+
+        '<td class="hide-sm">'+s.matches_drawn+'</td>'+
+        '<td class="hide-sm">'+s.matches_lost+'</td>'+
+        '<td class="hide-sm">'+s.points_for+'</td>'+
+        '<td class="hide-sm">'+s.points_against+'</td>'+
+        '<td class="hide-sm '+(gd>0?"gd-pos":gd<0?"gd-neg":"")+'">'+gdStr(gd)+'</td>'+
+        '<td class="pts">'+s.total+'</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  /* ── Render: Form ── */
+  function renderForm() {
+    var from=parseInt(document.getElementById("formFrom").value)||1;
+    var to=parseInt(document.getElementById("formTo").value)||maxGW();
+    if(from>to){ alert("From GW must be ≤ To GW"); return; }
+    var matches=filterMatches(from,to);
+    if(!matches.length){ alert("No finished matches in that range."); return; }
+    var form=calcForm(matches);
+    var rows=buildRows(form);
+    var pos=assignPos(rows);
+    document.getElementById("formBadge").textContent="GW"+from+"–"+to;
+    var body=document.getElementById("formBody");
+    body.innerHTML="";
+    rows.forEach(function(row){
+      var dp=pos[row.id];
+      var gd=row.gf-row.ga;
+      var gdClass=gd>0?"gd-pos":gd<0?"gd-neg":"";
+      var dots=row.results.map(function(r){ return '<div class="dot '+r+'">'+r+'</div>'; }).join("");
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td class="pos al '+posClass(dp)+'">'+dp+'</td>'+
+        '<td class="al"><div class="name">'+row.name+'</div><div class="team">'+row.team+'</div></td>'+
+        '<td class="hide-sm">'+row.played+'</td>'+
+        '<td class="hide-sm">'+row.w+'</td>'+
+        '<td class="hide-sm">'+row.d+'</td>'+
+        '<td class="hide-sm">'+row.l+'</td>'+
+        '<td class="hide-sm">'+row.gf+'</td>'+
+        '<td class="hide-sm">'+row.ga+'</td>'+
+        '<td class="hide-sm '+gdClass+'">'+gdStr(gd)+'</td>'+
+        '<td class="pts">'+row.pts+'</td>'+
+        '<td><div class="dots">'+dots+'</div></td>';
+      body.appendChild(tr);
+    });
+  }
+
+  /* ── Render: Unlucky ── */
+  function renderUnlucky() {
+    var from=parseInt(document.getElementById("ulFrom").value)||1;
+    var to=parseInt(document.getElementById("ulTo").value)||maxGW();
+    if(from>to){ alert("From GW must be ≤ To GW"); return; }
+    var matches=filterMatches(from,to);
+    if(!matches.length){ alert("No finished matches in that range."); return; }
+    var form=calcForm(matches);
+    var formRows=buildRows(form);
+    var formPos=assignPos(formRows);
+    document.getElementById("ulBadge").textContent="GW"+from+"–"+to;
+
+    var ulRows=formRows.slice().sort(function(a,b){
+      if(b.gf!==a.gf) return b.gf-a.gf;
+      return b.ga-a.ga;
+    });
+
+    var body=document.getElementById("unluckyBody");
+    body.innerHTML="";
+    var uPos=0, uDisp=0, uLast=null;
+    ulRows.forEach(function(row){
+      uPos++;
+      if(row.gf!==uLast) uDisp=uPos;
+      uLast=row.gf;
+      var delta=formPos[row.id]-uDisp;
+      var dStr=delta>0?"+"+delta:""+delta;
+      var dClass=delta>0?"delta-up":delta<0?"delta-down":"";
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td class="pos al '+posClass(uDisp)+'">'+uDisp+'</td>'+
+        '<td class="al"><div class="name">'+row.name+'</div><div class="team">'+row.team+'</div></td>'+
+        '<td>'+row.gf+'</td>'+
+        '<td>'+row.ga+'</td>'+
+        '<td class="hide-sm">'+row.w+'</td>'+
+        '<td class="hide-sm">'+row.d+'</td>'+
+        '<td class="hide-sm">'+row.l+'</td>'+
+        '<td class="pts-muted">'+row.pts+'</td>'+
+        '<td class="'+dClass+'">'+(delta===0?"—":dStr)+'</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  /* ── Render: H2H ── */
+  function renderH2H() {
+    var id1=document.getElementById("h2hM1").value;
+    var id2=document.getElementById("h2hM2").value;
+    if(id1===id2){ alert("Please select two different managers."); return; }
+    var mgr1=G.managers[id1], mgr2=G.managers[id2];
+
+    var games=G.data.matches.filter(function(m){
+      return m.finished && (
+        (m.league_entry_1.toString()===id1 && m.league_entry_2.toString()===id2)||
+        (m.league_entry_1.toString()===id2 && m.league_entry_2.toString()===id1)
+      );
+    }).sort(function(a,b){ return a.event-b.event; });
+
+    var w1=0,w2=0,draws=0;
+    var body=document.getElementById("h2hBody");
+    body.innerHTML="";
+
+    games.forEach(function(m){
+      var isFirst=m.league_entry_1.toString()===id1;
+      var s1=isFirst?m.league_entry_1_points:m.league_entry_2_points;
+      var s2=isFirst?m.league_entry_2_points:m.league_entry_1_points;
+      var result, rColor;
+      if(s1>s2){ w1++; result=mgr1.name.split(" ")[0]+" Win"; rColor="#00ff87"; }
+      else if(s2>s1){ w2++; result=mgr2.name.split(" ")[0]+" Win"; rColor="#ff2882"; }
+      else { draws++; result="Draw"; rColor="#f5a623"; }
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td style="color:rgba(255,255,255,0.4);font-size:13px">GW'+m.event+'</td>'+
+        '<td style="font-weight:700;font-size:16px;color:'+(s1>=s2?"#fff":"rgba(255,255,255,0.3)")+'">'+s1+'</td>'+
+        '<td style="font-weight:700;font-size:16px;color:'+(s2>=s1?"#fff":"rgba(255,255,255,0.3)")+'">'+s2+'</td>'+
+        '<td style="color:'+rColor+';font-weight:700;font-size:13px">'+result+'</td>';
+      body.appendChild(tr);
+    });
+
+    document.getElementById("h2hN1").textContent=mgr1.name;
+    document.getElementById("h2hN2").textContent=mgr2.name;
+    document.getElementById("h2hC1").textContent=mgr1.name.split(" ")[0];
+    document.getElementById("h2hC2").textContent=mgr2.name.split(" ")[0];
+    var s1el=document.getElementById("h2hS1"), s2el=document.getElementById("h2hS2");
+    s1el.textContent=w1; s2el.textContent=w2;
+    s1el.className="h2h-score"+(w1<w2?" loser":"");
+    s2el.className="h2h-score"+(w2<w1?" loser":"");
+    document.getElementById("h2hSub").textContent=
+      games.length+" meeting"+(games.length!==1?"s":"")+" · "+draws+" draw"+(draws!==1?"s":"");
+    document.getElementById("h2hResult").style.display="block";
+  }
+
+  /* ── Render: Trades ── */
+  function renderTrades(transactions) {
+    var content = document.getElementById("tradesContent");
+
+    if (!transactions || !transactions.transactions || transactions.transactions.length === 0) {
+      content.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:14px;text-align:center;padding:30px 0">No transfer data found.</p>';
+      return;
     }
-  });
 
-  // Sort form rows
-  const formRows = Object.keys(form).map(id => {
-    const f = form[id];
-    return {
-      id,
-      pts: f.w * 3 + f.d,
-      gd: f.gf - f.ga,
-      gf: f.gf, ga: f.ga,
-      played: f.w + f.d + f.l,
-      w: f.w, d: f.d, l: f.l,
-      results: f.results,
-      ...managers[id]
-    };
-  });
-  formRows.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+    var txns = transactions.transactions.filter(function(t){ return t.kind === "f" || t.kind === "w"; });
 
-  // Render form table
-  const formBody = document.getElementById("formBody");
-  formBody.innerHTML = "";
-  let lastPts = null, lastGD = null, pos = 0, displayPos = 0;
+    // Count activity per manager
+    var activity = {};
+    Object.keys(G.managers).forEach(function(id){ activity[id] = 0; });
 
-  formRows.forEach(row => {
-    pos++;
-    if (row.pts !== lastPts || row.gd !== lastGD) displayPos = pos;
-    lastPts = row.pts; lastGD = row.gd;
+    // Count player in/out frequency
+    var playerIn = {}, playerOut = {};
 
-    const gd = row.gf - row.ga;
-    const gdStr = gd >= 0 ? `+${gd}` : `${gd}`;
-    const gdClass = gd > 0 ? "gd-pos" : gd < 0 ? "gd-neg" : "";
-    const dots = row.results.map(r =>
-      `<div class="dot ${r}" title="${r === 'W' ? 'Win' : r === 'D' ? 'Draw' : 'Loss'}">${r}</div>`
-    ).join("");
+    txns.forEach(function(t) {
+      var eid = t.entry ? t.entry.toString() : null;
+      if (eid && activity[eid] !== undefined) activity[eid]++;
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="pos left ${posClass(displayPos)}">${displayPos}</td>
-      <td class="left">
-        <div class="manager-name">${row.name}</div>
-        <div class="team-name">${row.team}</div>
-      </td>
-      <td class="stat hide-mobile">${row.played}</td>
-      <td class="stat hide-mobile">${row.w}</td>
-      <td class="stat hide-mobile">${row.d}</td>
-      <td class="stat hide-mobile">${row.l}</td>
-      <td class="stat hide-mobile">${row.gf}</td>
-      <td class="stat hide-mobile">${row.ga}</td>
-      <td class="stat hide-mobile ${gdClass}">${gdStr}</td>
-      <td class="pts-cell">${row.pts}</td>
-      <td><div class="form-dots">${dots}</div></td>
-    `;
-    formBody.appendChild(tr);
-  });
+      if (t.element_in) {
+        playerIn[t.element_in] = (playerIn[t.element_in]||0) + 1;
+      }
+      if (t.element_out) {
+        playerOut[t.element_out] = (playerOut[t.element_out]||0) + 1;
+      }
+    });
 
-  // Render standings
-  const standingsBody = document.getElementById("standingsBody");
-  standingsBody.innerHTML = "";
-  [...data.standings].sort((a, b) => a.rank - b.rank).forEach(s => {
-    const mgr = managers[s.league_entry];
-    if (!mgr) return;
-    const gd = s.points_for - s.points_against;
-    const gdStr = gd >= 0 ? `+${gd}` : `${gd}`;
-    const gdClass = gd > 0 ? "gd-pos" : gd < 0 ? "gd-neg" : "";
-    const played = s.matches_won + s.matches_drawn + s.matches_lost;
+    // Sort managers by activity
+    var actRows = Object.keys(activity).map(function(id){
+      return { id:id, name:G.managers[id].name, team:G.managers[id].team, count:activity[id] };
+    }).sort(function(a,b){ return b.count-a.count; });
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="pos left ${posClass(s.rank)}">${s.rank}</td>
-      <td class="left">
-        <div class="manager-name">${mgr.name}</div>
-        <div class="team-name">${mgr.team}</div>
-      </td>
-      <td class="stat hide-mobile">${played}</td>
-      <td class="stat hide-mobile">${s.matches_won}</td>
-      <td class="stat hide-mobile">${s.matches_drawn}</td>
-      <td class="stat hide-mobile">${s.matches_lost}</td>
-      <td class="stat hide-mobile">${s.points_for}</td>
-      <td class="stat hide-mobile">${s.points_against}</td>
-      <td class="stat hide-mobile ${gdClass}">${gdStr}</td>
-      <td class="pts-cell">${s.total}</td>
-    `;
-    standingsBody.appendChild(tr);
-  });
+    // Sort players by in/out frequency
+    var topIn = Object.keys(playerIn).map(function(id){
+      return { id:id, count:playerIn[id] };
+    }).sort(function(a,b){ return b.count-a.count; }).slice(0,10);
 
-  document.getElementById("gwBadge").textContent = `GW${fromGW}–${toGW}`;
-  document.getElementById("inputPanel").style.display = "none";
-  document.getElementById("results").style.display = "block";
-  window.scrollTo(0, 0);
-}
+    var topOut = Object.keys(playerOut).map(function(id){
+      return { id:id, count:playerOut[id] };
+    }).sort(function(a,b){ return b.count-a.count; }).slice(0,10);
+
+    // Build player name lookup from data
+    var playerNames = {};
+    if (G.data.elements) {
+      G.data.elements.forEach(function(el){
+        playerNames[el.id] = (el.web_name || el.first_name + " " + el.second_name);
+      });
+    }
+
+    function pName(id) { return playerNames[id] || "Player #"+id; }
+
+    var totalTxns = txns.length;
+    var activeMgrs = actRows.filter(function(r){ return r.count>0; }).length;
+
+    var html = '';
+
+    // Summary stats
+    html += '<div class="trades-summary">';
+    html += '<div class="trades-stat"><div class="stat-val">'+totalTxns+'</div><div class="stat-lbl">Total Transfers</div></div>';
+    html += '<div class="trades-stat"><div class="stat-val">'+activeMgrs+'</div><div class="stat-lbl">Active Managers</div></div>';
+    html += '</div>';
+
+    // Activity table
+    html += '<div class="section-label">Transfer Activity</div>';
+    html += '<div class="table-wrap"><table>';
+    html += '<thead><tr><th class="al">Pos</th><th class="al">Manager</th><th>Transfers</th></tr></thead>';
+    html += '<tbody>';
+    var aPos=0, aDisp=0, aLast=null;
+    actRows.forEach(function(r){
+      aPos++;
+      if(r.count!==aLast) aDisp=aPos;
+      aLast=r.count;
+      html += '<tr>';
+      html += '<td class="pos al '+posClass(aDisp)+'">'+aDisp+'</td>';
+      html += '<td class="al"><div class="name">'+r.name+'</div><div class="team">'+r.team+'</div></td>';
+      html += '<td class="pts-muted">'+r.count+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+
+    // Most transferred in
+    if (topIn.length > 0) {
+      html += '<div class="section-label" style="margin-top:8px">Most Transferred In</div>';
+      html += '<div class="table-wrap"><table>';
+      html += '<thead><tr><th class="al">Player</th><th>Times In</th></tr></thead><tbody>';
+      topIn.forEach(function(p){
+        html += '<tr><td class="al"><span class="player-pill">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.count+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+
+    // Most transferred out
+    if (topOut.length > 0) {
+      html += '<div class="section-label" style="margin-top:8px">Most Transferred Out</div>';
+      html += '<div class="table-wrap"><table>';
+      html += '<thead><tr><th class="al">Player</th><th>Times Out</th></tr></thead><tbody>';
+      topOut.forEach(function(p){
+        html += '<tr><td class="al"><span class="player-pill out">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.count+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+
+    content.innerHTML = html;
+  }
+
+  /* ── Go ── */
+  function go() {
+    clearError();
+    var raw = document.getElementById("pasteArea").value.trim();
+    if (!raw) { showError("Please paste your league data first."); return; }
+
+    var parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch(e) {
+      showError("Could not read the pasted data — make sure you copied it correctly from the shortcut."); return;
+    }
+
+    // Support both combined {league: ..., transactions: ...} and plain league data
+    var leagueData, transactionData;
+    if (parsed.league_entries) {
+      leagueData = parsed;
+      transactionData = null;
+    } else if (parsed.league && parsed.league.league_entries) {
+      leagueData = parsed.league;
+      transactionData = parsed.transactions || null;
+    } else if (parsed.leagueData) {
+      leagueData = parsed.leagueData;
+      transactionData = parsed.transactionData || null;
+    } else {
+      showError("Unrecognised data format. Make sure you're using the updated shortcut."); return;
+    }
+
+    if (!leagueData.league_entries || !leagueData.matches) {
+      showError("Could not find league entries or match data."); return;
+    }
+
+    G.data = leagueData;
+    G.data._transactions = transactionData;
+
+    // Build manager map
+    G.managers = {};
+    leagueData.league_entries.forEach(function(e){
+      G.managers[e.id] = { name: e.player_first_name+" "+e.player_last_name, team: e.entry_name };
+    });
+
+    // All finished matches
+    G.allFinished = leagueData.matches.filter(function(m){ return m.finished; });
+
+    var mg = maxGW();
+
+    // Set default GW pickers to last 5 GWs
+    var defFrom = Math.max(1, mg-4);
+    document.getElementById("formFrom").value = defFrom;
+    document.getElementById("formTo").value = mg;
+    document.getElementById("ulFrom").value = defFrom;
+    document.getElementById("ulTo").value = mg;
+
+    // Populate H2H dropdowns
+    var sorted = Object.keys(G.managers).map(function(id){
+      return { id:id, name:G.managers[id].name };
+    }).sort(function(a,b){ return a.name.localeCompare(b.name); });
+
+    var s1=document.getElementById("h2hM1"), s2=document.getElementById("h2hM2");
+    s1.innerHTML=""; s2.innerHTML="";
+    sorted.forEach(function(m){
+      var o1=document.createElement("option"); o1.value=m.id; o1.textContent=m.name; s1.appendChild(o1);
+      var o2=document.createElement("option"); o2.value=m.id; o2.textContent=m.name; s2.appendChild(o2);
+    });
+    if(sorted.length>1) s2.selectedIndex=1;
+    document.getElementById("h2hResult").style.display="none";
+
+    // Render all tabs
+    renderStandings();
+    renderForm();
+    renderUnlucky();
+    renderTrades(transactionData);
+
+    document.getElementById("landing").style.display="none";
+    document.getElementById("results").style.display="block";
+
+    // Reset to standings tab
+    document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
+    document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
+    document.getElementById("tab-standings").classList.add("active");
+    document.querySelectorAll(".tab")[0].classList.add("active");
+
+    window.scrollTo(0,0);
+  }
 </script>
 
 </body>
