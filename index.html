@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FPL Draft · Form Table</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --purple: #38003c;
@@ -18,364 +18,364 @@
     --muted: rgba(255,255,255,0.45);
   }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-background: #0d0d1a;
-color: var(–text);
-font-family: ‘Barlow’, sans-serif;
-min-height: 100vh;
-background-image:
-radial-gradient(ellipse at 20% 0%, rgba(56,0,60,0.6) 0%, transparent 60%),
-radial-gradient(ellipse at 80% 100%, rgba(0,255,135,0.08) 0%, transparent 50%);
-}
+  body {
+    background: #0d0d1a;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(56,0,60,0.6) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,255,135,0.08) 0%, transparent 50%);
+  }
 
-header {
-padding: 2rem 1.5rem 1rem;
-text-align: center;
-border-bottom: 1px solid var(–border);
-position: relative;
-}
+  header {
+    padding: 2rem 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
 
-header::after {
-content: ‘’;
-position: absolute;
-bottom: 0; left: 50%; transform: translateX(-50%);
-width: 60px; height: 2px;
-background: var(–green);
-}
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 2px;
+    background: var(--green);
+  }
 
-.logo {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 0.75rem;
-font-weight: 700;
-letter-spacing: 0.25em;
-color: var(–green);
-text-transform: uppercase;
-margin-bottom: 0.4rem;
-}
+  .logo {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
 
-h1 {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: clamp(2rem, 6vw, 3.5rem);
-font-weight: 800;
-line-height: 1;
-text-transform: uppercase;
-letter-spacing: 0.03em;
-color: #fff;
-}
+  h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #fff;
+  }
 
-h1 span { color: var(–green); }
+  h1 span { color: var(--green); }
 
-.panel {
-max-width: 600px;
-margin: 2rem auto;
-padding: 0 1rem;
-}
+  .panel {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
 
-.input-card {
-background: var(–card);
-border: 1px solid var(–border);
-border-radius: 12px;
-padding: 1.5rem;
-display: flex;
-flex-direction: column;
-gap: 1.25rem;
-}
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
 
-.step {
-display: flex;
-gap: 1rem;
-align-items: flex-start;
-}
+  .step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
 
-.step-number {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 1.1rem;
-font-weight: 800;
-color: var(–green);
-background: rgba(0,255,135,0.1);
-border: 1px solid rgba(0,255,135,0.2);
-border-radius: 50%;
-width: 32px;
-height: 32px;
-display: flex;
-align-items: center;
-justify-content: center;
-flex-shrink: 0;
-margin-top: 2px;
-}
+  .step-number {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--green);
+    background: rgba(0,255,135,0.1);
+    border: 1px solid rgba(0,255,135,0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
 
-.step-content {
-flex: 1;
-display: flex;
-flex-direction: column;
-gap: 0.5rem;
-}
+  .step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-.step-label {
-font-size: 0.7rem;
-font-weight: 700;
-letter-spacing: 0.12em;
-text-transform: uppercase;
-color: var(–muted);
-}
+  .step-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-.gw-row {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 0.75rem;
-}
+  .gw-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
 
-.input-group {
-display: flex;
-flex-direction: column;
-gap: 0.35rem;
-}
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
 
-label {
-font-size: 0.68rem;
-font-weight: 600;
-letter-spacing: 0.08em;
-text-transform: uppercase;
-color: var(–muted);
-}
+  label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-input, textarea {
-background: rgba(255,255,255,0.06);
-border: 1px solid rgba(255,255,255,0.12);
-border-radius: 8px;
-color: #fff;
-font-family: ‘Barlow’, sans-serif;
-font-size: 1rem;
-padding: 0.65rem 0.75rem;
-transition: border-color 0.2s, box-shadow 0.2s;
-width: 100%;
-}
+  input, textarea {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    padding: 0.65rem 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
 
-input:focus, textarea:focus {
-outline: none;
-border-color: var(–green);
-box-shadow: 0 0 0 3px rgba(0,255,135,0.12);
-}
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,255,135,0.12);
+  }
 
-input::placeholder, textarea::placeholder {
-color: rgba(255,255,255,0.2);
-}
+  input::placeholder, textarea::placeholder {
+    color: rgba(255,255,255,0.2);
+  }
 
-textarea {
-font-family: monospace;
-font-size: 0.78rem;
-height: 90px;
-resize: none;
-line-height: 1.4;
-}
+  textarea {
+    font-family: monospace;
+    font-size: 0.78rem;
+    height: 90px;
+    resize: none;
+    line-height: 1.4;
+  }
 
-.paste-hint {
-font-size: 0.75rem;
-color: var(–muted);
-line-height: 1.5;
-}
+  .paste-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
 
-.paste-hint strong {
-color: var(–text);
-}
+  .paste-hint strong {
+    color: var(--text);
+  }
 
-.divider {
-height: 1px;
-background: var(–border);
-}
+  .divider {
+    height: 1px;
+    background: var(--border);
+  }
 
-button {
-width: 100%;
-padding: 1rem;
-background: var(–green);
-color: var(–purple);
-border: none;
-border-radius: 8px;
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 1.2rem;
-font-weight: 800;
-letter-spacing: 0.08em;
-text-transform: uppercase;
-cursor: pointer;
-transition: transform 0.15s, box-shadow 0.15s;
-}
+  button {
+    width: 100%;
+    padding: 1rem;
+    background: var(--green);
+    color: var(--purple);
+    border: none;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
 
-button:hover {
-transform: translateY(-1px);
-box-shadow: 0 4px 20px rgba(0,255,135,0.35);
-}
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0,255,135,0.35);
+  }
 
-button:active { transform: translateY(0); }
+  button:active { transform: translateY(0); }
 
-.error {
-background: rgba(255,40,130,0.12);
-border: 1px solid rgba(255,40,130,0.3);
-border-radius: 8px;
-color: var(–pink);
-font-size: 0.875rem;
-padding: 0.75rem 1rem;
-display: none;
-}
+  .error {
+    background: rgba(255,40,130,0.12);
+    border: 1px solid rgba(255,40,130,0.3);
+    border-radius: 8px;
+    color: var(--pink);
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    display: none;
+  }
 
-/* Results */
-.results {
-max-width: 900px;
-margin: 0 auto 3rem;
-padding: 0 1rem;
-display: none;
-}
+  /* Results */
+  .results {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    padding: 0 1rem;
+    display: none;
+  }
 
-.section-title {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 1.4rem;
-font-weight: 800;
-text-transform: uppercase;
-letter-spacing: 0.05em;
-margin-bottom: 1rem;
-display: flex;
-align-items: center;
-gap: 0.75rem;
-}
+  .section-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
 
-.section-title::after {
-content: ‘’;
-flex: 1;
-height: 1px;
-background: var(–border);
-}
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
 
-.gw-badge {
-background: var(–green);
-color: var(–purple);
-font-size: 0.7rem;
-font-weight: 700;
-padding: 0.2rem 0.5rem;
-border-radius: 4px;
-letter-spacing: 0.1em;
-}
+  .gw-badge {
+    background: var(--green);
+    color: var(--purple);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+  }
 
-.reset-btn {
-background: transparent;
-color: var(–muted);
-border: 1px solid var(–border);
-font-size: 0.85rem;
-padding: 0.5rem;
-margin-bottom: 1.5rem;
-letter-spacing: 0.05em;
-}
+  .reset-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
+  }
 
-.reset-btn:hover {
-color: var(–text);
-border-color: rgba(255,255,255,0.2);
-box-shadow: none;
-transform: none;
-}
+  .reset-btn:hover {
+    color: var(--text);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: none;
+    transform: none;
+  }
 
-.table-wrap {
-background: var(–card);
-border: 1px solid var(–border);
-border-radius: 12px;
-overflow: hidden;
-margin-bottom: 2rem;
-overflow-x: auto;
-}
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+  }
 
-table {
-width: 100%;
-border-collapse: collapse;
-font-size: 0.9rem;
-min-width: 380px;
-}
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 380px;
+  }
 
-thead tr { background: rgba(255,255,255,0.04); }
+  thead tr { background: rgba(255,255,255,0.04); }
 
-th {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 0.7rem;
-font-weight: 700;
-letter-spacing: 0.12em;
-text-transform: uppercase;
-color: var(–muted);
-padding: 0.75rem;
-text-align: center;
-border-bottom: 1px solid var(–border);
-white-space: nowrap;
-}
+  th {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
 
-th.left { text-align: left; }
+  th.left { text-align: left; }
 
-tbody tr {
-border-bottom: 1px solid var(–border);
-transition: background 0.15s;
-}
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
 
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: rgba(255,255,255,0.03); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-td {
-padding: 0.85rem 0.75rem;
-text-align: center;
-vertical-align: middle;
-white-space: nowrap;
-}
+  td {
+    padding: 0.85rem 0.75rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
 
-td.left { text-align: left; }
+  td.left { text-align: left; }
 
-.pos {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 1.1rem;
-font-weight: 800;
-color: var(–muted);
-}
+  .pos {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--muted);
+  }
 
-.pos.gold { color: #ffd700; }
-.pos.silver { color: #c0c0c0; }
-.pos.bronze { color: #cd7f32; }
+  .pos.gold { color: #ffd700; }
+  .pos.silver { color: #c0c0c0; }
+  .pos.bronze { color: #cd7f32; }
 
-.manager-name { font-weight: 600; color: #fff; }
-.team-name { font-size: 0.78rem; color: var(–muted); margin-top: 0.15rem; }
+  .manager-name { font-weight: 600; color: #fff; }
+  .team-name { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
 
-.pts-cell {
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 1.3rem;
-font-weight: 800;
-color: var(–green);
-}
+  .pts-cell {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--green);
+  }
 
-.stat { font-size: 0.9rem; }
-.gd-pos { color: var(–green); }
-.gd-neg { color: var(–pink); }
+  .stat { font-size: 0.9rem; }
+  .gd-pos { color: var(--green); }
+  .gd-neg { color: var(--pink); }
 
-.form-dots {
-display: flex;
-gap: 4px;
-justify-content: center;
-align-items: center;
-}
+  .form-dots {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+  }
 
-.dot {
-width: 22px; height: 22px;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-font-family: ‘Barlow Condensed’, sans-serif;
-font-size: 0.65rem;
-font-weight: 800;
-flex-shrink: 0;
-}
+  .dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-stretch: condensed;
+    font-size: 0.65rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
 
-.dot.W { background: #00c96e; color: #003d20; }
-.dot.D { background: #f5a623; color: #5a3a00; }
-.dot.L { background: #e8193c; color: #fff; }
+  .dot.W { background: #00c96e; color: #003d20; }
+  .dot.D { background: #f5a623; color: #5a3a00; }
+  .dot.L { background: #e8193c; color: #fff; }
 
-@media (max-width: 600px) {
-th.hide-mobile, td.hide-mobile { display: none; }
-.dot { width: 18px; height: 18px; font-size: 0.55rem; }
-.form-dots { gap: 3px; }
-}
+  @media (max-width: 600px) {
+    th.hide-mobile, td.hide-mobile { display: none; }
+    .dot { width: 18px; height: 18px; font-size: 0.55rem; }
+    .form-dots { gap: 3px; }
+  }
 </style>
 
 </head>
