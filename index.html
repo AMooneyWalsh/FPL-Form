@@ -121,6 +121,41 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .badge { background-color: #00ff87; color: #38003c; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 .badge-dim { background-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 
+/* Sub-tabs */
+.sub-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.sub-tab {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.5); border-radius: 6px; padding: 7px 16px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.sub-tab.active { background: #00ff87; border-color: #00ff87; color: #0d0d1a; }
+.sub-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+/* Manager card */
+.mgr-card {
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; margin-bottom: 14px; overflow: hidden;
+}
+.mgr-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; cursor: pointer;
+}
+.mgr-card-header:hover { background: rgba(255,255,255,0.03); }
+.mgr-card-name { font-size: 15px; font-weight: 700; color: #fff; }
+.mgr-card-team { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+.mgr-card-stats { display: flex; gap: 12px; align-items: center; }
+.mgr-mini-stat { text-align: center; min-width: 36px; }
+.mgr-mini-stat .v { font-size: 18px; font-weight: 800; color: #00ff87; line-height: 1; }
+.mgr-mini-stat .l { font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.mgr-card-body { display: none; padding: 0 16px 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+.mgr-card-body.open { display: block; }
+.mgr-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.3); margin: 12px 0 8px; }
+.mini-trade-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.mini-trade-row:last-child { border-bottom: none; }
+.mini-gw { color: rgba(255,255,255,0.3); font-size: 11px; min-width: 30px; margin-top: 2px; }
+.mini-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+
+
 .gw-picker {
   display: flex; align-items: flex-end; gap: 10px; margin-bottom: 16px;
   background-color: rgba(255,255,255,0.04);
@@ -494,8 +529,12 @@ select option { background-color: #1a1a2e; color: #fff; }
 
 <!-- TRADES -->
 <div id="tab-trades" class="tab-content">
-  <div class="section-label">Transfers <span class="badge-dim" id="tradesBadge">Full Season</span></div>
-  <div id="tradesContent"></div>
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchSubTab(this,'tradesOverview')">Overview</button>
+    <button class="sub-tab" onclick="switchSubTab(this,'tradesByManager')">By Manager</button>
+  </div>
+  <div id="tradesOverview"></div>
+  <div id="tradesByManager" style="display:none"></div>
 </div>
 ```
 
@@ -503,7 +542,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 </div>
 
 <script>
-  var G = { data: null, managers: {}, allFinished: [], playerNames: {} };
+  var G = { data: null, managers: {}, managersByEntry: {}, allFinished: [], playerNames: {} };
 
   /* ── Utilities ── */
   function showError(msg) {
@@ -744,231 +783,296 @@ select option { background-color: #1a1a2e; color: #fff; }
   }
 
   function mName(id) {
-    var m = G.managers[id] || G.managers[id ? id.toString() : ''];
+    var m = G.managersByEntry[id] || G.managersByEntry[id ? id.toString() : '']
+         || G.managers[id]        || G.managers[id ? id.toString() : ''];
     return m ? m.name : "Manager #"+id;
+  }
+  function mTeam(id) {
+    var m = G.managersByEntry[id] || G.managersByEntry[id ? id.toString() : '']
+         || G.managers[id]        || G.managers[id ? id.toString() : ''];
+    return m ? m.team : "";
+  }
+
+  /* Build stats for all managers across trades + waivers */
+  function buildMgrStats(approved, acceptedTrades) {
+    var stats = {};
+
+    // Seed all managers
+    Object.keys(G.managers).forEach(function(id) {
+      var m = G.managers[id];
+      // key by both league entry id and raw entry id
+      var key = m.entry ? m.entry.toString() : id.toString();
+      stats[key] = {
+        id: key, leagueId: id,
+        name: m.name, team: m.team,
+        waivers: 0, freeAgents: 0,
+        tradesOffered: 0, tradesReceived: 0,
+        deniedWaivers: 0,
+        tradeHistory: [],  // {gw, with, playersGot, playersGave}
+        waiverHistory: []  // {gw, kind, in, out}
+      };
+      // also key by league entry id if different
+      if (id.toString() !== key) stats[id.toString()] = stats[key];
+    });
+
+    // Waivers
+    approved.forEach(function(t) {
+      var eid = t.entry ? t.entry.toString() : null;
+      if (!eid) return;
+      var s = stats[eid];
+      if (!s) return;
+      if (t.kind === 'w') s.waivers++;
+      else s.freeAgents++;
+      s.waiverHistory.push({ gw: t.event, kind: t.kind, inId: t.element_in, outId: t.element_out });
+    });
+
+    // Denied waivers (raw list needed — pass separately)
+    // Trades
+    acceptedTrades.forEach(function(t) {
+      var oid = t.offered_entry ? t.offered_entry.toString() : null;
+      var rid = t.received_entry ? t.received_entry.toString() : null;
+      if (oid && stats[oid]) {
+        stats[oid].tradesOffered++;
+        stats[oid].tradeHistory.push({
+          gw: t.event, withName: mName(t.received_entry),
+          got: t.tradeitem_set.map(function(i){ return i.element_in; }),
+          gave: t.tradeitem_set.map(function(i){ return i.element_out; })
+        });
+      }
+      if (rid && stats[rid]) {
+        stats[rid].tradesReceived++;
+        stats[rid].tradeHistory.push({
+          gw: t.event, withName: mName(t.offered_entry),
+          got: t.tradeitem_set.map(function(i){ return i.element_out; }),
+          gave: t.tradeitem_set.map(function(i){ return i.element_in; })
+        });
+      }
+    });
+
+    // Return unique (de-dupe by name since we double-keyed)
+    var seen = {};
+    return Object.keys(stats).filter(function(k) {
+      var n = stats[k].name;
+      if (seen[n]) return false;
+      seen[n] = true;
+      return true;
+    }).map(function(k){ return stats[k]; })
+      .sort(function(a,b){ return a.name.localeCompare(b.name); });
   }
 
   function renderTrades(transactionData, tradeData) {
-    var content = document.getElementById("tradesContent");
-
-    // ── Parse waivers/free-agents ──────────────────────────────────────────
-    var rawList = null;
-    if (!transactionData) {
-      rawList = [];
-    } else if (Array.isArray(transactionData)) {
-      rawList = transactionData;
-    } else if (transactionData.transactions && Array.isArray(transactionData.transactions)) {
-      rawList = transactionData.transactions;
-    } else {
-      rawList = [];
+    // ── Parse waivers/free-agents ──────────────────────────────
+    var rawList = [];
+    if (transactionData) {
+      if (Array.isArray(transactionData)) rawList = transactionData;
+      else if (transactionData.transactions) rawList = transactionData.transactions;
     }
+    var approved = rawList.filter(function(t){ return (t.kind==='w'||t.kind==='f') && t.result==='a'; });
+    var denied   = rawList.filter(function(t){ return t.result==='di'; });
 
-    var approved = rawList.filter(function(t) {
-      return (t.kind === "w" || t.kind === "f") && t.result === "a";
+    // ── Parse manager-to-manager trades ───────────────────────
+    var rawTrades = [];
+    if (tradeData) {
+      if (Array.isArray(tradeData)) rawTrades = tradeData;
+      else if (tradeData.trades) rawTrades = tradeData.trades;
+      else { try { var td=typeof tradeData==='string'?JSON.parse(tradeData):tradeData; rawTrades=td.trades||(Array.isArray(td)?td:[]); } catch(e){} }
+    }
+    var acceptedTrades = rawTrades.filter(function(t){ return t.state==='p'; });
+
+    // ── Build manager stats ────────────────────────────────────
+    var mgrStats = buildMgrStats(approved, acceptedTrades);
+    // attach denied counts
+    denied.forEach(function(t) {
+      var eid = t.entry ? t.entry.toString() : null;
+      if (!eid) return;
+      var s = mgrStats.find(function(m){ return m.id===eid || m.leagueId===eid; });
+      if (s) s.deniedWaivers = (s.deniedWaivers||0)+1;
     });
-    var totalDenied = rawList.filter(function(t){ return t.result === "di"; }).length;
 
-    // ── Parse manager-to-manager trades ───────────────────────────────────
-    var rawTrades = null;
-    if (!tradeData) {
-      rawTrades = [];
-    } else if (Array.isArray(tradeData)) {
-      rawTrades = tradeData;
-    } else if (tradeData.trades && Array.isArray(tradeData.trades)) {
-      rawTrades = tradeData.trades;
-    } else {
-      try {
-        var td = typeof tradeData === 'string' ? JSON.parse(tradeData) : tradeData;
-        rawTrades = td.trades || (Array.isArray(td) ? td : []);
-      } catch(e) { rawTrades = []; }
-    }
-    // state "p" = processed/accepted
-    var acceptedTrades = rawTrades.filter(function(t){ return t.state === "p"; });
+    // ── Overview tab ──────────────────────────────────────────
+    renderTradesOverview(approved, acceptedTrades, denied);
 
-    // ── Summary stats ──────────────────────────────────────────────────────
-    var html = '<div class="trades-summary">';
+    // ── By Manager tab ────────────────────────────────────────
+    renderTradesByManager(mgrStats);
+  }
+
+  function renderTradesOverview(approved, acceptedTrades, denied) {
+    var content = document.getElementById("tradesOverview");
+    var html = '';
+
+    // Summary stats
+    html += '<div class="trades-summary">';
     html += '<div class="trades-stat"><div class="stat-val">'+approved.length+'</div><div class="stat-lbl">Waivers / FA</div></div>';
     html += '<div class="trades-stat"><div class="stat-val">'+acceptedTrades.length+'</div><div class="stat-lbl">Trades</div></div>';
-    html += '<div class="trades-stat"><div class="stat-val">'+totalDenied+'</div><div class="stat-lbl">Denied Waivers</div></div>';
+    html += '<div class="trades-stat"><div class="stat-val">'+denied.length+'</div><div class="stat-lbl">Denied Waivers</div></div>';
     html += '</div>';
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // SECTION 1 — Manager-to-manager trades
-    // ═══════════════════════════════════════════════════════════════════════
+    // ── Manager Trades section ──
     html += '<div class="section-label" style="margin-bottom:12px">Manager Trades <span class="badge-dim">'+acceptedTrades.length+' total</span></div>';
 
     if (!acceptedTrades.length) {
       html += '<p style="color:rgba(255,255,255,0.4);font-size:14px;text-align:center;padding:16px 0 24px">No manager trades yet.</p>';
     } else {
-      // Group by GW, newest first
       var tradesByGW = {};
-      acceptedTrades.forEach(function(t) {
-        var gw = t.event || 0;
-        if (!tradesByGW[gw]) tradesByGW[gw] = [];
-        tradesByGW[gw].push(t);
-      });
-      var tradeGWKeys = Object.keys(tradesByGW).map(Number).sort(function(a,b){ return b-a; });
-
-      tradeGWKeys.forEach(function(gw) {
+      acceptedTrades.forEach(function(t){ var gw=t.event||0; if(!tradesByGW[gw])tradesByGW[gw]=[]; tradesByGW[gw].push(t); });
+      Object.keys(tradesByGW).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
         var gwTrades = tradesByGW[gw];
-        html += '<div class="gw-block">';
-        html += '<div class="gw-block-header" onclick="toggleGW(this)">';
+        html += '<div class="gw-block"><div class="gw-block-header" onclick="toggleGW(this)">';
         html += '<span class="gw-title">Gameweek '+gw+'</span>';
         html += '<span style="display:flex;align-items:center;gap:10px"><span class="gw-count">'+gwTrades.length+' trade'+(gwTrades.length!==1?'s':'')+'</span><span class="gw-chevron">▼</span></span>';
-        html += '</div>';
-        html += '<div class="gw-block-body">';
-
-        gwTrades.forEach(function(trade) {
-          var offMgr  = mName(trade.offered_entry);
-          var recMgr  = mName(trade.received_entry);
-          var items   = trade.tradeitem_set || [];
-
-          // From offerer's perspective: gives element_out, gets element_in
-          // Receiver gets element_out, gives element_in
-          html += '<div class="trade-block">';
-          html += '<div class="trade-header">';
-          html += '<span class="trade-mgr offered">'+offMgr+'</span>';
-          html += '<span class="trade-vs">⇄</span>';
-          html += '<span class="trade-mgr received">'+recMgr+'</span>';
-          html += '</div>';
-          html += '<div class="trade-players">';
-
-          // Left side: what offerer gets (element_in)
-          html += '<div class="trade-side">';
-          html += '<div class="trade-side-label">'+offMgr.split(' ')[0]+' gets</div>';
-          items.forEach(function(item) {
-            html += '<span class="player-pill">'+pName(item.element_in)+'</span>';
-          });
-          html += '</div>';
-
-          // Right side: what receiver gets (element_out)
-          html += '<div class="trade-side">';
-          html += '<div class="trade-side-label">'+recMgr.split(' ')[0]+' gets</div>';
-          items.forEach(function(item) {
-            html += '<span class="player-pill">'+pName(item.element_out)+'</span>';
-          });
-          html += '</div>';
-
-          html += '</div>'; // trade-players
-          html += '</div>'; // trade-block
+        html += '</div><div class="gw-block-body">';
+        gwTrades.forEach(function(trade){
+          var offMgr=mName(trade.offered_entry), recMgr=mName(trade.received_entry);
+          var items=trade.tradeitem_set||[];
+          html += '<div class="trade-block"><div class="trade-header">';
+          html += '<span class="trade-mgr offered">'+offMgr+'</span><span class="trade-vs">⇄</span><span class="trade-mgr received">'+recMgr+'</span>';
+          html += '</div><div class="trade-players">';
+          html += '<div class="trade-side"><div class="trade-side-label">'+offMgr.split(' ')[0]+' gets</div>';
+          items.forEach(function(i){ html+='<span class="player-pill">'+pName(i.element_in)+'</span>'; });
+          html += '</div><div class="trade-side"><div class="trade-side-label">'+recMgr.split(' ')[0]+' gets</div>';
+          items.forEach(function(i){ html+='<span class="player-pill">'+pName(i.element_out)+'</span>'; });
+          html += '</div></div></div>';
         });
-
-        html += '</div></div>'; // gw-block-body + gw-block
+        html += '</div></div>';
       });
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // SECTION 2 — Waivers & Free Agents
-    // ═══════════════════════════════════════════════════════════════════════
+    // ── Waivers & Free Agents ──
     html += '<div class="section-label" style="margin-top:8px;margin-bottom:12px">Waivers & Free Agents <span class="badge-dim">'+approved.length+' approved</span></div>';
 
-    if (!approved.length) {
-      html += '<p style="color:rgba(255,255,255,0.4);font-size:14px;text-align:center;padding:16px 0 24px">No waiver/FA data found.</p>';
-    } else {
-      // Group by GW, newest first
+    if (approved.length) {
       var byGW = {};
-      approved.forEach(function(t) {
-        var gw = t.event || 0;
-        var eid = t.entry ? t.entry.toString() : "unknown";
-        if (!byGW[gw]) byGW[gw] = {};
-        if (!byGW[gw][eid]) byGW[gw][eid] = [];
-        byGW[gw][eid].push(t);
-      });
-      var gwKeys = Object.keys(byGW).map(Number).sort(function(a,b){ return b-a; });
-
-      gwKeys.forEach(function(gw) {
-        var gwEntries = byGW[gw];
-        var gwTotal = 0;
-        Object.keys(gwEntries).forEach(function(eid){ gwTotal += gwEntries[eid].length; });
-
-        html += '<div class="gw-block">';
-        html += '<div class="gw-block-header" onclick="toggleGW(this)">';
-        html += '<span class="gw-title">Gameweek '+gw+'</span>';
-        html += '<span style="display:flex;align-items:center;gap:10px"><span class="gw-count">'+gwTotal+' transfer'+(gwTotal!==1?'s':'')+'</span><span class="gw-chevron">▼</span></span>';
-        html += '</div>';
-        html += '<div class="gw-block-body">';
-
-        var mgrIds = Object.keys(gwEntries).sort(function(a,b){
-          var na = G.managers[a] ? G.managers[a].name : '';
-          var nb = G.managers[b] ? G.managers[b].name : '';
-          return na.localeCompare(nb);
-        });
-
-        mgrIds.forEach(function(eid) {
-          var mgr = G.managers[eid] || { name: 'Unknown', team: '' };
-          gwEntries[eid].forEach(function(t) {
-            html += '<div class="waiver-row">';
-            html += '<div class="waiver-mgr">'+mgr.name+'</div>';
-            html += '<div class="waiver-players">';
-            html += '<span class="player-pill">'+pName(t.element_in)+'</span>';
-            html += '<span class="waiver-arrow">⇄</span>';
-            html += '<span class="player-pill out">'+pName(t.element_out)+'</span>';
-            html += '</div>';
-            html += '<div style="font-size:11px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px">'+(t.kind==='w'?'Waiver':'Free agent')+'</div>';
-            html += '</div>';
+      approved.forEach(function(t){ var gw=t.event||0; var eid=t.entry?t.entry.toString():"x"; if(!byGW[gw])byGW[gw]={}; if(!byGW[gw][eid])byGW[gw][eid]=[]; byGW[gw][eid].push(t); });
+      Object.keys(byGW).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
+        var gwEntries=byGW[gw];
+        var gwTotal=0; Object.keys(gwEntries).forEach(function(e){gwTotal+=gwEntries[e].length;});
+        html+='<div class="gw-block"><div class="gw-block-header" onclick="toggleGW(this)">';
+        html+='<span class="gw-title">Gameweek '+gw+'</span>';
+        html+='<span style="display:flex;align-items:center;gap:10px"><span class="gw-count">'+gwTotal+' transfer'+(gwTotal!==1?'s':'')+'</span><span class="gw-chevron">▼</span></span>';
+        html+='</div><div class="gw-block-body">';
+        Object.keys(gwEntries).sort(function(a,b){
+          return (G.managers[a]||{name:''}).name.localeCompare((G.managers[b]||{name:''}).name);
+        }).forEach(function(eid){
+          var mgr=G.managers[eid]||G.managersByEntry[eid]||{name:'Unknown',team:''};
+          gwEntries[eid].forEach(function(t){
+            html+='<div class="waiver-row"><div class="waiver-mgr">'+mgr.name+'</div>';
+            html+='<div class="waiver-players"><span class="player-pill">'+pName(t.element_in)+'</span><span class="waiver-arrow">⇄</span><span class="player-pill out">'+pName(t.element_out)+'</span></div>';
+            html+='<div style="font-size:11px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px">'+(t.kind==='w'?'Waiver':'Free agent')+'</div></div>';
           });
         });
-
-        html += '</div></div>';
+        html+='</div></div>';
       });
 
-      // Most transferred in/out
-      var playerIn = {}, playerOut = {};
-      approved.forEach(function(t) {
-        if (t.element_in)  playerIn[t.element_in]  = (playerIn[t.element_in]||0)  + 1;
-        if (t.element_out) playerOut[t.element_out] = (playerOut[t.element_out]||0) + 1;
-      });
-      var topIn = Object.keys(playerIn).map(function(id){ return {id:id,count:playerIn[id]}; }).sort(function(a,b){return b.count-a.count;}).slice(0,10);
-      var topOut = Object.keys(playerOut).map(function(id){ return {id:id,count:playerOut[id]}; }).sort(function(a,b){return b.count-a.count;}).slice(0,10);
+      // Top transferred in/out
+      var pIn={},pOut={};
+      approved.forEach(function(t){ pIn[t.element_in]=(pIn[t.element_in]||0)+1; pOut[t.element_out]=(pOut[t.element_out]||0)+1; });
+      var topIn=Object.keys(pIn).map(function(id){return{id:id,c:pIn[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
+      var topOut=Object.keys(pOut).map(function(id){return{id:id,c:pOut[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
 
-      if (topIn.length) {
-        html += '<div class="section-label" style="margin-top:8px">Most Transferred In</div>';
-        html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times In</th></tr></thead><tbody>';
-        topIn.forEach(function(p){ html += '<tr><td class="al"><span class="player-pill">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.count+'</td></tr>'; });
-        html += '</tbody></table></div>';
-      }
-      if (topOut.length) {
-        html += '<div class="section-label" style="margin-top:8px">Most Transferred Out</div>';
-        html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times Out</th></tr></thead><tbody>';
-        topOut.forEach(function(p){ html += '<tr><td class="al"><span class="player-pill out">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.count+'</td></tr>'; });
-        html += '</tbody></table></div>';
-      }
+      html += '<div class="section-label" style="margin-top:8px">Most Transferred In</div>';
+      html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times In</th></tr></thead><tbody>';
+      topIn.forEach(function(p){ html+='<tr><td class="al"><span class="player-pill">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
+      html += '</tbody></table></div>';
 
-      // Activity per manager
-      var activity = {};
-      Object.keys(G.managers).forEach(function(id){ activity[id] = 0; });
-      approved.forEach(function(t) {
-        var eid = t.entry ? t.entry.toString() : null;
-        if (eid && activity[eid] !== undefined) activity[eid]++;
-      });
-      var actRows = Object.keys(activity).map(function(id){
-        return { id:id, name:G.managers[id].name, team:G.managers[id].team, count:activity[id] };
-      }).sort(function(a,b){ return b.count-a.count; });
-
-      html += '<div class="section-label" style="margin-top:8px">Transfer Activity <span class="badge-dim">Per Manager</span></div>';
-      html += '<div class="table-wrap"><table><thead><tr><th class="al">Pos</th><th class="al">Manager</th><th>Transfers</th></tr></thead><tbody>';
-      var aPos=0, aDisp=0, aLast=null;
-      actRows.forEach(function(r){
-        aPos++;
-        if(r.count!==aLast) aDisp=aPos;
-        aLast=r.count;
-        html += '<tr>';
-        html += '<td class="pos al '+posClass(aDisp)+'">'+aDisp+'</td>';
-        html += '<td class="al"><div class="name">'+r.name+'</div><div class="team">'+r.team+'</div></td>';
-        html += '<td class="pts-muted">'+r.count+'</td>';
-        html += '</tr>';
-      });
+      html += '<div class="section-label" style="margin-top:8px">Most Transferred Out</div>';
+      html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times Out</th></tr></thead><tbody>';
+      topOut.forEach(function(p){ html+='<tr><td class="al"><span class="player-pill out">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
       html += '</tbody></table></div>';
     }
 
     content.innerHTML = html;
   }
 
-  /* Toggle GW accordion */
+  function renderTradesByManager(mgrStats) {
+    var content = document.getElementById("tradesByManager");
+    var html = '';
+
+    // Sort by total activity desc
+    var sorted = mgrStats.slice().sort(function(a,b){
+      var ta = a.waivers+a.freeAgents+a.tradesOffered+a.tradesReceived;
+      var tb = b.waivers+b.freeAgents+b.tradesOffered+b.tradesReceived;
+      return tb - ta;
+    });
+
+    sorted.forEach(function(m) {
+      var totalTrades = m.tradesOffered + m.tradesReceived;
+      var totalWaivers = m.waivers + m.freeAgents;
+      var uid = 'mgr-'+m.id.replace(/[^a-z0-9]/gi,'');
+
+      html += '<div class="mgr-card">';
+      html += '<div class="mgr-card-header" onclick="toggleMgrCard(this)">';
+      html += '<div><div class="mgr-card-name">'+m.name+'</div><div class="mgr-card-team">'+m.team+'</div></div>';
+      html += '<div class="mgr-card-stats">';
+      html += '<div class="mgr-mini-stat"><div class="v">'+totalTrades+'</div><div class="l">Trades</div></div>';
+      html += '<div class="mgr-mini-stat"><div class="v">'+totalWaivers+'</div><div class="l">Transfers</div></div>';
+      html += '<div class="mgr-mini-stat"><div class="v" style="color:#ff2882">'+m.deniedWaivers+'</div><div class="l">Denied</div></div>';
+      html += '<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-left:4px">▼</span>';
+      html += '</div></div>';
+
+      html += '<div class="mgr-card-body" id="'+uid+'">';
+
+      // Trade breakdown
+      if (m.tradeHistory.length) {
+        html += '<div class="mgr-section-title">Trades ('+m.tradesOffered+' offered · '+m.tradesReceived+' received)</div>';
+        // Sort by GW desc
+        var sortedTrades = m.tradeHistory.slice().sort(function(a,b){return b.gw-a.gw;});
+        sortedTrades.forEach(function(t){
+          html += '<div class="mini-trade-row">';
+          html += '<div class="mini-gw">GW'+t.gw+'</div>';
+          html += '<div style="flex:1">';
+          html += '<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:3px">with '+t.withName+'</div>';
+          html += '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+          html += '<div><div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:2px">Got</div><div class="mini-pills">';
+          t.got.forEach(function(id){ html+='<span class="player-pill" style="font-size:11px;padding:2px 8px">'+pName(id)+'</span>'; });
+          html += '</div></div>';
+          html += '<div><div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:2px">Gave</div><div class="mini-pills">';
+          t.gave.forEach(function(id){ html+='<span class="player-pill out" style="font-size:11px;padding:2px 8px">'+pName(id)+'</span>'; });
+          html += '</div></div>';
+          html += '</div></div></div>';
+        });
+      } else {
+        html += '<p style="font-size:13px;color:rgba(255,255,255,0.3);padding:10px 0 4px">No trades this season.</p>';
+      }
+
+      // Waiver summary by GW
+      if (m.waiverHistory.length) {
+        html += '<div class="mgr-section-title">Waivers & Free Agents ('+m.waivers+' waivers · '+m.freeAgents+' FA picks)</div>';
+        var wByGW = {};
+        m.waiverHistory.forEach(function(w){ if(!wByGW[w.gw])wByGW[w.gw]=[]; wByGW[w.gw].push(w); });
+        Object.keys(wByGW).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
+          html += '<div class="mini-trade-row"><div class="mini-gw">GW'+gw+'</div>';
+          html += '<div class="mini-pills" style="flex:1">';
+          wByGW[gw].forEach(function(w){
+            html += '<span class="player-pill" style="font-size:11px;padding:2px 8px">'+pName(w.inId)+'</span>';
+          });
+          html += '</div></div>';
+        });
+      }
+
+      html += '</div></div>'; // mgr-card-body + mgr-card
+    });
+
+    content.innerHTML = html;
+  }
+
   function toggleGW(header) {
     header.classList.toggle("open");
+    header.nextElementSibling.classList.toggle("open");
+  }
+
+  function toggleMgrCard(header) {
     var body = header.nextElementSibling;
     body.classList.toggle("open");
+    var chevron = header.querySelector('span[style*="font-size:18px"]');
+    if (chevron) chevron.textContent = body.classList.contains('open') ? '▲' : '▼';
+  }
+
+  function switchSubTab(btn, targetId) {
+    btn.parentElement.querySelectorAll('.sub-tab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    ['tradesOverview','tradesByManager'].forEach(function(id){
+      document.getElementById(id).style.display = id===targetId ? 'block' : 'none';
+    });
   }
 
   /* ── Go ── */
@@ -999,10 +1103,13 @@ select option { background-color: #1a1a2e; color: #fff; }
 
     G.data = leagueData;
 
-    // Build manager map  (entry id → name/team)
+    // Build manager map keyed by league entry id AND by raw FPL entry id (used in trades)
     G.managers = {};
+    G.managersByEntry = {};
     leagueData.league_entries.forEach(function(e){
-      G.managers[e.id] = { name: e.player_first_name+" "+e.player_last_name, team: e.entry_name };
+      var m = { name: e.player_first_name+" "+e.player_last_name, team: e.entry_name, id: e.id, entry: e.entry };
+      G.managers[e.id] = m;
+      if (e.entry) G.managersByEntry[e.entry] = m;
     });
 
     // Build player name lookup — prefer bootstrap, fall back to leagueData.elements
