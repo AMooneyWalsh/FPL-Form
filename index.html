@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 
+<!-- v41b -->
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,10 +11,10 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
 ```
-html { background-color: #0d0d1a; }
+html { background-color: #0e0818; }
 
 body {
-  background-color: #0d0d1a;
+  background-color: #0e0818;
   color: #e8e8f0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -23,11 +25,11 @@ header {
   background-color: #38003c;
   padding: 20px 16px;
   text-align: center;
-  border-bottom: 3px solid #00ff87;
+  border-bottom: 3px solid #00d4ff;
 }
 
 header h1 { color: #fff; font-size: 26px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-header h1 span { color: #00ff87; }
+header h1 span { color: #00d4ff; }
 header p { color: rgba(255,255,255,0.45); font-size: 13px; margin-top: 4px; }
 
 .container { max-width: 700px; margin: 0 auto; padding: 20px 16px; }
@@ -37,7 +39,7 @@ header p { color: rgba(255,255,255,0.45); font-size: 13px; margin-top: 4px; }
 .landing-intro p { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.5; }
 
 .card {
-  background-color: #1a1a2e;
+  background-color: #150d22;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   padding: 20px;
@@ -60,7 +62,7 @@ textarea {
   resize: none;
   display: block;
 }
-textarea:focus { outline: none; border-color: #00ff87; }
+textarea:focus { outline: none; border-color: #00d4ff; }
 textarea::placeholder { color: rgba(255,255,255,0.2); }
 
 .error {
@@ -76,13 +78,13 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 
 .btn {
   display: block; width: 100%; padding: 16px;
-  background-color: #00ff87; color: #38003c;
+  background-color: #00d4ff; color: #38003c;
   border: none; border-radius: 8px;
   font-size: 17px; font-weight: 800;
   text-transform: uppercase; letter-spacing: 1px;
   cursor: pointer; -webkit-appearance: none;
 }
-.btn:active { background-color: #00cc6a; }
+.btn:active { background-color: #00aacc; }
 
 .btn-ghost {
   background-color: transparent;
@@ -107,7 +109,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
   text-transform: uppercase; letter-spacing: 0.5px;
   -webkit-appearance: none; flex-shrink: 0;
 }
-.tab.active { background-color: #00ff87; color: #38003c; border-color: #00ff87; }
+.tab.active { background-color: #00d4ff; color: #38003c; border-color: #00d4ff; }
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
@@ -118,7 +120,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
   margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
 }
 
-.badge { background-color: #00ff87; color: #38003c; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+.badge { background-color: #00d4ff; color: #38003c; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 .badge-dim { background-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 
 /* ── Sub-tabs ── */
@@ -129,16 +131,16 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
   font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
   letter-spacing: 0.3px;
 }
-.sub-tab.active { background: #00ff87; border-color: #00ff87; color: #0d0d1a; }
+.sub-tab.active { background: #00d4ff; border-color: #00d4ff; color: #0e0818; }
 .sub-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.75); }
 
 /* ── Trade card (Overview) ── */
-.trade-card { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #12122a; }
+.trade-card { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #1a0f2e; }
 .trade-card-header { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.07); }
 .trade-offerer { display: flex; align-items: center; gap: 6px; }
 .trade-offerer-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.55); }
 .trade-offerer-name { font-size: 14px; font-weight: 800; color: #fff; }
-.trade-accepted-badge { background: rgba(0,255,135,0.12); color: #00e676; border: 1px solid rgba(0,255,135,0.25); font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; padding: 3px 10px; }
+.trade-accepted-badge { background: rgba(0,255,135,0.12); color: #00d4ff; border: 1px solid rgba(0,255,135,0.25); font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; padding: 3px 10px; }
 .trade-card-body { padding: 12px 14px; }
 .trade-columns { display: flex; gap: 0; }
 .trade-col { flex: 1; }
@@ -146,13 +148,13 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .trade-col:last-child { padding-left: 14px; }
 .trade-col-header { display: flex; align-items: baseline; gap: 0; margin-bottom: 8px; }
 .trade-col-direction { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.trade-col-direction.gets { color: #00e676; }
+.trade-col-direction.gets { color: #00d4ff; }
 .trade-col-direction.gives { color: #ff6b6b; }
 .trade-col-manager { font-size: 13px; font-weight: 800; color: #fff; }
 
 /* ── Player chips ── */
 .chip { display: inline-block; padding: 4px 9px; border-radius: 6px; font-size: 12px; font-weight: 700; margin: 0 4px 4px 0; letter-spacing: 0.1px; white-space: nowrap; }
-.chip.in { background: rgba(0,230,118,0.1); color: #00e676; border: 1px solid rgba(0,230,118,0.2); }
+.chip.in { background: rgba(0,230,118,0.1); color: #00d4ff; border: 1px solid rgba(0,230,118,0.2); }
 .chip.out { background: rgba(255,107,107,0.1); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.2); }
 .chip.neutral { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.1); }
 
@@ -167,7 +169,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .waiver-arrow { color: rgba(255,255,255,0.45); font-size: 12px; }
 
 /* ── Manager card (By Manager) ── */
-.mgr-card { background: #13132a; border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+.mgr-card { background: #160d26; border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
 .mgr-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; transition: background 0.15s; }
 .mgr-card-header:hover { background: rgba(255,255,255,0.03); }
 .mgr-card-info { flex: 1; min-width: 0; }
@@ -176,7 +178,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .mgr-card-stats { display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
 .mgr-mini-stat { text-align: center; min-width: 30px; }
 .mgr-mini-stat .v { font-size: 19px; font-weight: 900; line-height: 1; }
-.mgr-mini-stat .v.trades { color: #00e676; }
+.mgr-mini-stat .v.trades { color: #00d4ff; }
 .mgr-mini-stat .v.xfers { color: #7ec8ff; }
 .mgr-mini-stat .v.denied { color: #ff6b6b; }
 .mgr-mini-stat .l { font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.45); margin-top: 2px; }
@@ -194,7 +196,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .mgr-trade-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .mgr-trade-group { min-width: 0; }
 .mgr-trade-group-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
-.mgr-trade-group-label.got { color: #00e676; }
+.mgr-trade-group-label.got { color: #00d4ff; }
 .mgr-trade-group-label.gave { color: #ff6b6b; }
 .mgr-waiver-item { display: flex; align-items: center; gap: 6px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
 .mgr-waiver-item:last-child { border-bottom: none; }
@@ -215,19 +217,19 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
   padding: 8px 10px; width: 70px;
   -webkit-appearance: none; text-align: center;
 }
-.gw-picker input:focus { outline: none; border-color: #00ff87; }
+.gw-picker input:focus { outline: none; border-color: #00d4ff; }
 .gw-picker .btn-apply {
-  background-color: #00ff87; color: #38003c;
+  background-color: #00d4ff; color: #38003c;
   border: none; border-radius: 6px;
   font-size: 13px; font-weight: 800;
   padding: 9px 16px; cursor: pointer;
   text-transform: uppercase; letter-spacing: 0.5px;
   white-space: nowrap; -webkit-appearance: none; flex-shrink: 0;
 }
-.gw-picker .btn-apply:active { background-color: #00cc6a; }
+.gw-picker .btn-apply:active { background-color: #00aacc; }
 
 .table-wrap {
-  background-color: #1a1a2e;
+  background-color: #150d22;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px; overflow: hidden;
   margin-bottom: 24px; overflow-x: auto;
@@ -254,10 +256,10 @@ td.al { text-align: left; }
 .bronze { color: #cd7f32; }
 .name { font-weight: 700; color: #fff; font-size: 14px; }
 .team { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 2px; }
-.pts { font-size: 20px; font-weight: 800; color: #00ff87; }
+.pts { font-size: 20px; font-weight: 800; color: #00d4ff; }
 .pts-muted { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.55); }
-.gd-pos { color: #00ff87; }
-.gd-neg { color: #ff2882; }
+.gd-pos { color: #00d4ff; }
+.gd-neg { color: #f0407a; }
 
 .dots { display: flex; gap: 4px; justify-content: center; align-items: center; }
 .dot {
@@ -265,12 +267,12 @@ td.al { text-align: left; }
   font-size: 10px; font-weight: 800;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.dot.W { background-color: #00c96e; color: #002a17; }
+.dot.W { background-color: #00a878; color: #002a17; }
 .dot.D { background-color: #f5a623; color: #4a2f00; }
 .dot.L { background-color: #e8193c; color: #fff; }
 
-.delta-up { color: #00ff87; font-weight: 700; }
-.delta-down { color: #ff2882; font-weight: 700; }
+.delta-up { color: #f0407a; font-weight: 700; }
+.delta-down { color: #00d4ff; font-weight: 700; }
 
 .h2h-selectors { display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
 .h2h-selectors .sel-group { flex: 1; }
@@ -286,12 +288,12 @@ select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='rgba(255,255,255,0.35)' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 10px center;
 }
-select:focus { outline: none; border-color: #00ff87; }
-select option { background-color: #1a1a2e; color: #fff; }
+select:focus { outline: none; border-color: #00d4ff; }
+select option { background-color: #150d22; color: #fff; }
 
 .btn-go {
-  background-color: #38003c; color: #00ff87;
-  border: 1px solid #00ff87; border-radius: 8px;
+  background-color: #38003c; color: #00d4ff;
+  border: 1px solid #00d4ff; border-radius: 8px;
   font-size: 13px; font-weight: 800;
   padding: 10px 18px; cursor: pointer;
   text-transform: uppercase; letter-spacing: 0.5px;
@@ -309,7 +311,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 .h2h-mgr { flex: 1; font-weight: 800; font-size: 15px; color: #fff; }
 .h2h-vs { color: rgba(255,255,255,0.75); font-size: 12px; font-weight: 700; }
 .h2h-scores { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.h2h-score { flex: 1; font-size: 52px; font-weight: 800; color: #00ff87; line-height: 1; }
+.h2h-score { flex: 1; font-size: 52px; font-weight: 800; color: #00d4ff; line-height: 1; }
 .h2h-score.loser { color: rgba(255,255,255,0.75); }
 .h2h-dash { color: rgba(255,255,255,0.15); font-size: 24px; font-weight: 800; }
 .h2h-sub { color: rgba(255,255,255,0.35); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
@@ -329,7 +331,7 @@ select option { background-color: #1a1a2e; color: #fff; }
   margin-bottom: 10px;
 }
 .trade-mgr { font-size: 13px; font-weight: 700; flex: 1; }
-.trade-mgr.offered { color: #00ff87; }
+.trade-mgr.offered { color: #00d4ff; }
 .trade-mgr.received { color: #7ec8e3; text-align: right; }
 .trade-vs { color: rgba(255,255,255,0.55); font-size: 16px; flex-shrink: 0; }
 .trade-players { display: flex; gap: 12px; }
@@ -346,14 +348,14 @@ select option { background-color: #1a1a2e; color: #fff; }
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 10px; padding: 12px 8px; text-align: center;
 }
-.trades-stat .stat-val { font-size: 26px; font-weight: 900; color: #00ff87; line-height: 1; }
+.trades-stat .stat-val { font-size: 26px; font-weight: 900; color: #00d4ff; line-height: 1; }
 .trades-stat .stat-lbl { font-size: 9px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; }
 
 .player-pill {
   display: inline-block;
   background-color: rgba(0,255,135,0.1);
   border: 1px solid rgba(0,255,135,0.2);
-  border-radius: 20px; color: #00ff87;
+  border-radius: 20px; color: #00d4ff;
   font-size: 12px; font-weight: 700; padding: 3px 10px;
 }
 .player-pill.out {
@@ -380,7 +382,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 .gw-block-body.open { display: block; }
 
 .waiver-row {
-  background-color: #1a1a2e;
+  background-color: #150d22;
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 8px; padding: 10px 14px;
   margin-bottom: 6px;
@@ -402,7 +404,7 @@ select option { background-color: #1a1a2e; color: #fff; }
   cursor: pointer; -webkit-appearance: none;
   text-transform: uppercase; letter-spacing: 0.5px;
 }
-.filter-btn.active { background-color: rgba(0,255,135,0.15); border-color: rgba(0,255,135,0.4); color: #00ff87; }
+.filter-btn.active { background-color: rgba(0,255,135,0.15); border-color: rgba(0,255,135,0.4); color: #00d4ff; }
 
 @media (max-width: 500px) {
   .hide-sm { display: none; }
@@ -419,7 +421,7 @@ select option { background-color: #1a1a2e; color: #fff; }
   letter-spacing: 0.6px; padding: 2px 7px; border-radius: 10px;
   flex-shrink: 0;
 }
-.role-badge.offered  { background: rgba(0,230,118,0.1);  color: #00e676; border: 1px solid rgba(0,230,118,0.25); }
+.role-badge.offered  { background: rgba(0,230,118,0.1);  color: #00d4ff; border: 1px solid rgba(0,230,118,0.25); }
 .role-badge.received { background: rgba(126,200,255,0.1); color: #7ec8ff; border: 1px solid rgba(126,200,255,0.25); }
 .role-badge.rejected { background: rgba(255,107,107,0.1); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.25); }
 .role-badge.withdrawn{ background: rgba(255,201,64,0.1);  color: #ffc940; border: 1px solid rgba(255,201,64,0.25); }
@@ -456,7 +458,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 .insight-name { font-size: 13px; font-weight: 700; color: #fff; min-width: 90px; }
 .insight-bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
 .insight-bar { display: block; height: 100%; background: rgba(0,230,118,0.5); border-radius: 2px; }
-.insight-count { font-size: 12px; font-weight: 800; color: #00e676; min-width: 28px; text-align: right; }
+.insight-count { font-size: 12px; font-weight: 800; color: #00d4ff; min-width: 28px; text-align: right; }
 .insight-detail {
   font-size: 10px; color: rgba(255,255,255,0.35); padding: 0 0 7px 26px;
   border-bottom: 1px solid rgba(255,255,255,0.04);
@@ -514,7 +516,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 .pos-badge { font-size: 8px; font-weight: 800; padding: 1px 4px; border-radius: 3px; }
 .pos-badge.fwd { background: rgba(255,107,107,0.15); color: #ff6b6b; }
 .pos-badge.mid { background: rgba(126,200,255,0.15); color: #7ec8ff; }
-.pos-badge.def { background: rgba(0,230,118,0.15); color: #00e676; }
+.pos-badge.def { background: rgba(0,230,118,0.15); color: #00d4ff; }
 .pos-badge.gkp { background: rgba(255,201,64,0.12); color: #ffc940; }
 
 /* ── Draft squad cards ── */
@@ -526,7 +528,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 }
 .draft-pos-label.fwd { color: #ff6b6b; }
 .draft-pos-label.mid { color: #7ec8ff; }
-.draft-pos-label.def { color: #00e676; }
+.draft-pos-label.def { color: #00d4ff; }
 .draft-pos-label.gkp { color: #ffc940; }
 .draft-pos-players { display: flex; flex-direction: column; gap: 3px; }
 .draft-squad-row {
@@ -537,6 +539,41 @@ select option { background-color: #1a1a2e; color: #fff; }
 .draft-pick-tag { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); min-width: 28px; }
 .draft-squad-name { font-size: 13px; font-weight: 700; color: #fff; flex: 1; }
 .draft-squad-team { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* ── All picks list ── */
+.draft-all-list { font-size: 12px; }
+.draft-all-header, .draft-all-row {
+  display: grid;
+  grid-template-columns: 38px 24px 1fr 36px 60px 36px;
+  align-items: center; gap: 4px;
+  padding: 5px 4px;
+}
+.draft-all-header {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.5px; color: rgba(255,255,255,0.35);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 6px; margin-bottom: 2px;
+}
+.draft-all-row { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.draft-all-row:last-child { border-bottom: none; }
+.draft-all-row:nth-child(even) { background: rgba(255,255,255,0.015); }
+.da-pick { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); }
+.da-rd   { font-size: 10px; color: rgba(255,255,255,0.2); text-align: center; }
+.da-player { font-size: 12px; font-weight: 700; color: #fff; }
+.da-pos  { }
+.da-mgr  { font-size: 11px; color: rgba(255,255,255,0.55); }
+.da-team { font-size: 11px; color: rgba(255,255,255,0.45); }
+.da-team.changed { color: #ffc940; font-weight: 700; }
+.team-changed { color: #ffc940; font-size: 10px; }
+
+/* ── Current owner column ── */
+.draft-all-header, .draft-all-row {
+  grid-template-columns: 38px 24px 1fr 36px 68px 56px;
+}
+.da-now { font-size: 11px; font-weight: 700; text-align: right; }
+.owner-changed { color: #ffc940; font-weight: 800; }
+.owner-same { color: rgba(0,230,118,0.4); font-size: 12px; }
+.draft-all-row.player-moved { background: rgba(255,201,64,0.04); }
 ```
 
   </style>
@@ -575,7 +612,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 <div class="tabs">
   <button class="tab active" onclick="showTab('standings', this)">Standings</button>
   <button class="tab" onclick="showTab('form', this)">Form</button>
-  <button class="tab" onclick="showTab('unlucky', this)">Unlucky</button>
+  <button class="tab" onclick="showTab('luck', this)">Luck Index</button>
   <button class="tab" onclick="showTab('h2h', this)">Head to Head</button>
   <button class="tab" onclick="showTab('trades', this)">Transactions</button>
 <button class="tab" onclick="showTab('draft', this)">Draft</button>
@@ -624,31 +661,34 @@ select option { background-color: #1a1a2e; color: #fff; }
 </div>
 
 <!-- UNLUCKY -->
-<div id="tab-unlucky" class="tab-content">
+<div id="tab-luck" class="tab-content">
   <div class="gw-picker">
     <div>
-      <label for="ulFrom">From GW</label>
-      <input type="number" id="ulFrom" placeholder="1" min="1" max="38">
+      <label for="liFrom">From GW</label>
+      <input type="number" id="liFrom" placeholder="1" min="1" max="38">
     </div>
     <div>
-      <label for="ulTo">To GW</label>
-      <input type="number" id="ulTo" placeholder="38" min="1" max="38">
+      <label for="liTo">To GW</label>
+      <input type="number" id="liTo" placeholder="38" min="1" max="38">
     </div>
-    <button class="btn-apply" onclick="renderUnlucky()">Apply</button>
+    <button class="btn-apply" onclick="renderLuck()">Apply</button>
   </div>
-  <div class="section-label">Unlucky Table <span class="badge" id="ulBadge"></span></div>
+  <div class="section-label">Luck Index <span class="badge" id="liBadge"></span></div>
   <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">
-    Ranked by total points scored. The <span style="color:#00ff87;font-weight:700;">&#916;</span> column shows how many places higher you should be based on scoring alone — a high positive number means you've been unlucky.
+    Ranked by <strong style="color:rgba(255,255,255,0.7)">Expected Wins</strong> — gameweeks where you scored above the median score across all managers. <strong style="color:rgba(255,255,255,0.7)">Luck</strong> = actual wins minus expected wins. Negative means you deserved more. 😭
   </p>
   <div class="table-wrap">
     <table>
       <thead><tr>
         <th class="al">Pos</th><th class="al">Manager</th>
-        <th>GF</th><th>GA</th>
-        <th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
-        <th>Pts</th><th>&#916;</th>
+        <th title="Gameweeks scored above median">Exp W</th>
+        <th title="Actual wins">Act W</th>
+        <th title="Luck delta (actual minus expected wins)">Luck</th>
+        <th class="hide-sm" title="Draws">D</th>
+        <th class="hide-sm" title="Losses">L</th>
+        <th title="Total points scored">PF</th>
       </tr></thead>
-      <tbody id="unluckyBody"></tbody>
+      <tbody id="luckBody"></tbody>
     </table>
   </div>
 </div>
@@ -712,6 +752,189 @@ select option { background-color: #1a1a2e; color: #fff; }
 </div>
 
 <script>
+var DRAFT_PICKS = [
+  {pick:1,round:1,manager:"Mark",player:"Haaland",pos:"FWD",team:"MCI",id:3},
+  {pick:2,round:1,manager:"Conor",player:"M.Salah",pos:"MID",team:"LIV",id:1},
+  {pick:3,round:1,manager:"Jack",player:"Palmer",pos:"MID",team:"CHE",id:3},
+  {pick:4,round:1,manager:"Ben",player:"Saka",pos:"MID",team:"ARS",id:5},
+  {pick:5,round:1,manager:"Darragh",player:"B.Fernandes",pos:"MID",team:"MUN",id:7},
+  {pick:6,round:1,manager:"Joe",player:"Isak",pos:"FWD",team:"NEW",id:4},
+  {pick:7,round:1,manager:"Daire",player:"Gyökeres",pos:"FWD",team:"ARS",id:8},
+  {pick:8,round:1,manager:"Adam",player:"Watkins",pos:"FWD",team:"AVL",id:6},
+  {pick:9,round:1,manager:"Michael",player:"Wirtz",pos:"FWD",team:"AVL",id:6},
+  {pick:10,round:1,manager:"Peter",player:"Marmoush",pos:"MID",team:"MCI",id:10},
+  {pick:11,round:1,manager:"Ruairi",player:"João Pedro",pos:"FWD",team:"CHE",id:19},
+  {pick:12,round:1,manager:"John",player:"Bowen",pos:"FWD",team:"WHU",id:13},
+  {pick:13,round:2,manager:"John",player:"Ekitiké",pos:"FWD",team:"LIV",id:11},
+  {pick:14,round:2,manager:"Ruairi",player:"Mbeumo",pos:"MID",team:"MUN",id:14},
+  {pick:15,round:2,manager:"Peter",player:"Wood",pos:"FWD",team:"NFO",id:21},
+  {pick:16,round:2,manager:"Michael",player:"Solanke",pos:"FWD",team:"TOT",id:20},
+  {pick:17,round:2,manager:"Adam",player:"Mateta",pos:"FWD",team:"CRY",id:24},
+  {pick:18,round:2,manager:"Daire",player:"Evanilson",pos:"FWD",team:"BOU",id:37},
+  {pick:19,round:2,manager:"Joe",player:"Eze",pos:"MID",team:"CRY",id:23},
+  {pick:20,round:2,manager:"Darragh",player:"Cherki",pos:"MID",team:"MCI",id:45},
+  {pick:21,round:2,manager:"Ben",player:"Gakpo",pos:"MID",team:"LIV",id:28},
+  {pick:22,round:2,manager:"Jack",player:"Gordon",pos:"MID",team:"NEW",id:26},
+  {pick:23,round:2,manager:"Conor",player:"S.Larsen",pos:"FWD",team:"WOL",id:49},
+  {pick:24,round:2,manager:"Mark",player:"Elanga",pos:"MID",team:"NEW",id:31},
+  {pick:25,round:3,manager:"Mark",player:"Cunha",pos:"MID",team:"MUN",id:15},
+  {pick:26,round:3,manager:"Conor",player:"Rogers",pos:"MID",team:"AVL",id:30},
+  {pick:27,round:3,manager:"Jack",player:"Semenyo",pos:"MID",team:"BOU",id:32},
+  {pick:28,round:3,manager:"Ben",player:"Kudus",pos:"MID",team:"TOT",id:44},
+  {pick:29,round:3,manager:"Darragh",player:"Ødegaard",pos:"MID",team:"ARS",id:17},
+  {pick:30,round:3,manager:"Joe",player:"Wissa",pos:"FWD",team:"BRE",id:22},
+  {pick:31,round:3,manager:"Daire",player:"Foden",pos:"MID",team:"MCI",id:16},
+  {pick:32,round:3,manager:"Adam",player:"Minteh",pos:"MID",team:"BHA",id:67},
+  {pick:33,round:3,manager:"Michael",player:"Kluivert",pos:"FWD",team:"BOU",id:34},
+  {pick:34,round:3,manager:"Peter",player:"Raúl",pos:"FWD",team:"FUL",id:56},
+  {pick:35,round:3,manager:"Ruairi",player:"Welbeck",pos:"FWD",team:"BHA",id:47},
+  {pick:36,round:3,manager:"John",player:"Havertz",pos:"FWD",team:"ARS",id:27},
+  {pick:37,round:4,manager:"John",player:"Rice",pos:"MID",team:"ARS",id:48},
+  {pick:38,round:4,manager:"Ruairi",player:"Neto",pos:"MID",team:"CHE",id:33},
+  {pick:39,round:4,manager:"Peter",player:"Gibbs-White",pos:"MID",team:"NFO",id:25},
+  {pick:40,round:4,manager:"Michael",player:"Thiago",pos:"FWD",team:"BRE",id:100},
+  {pick:41,round:4,manager:"Adam",player:"Schade",pos:"MID",team:"BRE",id:38},
+  {pick:42,round:4,manager:"Daire",player:"Johnson",pos:"MID",team:"TOT",id:35},
+  {pick:43,round:4,manager:"Joe",player:"Amad",pos:"MID",team:"MUN",id:53},
+  {pick:44,round:4,manager:"Darragh",player:"Trossard",pos:"MID",team:"ARS",id:42},
+  {pick:45,round:4,manager:"Ben",player:"Cucurella",pos:"DEF",team:"CHE",id:82},
+  {pick:46,round:4,manager:"Jack",player:"Mitoma",pos:"MID",team:"EVE",id:50},
+  {pick:47,round:4,manager:"Conor",player:"Ndiaye",pos:"MID",team:"EVE",id:46},
+  {pick:48,round:4,manager:"Mark",player:"Virgil",pos:"DEF",team:"LIV",id:84},
+  {pick:49,round:5,manager:"Mark",player:"Tielemans",pos:"MID",team:"AVL",id:91},
+  {pick:50,round:5,manager:"Conor",player:"Delap",pos:"FWD",team:"CHE",id:51},
+  {pick:51,round:5,manager:"Jack",player:"Beto",pos:"FWD",team:"EVE",id:117},
+  {pick:52,round:5,manager:"Ben",player:"Muñoz",pos:"DEF",team:"CRY",id:120},
+  {pick:53,round:5,manager:"Darragh",player:"Martinelli",pos:"MID",team:"ARS",id:43},
+  {pick:54,round:5,manager:"Joe",player:"Sarr",pos:"MID",team:"CRY",id:57},
+  {pick:55,round:5,manager:"Daire",player:"Füllkrug",pos:"FWD",team:"WHU",id:65},
+  {pick:56,round:5,manager:"Adam",player:"Gabriel",pos:"DEF",team:"ARS",id:81},
+  {pick:57,round:5,manager:"Michael",player:"Gvardiol",pos:"DEF",team:"MCI",id:83},
+  {pick:58,round:5,manager:"Peter",player:"Andreas",pos:"MID",team:"FUL",id:58},
+  {pick:59,round:5,manager:"Ruairi",player:"Frimpong",pos:"DEF",team:"LIV",id:79},
+  {pick:60,round:5,manager:"John",player:"Saliba",pos:"DEF",team:"ARS",id:86},
+  {pick:61,round:6,manager:"John",player:"Raya",pos:"GKP",team:"ARS",id:16},
+  {pick:62,round:6,manager:"Ruairi",player:"Pedro Porro",pos:"DEF",team:"TOT",id:121},
+  {pick:63,round:6,manager:"Peter",player:"Milenković",pos:"DEF",team:"NFO",id:124},
+  {pick:64,round:6,manager:"Michael",player:"Iwobi",pos:"MID",team:"FUL",id:62},
+  {pick:65,round:6,manager:"Adam",player:"Aït-Nouri",pos:"DEF",team:"NFO",id:133},
+  {pick:66,round:6,manager:"Daire",player:"Murillo",pos:"DEF",team:"NFO",id:140},
+  {pick:67,round:6,manager:"Joe",player:"Schär",pos:"DEF",team:"NEW",id:64},
+  {pick:68,round:6,manager:"Darragh",player:"Richarlison",pos:"FWD",team:"TOT",id:64},
+  {pick:69,round:6,manager:"Ben",player:"McNeil",pos:"MID",team:"EVE",id:94},
+  {pick:70,round:6,manager:"Jack",player:"Pickford",pos:"GKP",team:"EVE",id:118},
+  {pick:71,round:6,manager:"Conor",player:"Kerkez",pos:"DEF",team:"BOU",id:85},
+  {pick:72,round:6,manager:"Mark",player:"Madueke",pos:"MID",team:"ARS",id:39},
+  {pick:73,round:7,manager:"Mark",player:"A.Becker",pos:"GKP",team:"LIV",id:119},
+  {pick:74,round:7,manager:"Conor",player:"White",pos:"DEF",team:"ARS",id:50},
+  {pick:75,round:7,manager:"Jack",player:"Tarkowski",pos:"DEF",team:"EVE",id:125},
+  {pick:76,round:7,manager:"Ben",player:"Wilson",pos:"MID",team:"FUL",id:172},
+  {pick:77,round:7,manager:"Darragh",player:"Robertson",pos:"DEF",team:"LIV",id:87},
+  {pick:78,round:7,manager:"Joe",player:"Chalobah",pos:"DEF",team:"CHE",id:247},
+  {pick:79,round:7,manager:"Daire",player:"Rodrigo",pos:"MID",team:"MCI",id:58},
+  {pick:80,round:7,manager:"Adam",player:"Damsgaard",pos:"MID",team:"BRE",id:92},
+  {pick:81,round:7,manager:"Michael",player:"J.Timber",pos:"DEF",team:"ARS",id:134},
+  {pick:82,round:7,manager:"Peter",player:"AWB",pos:"DEF",team:"WHU",id:357},
+  {pick:83,round:7,manager:"Ruairi",player:"Savinho",pos:"MID",team:"MCI",id:40},
+  {pick:84,round:7,manager:"John",player:"J.Murphy",pos:"MID",team:"NEW",id:55},
+  {pick:85,round:8,manager:"John",player:"J.Arias",pos:"MID",team:"WOL",id:208},
+  {pick:86,round:8,manager:"Ruairi",player:"Igor Jesus",pos:"FWD",team:"NFO",id:90},
+  {pick:87,round:8,manager:"Peter",player:"Enzo",pos:"MID",team:"CHE",id:52},
+  {pick:88,round:8,manager:"Michael",player:"Sánchez",pos:"GKP",team:"CHE",id:216},
+  {pick:89,round:8,manager:"Adam",player:"L.Paquetá",pos:"MID",team:"WHU",id:102},
+  {pick:90,round:8,manager:"Daire",player:"Lewis-Skelly",pos:"DEF",team:"ARS",id:123},
+  {pick:91,round:8,manager:"Joe",player:"Sels",pos:"GKP",team:"NFO",id:214},
+  {pick:92,round:8,manager:"Darragh",player:"Barry",pos:"FWD",team:"EVE",id:89},
+  {pick:93,round:8,manager:"Ben",player:"Ederson M.",pos:"GKP",team:"MCI",id:128},
+  {pick:94,round:8,manager:"Jack",player:"Lacroix",pos:"DEF",team:"CRY",id:245},
+  {pick:95,round:8,manager:"Conor",player:"Georginio",pos:"MID",team:"BHA",id:101},
+  {pick:96,round:8,manager:"Mark",player:"Collins",pos:"DEF",team:"BRE",id:234},
+  {pick:97,round:9,manager:"Mark",player:"Branthwaite",pos:"DEF",team:"EVE",id:137},
+  {pick:98,round:9,manager:"Conor",player:"Pope",pos:"GKP",team:"NEW",id:221},
+  {pick:99,round:9,manager:"Jack",player:"Malen",pos:"MID",team:"AVL",id:148},
+  {pick:100,round:9,manager:"Ben",player:"Marc Guiu",pos:"FWD",team:"SUN",id:395},
+  {pick:101,round:9,manager:"Darragh",player:"James",pos:"DEF",team:"CHE",id:126},
+  {pick:102,round:9,manager:"Joe",player:"Bruno G.",pos:"MID",team:"NEW",id:60},
+  {pick:103,round:9,manager:"Daire",player:"Szoboszlai",pos:"MID",team:"LIV",id:63},
+  {pick:104,round:9,manager:"Adam",player:"Konaté",pos:"DEF",team:"LIV",id:135},
+  {pick:105,round:9,manager:"Michael",player:"Aina",pos:"DEF",team:"NFO",id:215},
+  {pick:106,round:9,manager:"Peter",player:"Kelleher",pos:"GKP",team:"BRE",id:356},
+  {pick:107,round:9,manager:"Ruairi",player:"Vicario",pos:"GKP",team:"TOT",id:224},
+  {pick:108,round:9,manager:"John",player:"Hall",pos:"DEF",team:"NEW",id:129},
+  {pick:109,round:10,manager:"John",player:"Caicedo",pos:"MID",team:"CHE",id:122},
+  {pick:110,round:10,manager:"Ruairi",player:"Robinson",pos:"DEF",team:"FUL",id:217},
+  {pick:111,round:10,manager:"Peter",player:"Nketiah",pos:"FWD",team:"CRY",id:142},
+  {pick:112,round:10,manager:"Michael",player:"CHO",pos:"MID",team:"MCI",id:88},
+  {pick:113,round:10,manager:"Adam",player:"Leno",pos:"GKP",team:"FUL",id:231},
+  {pick:114,round:10,manager:"Daire",player:"Van de Ven",pos:"DEF",team:"TOT",id:360},
+  {pick:115,round:10,manager:"Joe",player:"Rúben",pos:"MID",team:"LIV",id:138},
+  {pick:116,round:10,manager:"Darragh",player:"Awoniyi",pos:"FWD",team:"NFO",id:147},
+  {pick:117,round:10,manager:"Ben",player:"N.Williams",pos:"DEF",team:"NFO",id:233},
+  {pick:118,round:10,manager:"Jack",player:"Matheus N.",pos:"DEF",team:"MCI",id:152},
+  {pick:119,round:10,manager:"Conor",player:"Piroe",pos:"FWD",team:"LEE",id:130},
+  {pick:120,round:10,manager:"Mark",player:"Guéhi",pos:"DEF",team:"CRY",id:359},
+  {pick:121,round:11,manager:"Mark",player:"Smith Rowe",pos:"MID",team:"FUL",id:96},
+  {pick:122,round:11,manager:"Conor",player:"Mykolenko",pos:"DEF",team:"EVE",id:220},
+  {pick:123,round:11,manager:"Jack",player:"Mitchell",pos:"DEF",team:"CRY",id:241},
+  {pick:124,round:11,manager:"Ben",player:"Konsa",pos:"DEF",team:"AVL",id:358},
+  {pick:125,round:11,manager:"Darragh",player:"Calafiori",pos:"DEF",team:"ARS",id:156},
+  {pick:126,round:11,manager:"Joe",player:"Mac Allister",pos:"MID",team:"LIV",id:59},
+  {pick:127,round:11,manager:"Daire",player:"Henderson",pos:"GKP",team:"CRY",id:226},
+  {pick:128,round:11,manager:"Adam",player:"De Cuyper",pos:"DEF",team:"BHA",id:363},
+  {pick:129,round:11,manager:"Michael",player:"Livramento",pos:"DEF",team:"NEW",id:218},
+  {pick:130,round:11,manager:"Peter",player:"Trippier",pos:"DEF",team:"NEW",id:237},
+  {pick:131,round:11,manager:"Ruairi",player:"Dorgu",pos:"DEF",team:"MUN",id:378},
+  {pick:132,round:11,manager:"John",player:"Burn",pos:"DEF",team:"NEW",id:227},
+  {pick:133,round:12,manager:"John",player:"JWP",pos:"MID",team:"WHU",id:104},
+  {pick:134,round:12,manager:"Ruairi",player:"Reijnders",pos:"MID",team:"MCI",id:127},
+  {pick:135,round:12,manager:"Peter",player:"Mazraoui",pos:"DEF",team:"MUN",id:236},
+  {pick:136,round:12,manager:"Michael",player:"Digne",pos:"DEF",team:"AVL",id:383},
+  {pick:137,round:12,manager:"Adam",player:"Tel",pos:"MID",team:"TOT",id:70},
+  {pick:138,round:12,manager:"Daire",player:"Diouf",pos:"DEF",team:"WHU",id:398},
+  {pick:139,round:12,manager:"Joe",player:"Gusto",pos:"DEF",team:"CHE",id:228},
+  {pick:140,round:12,manager:"Darragh",player:"Akanji",pos:"DEF",team:"MCI",id:159},
+  {pick:141,round:12,manager:"Ben",player:"N.Jackson",pos:"FWD",team:"CHE",id:74},
+  {pick:142,round:12,manager:"Jack",player:"Truffert",pos:"DEF",team:"BOU",id:376},
+  {pick:143,round:12,manager:"Conor",player:"O.Dango",pos:"MID",team:"BOU",id:105},
+  {pick:144,round:12,manager:"Mark",player:"Udogie",pos:"DEF",team:"TOT",id:362},
+  {pick:145,round:13,manager:"Mark",player:"Verbruggen",pos:"GKP",team:"BHA",id:365},
+  {pick:146,round:13,manager:"Conor",player:"Cash",pos:"DEF",team:"AVL",id:381},
+  {pick:147,round:13,manager:"Jack",player:"Muniz",pos:"FWD",team:"FUL",id:132},
+  {pick:148,round:13,manager:"Ben",player:"Zirkzee",pos:"FWD",team:"MUN",id:93},
+  {pick:149,round:13,manager:"Darragh",player:"Romero",pos:"DEF",team:"TOT",id:232},
+  {pick:150,round:13,manager:"Joe",player:"Højlund",pos:"FWD",team:"MUN",id:65},
+  {pick:151,round:13,manager:"Daire",player:"J.Palhinha",pos:"MID",team:"TOT",id:212},
+  {pick:152,round:13,manager:"Adam",player:"Botman",pos:"DEF",team:"NEW",id:256},
+  {pick:153,round:13,manager:"Michael",player:"Tonali",pos:"MID",team:"NEW",id:136},
+  {pick:154,round:13,manager:"Peter",player:"Tavernier",pos:"MID",team:"BOU",id:157},
+  {pick:155,round:13,manager:"Ruairi",player:"Anderson",pos:"MID",team:"NFO",id:141},
+  {pick:156,round:13,manager:"John",player:"Bradley",pos:"DEF",team:"FUL",id:242},
+  {pick:157,round:14,manager:"John",player:"Aké",pos:"MID",team:"MCI",id:161},
+  {pick:158,round:14,manager:"Ruairi",player:"Stones",pos:"DEF",team:"MCI",id:164},
+  {pick:159,round:14,manager:"Peter",player:"Khusanov",pos:"DEF",team:"MCI",id:173},
+  {pick:160,round:14,manager:"Michael",player:"Kroupi Jr.",pos:"FWD",team:"BOU",id:377},
+  {pick:161,round:14,manager:"Adam",player:"Nmecha",pos:"MID",team:"FUL",id:235},
+  {pick:162,round:14,manager:"Daire",player:"Lewis-P",pos:"DEF",team:"BRE",id:261},
+  {pick:163,round:14,manager:"Joe",player:"O'Brien",pos:"DEF",team:"EVE",id:258},
+  {pick:164,round:14,manager:"Darragh",player:"Ramsdale",pos:"GKP",team:"NEW",id:354},
+  {pick:165,round:14,manager:"Ben",player:"Andersen",pos:"DEF",team:"FUL",id:405},
+  {pick:166,round:14,manager:"Jack",player:"Barnes",pos:"FWD",team:"BOU",id:368},
+  {pick:167,round:14,manager:"Conor",player:"Hato",pos:"DEF",team:"CHE",id:353},
+  {pick:168,round:14,manager:"Mark",player:"Wilson",pos:"FWD",team:"WHU",id:115},
+  {pick:169,round:15,manager:"Mark",player:"Bamford",pos:"FWD",team:"LEE",id:223},
+  {pick:170,round:15,manager:"Conor",player:"Martinez",pos:"GKP",team:"AVL",id:259},
+  {pick:171,round:15,manager:"Jack",player:"Dúbravka",pos:"GKP",team:"BUR",id:557},
+  {pick:172,round:15,manager:"Ben",player:"José Sá",pos:"GKP",team:"WOL",id:373},
+  {pick:173,round:15,manager:"Darragh",player:"Petrovic",pos:"GKP",team:"BOU",id:367},
+  {pick:174,round:15,manager:"Joe",player:"Areola",pos:"GKP",team:"WHU",id:366},
+  {pick:175,round:15,manager:"Daire",player:"Trafford",pos:"GKP",team:"MCI",id:225},
+  {pick:176,round:15,manager:"Adam",player:"Onana",pos:"GKP",team:"MUN",id:332},
+  {pick:177,round:15,manager:"Michael",player:"Jörgensen",pos:"GKP",team:"MUN",id:332},
+  {pick:178,round:15,manager:"Peter",player:"Ortega",pos:"GKP",team:"MCI",id:249},
+  {pick:179,round:15,manager:"Ruairi",player:"Bayindir",pos:"GKP",team:"MUN",id:252},
+  {pick:180,round:15,manager:"John",player:"Meslier",pos:"GKP",team:"MCI",id:380}
+];
+
   var G = { data: null, managers: {}, managerById: {}, allFinished: [], playerNames: {} };
 
   /* ── Utilities ── */
@@ -731,6 +954,7 @@ select option { background-color: #1a1a2e; color: #fff; }
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
     document.getElementById("tab-"+name).classList.add("active");
     btn.classList.add("active");
+    if (name === "draft" && G.data) renderDraft();
   }
 
   function reset() {
@@ -858,43 +1082,94 @@ select option { background-color: #1a1a2e; color: #fff; }
   }
 
   /* ── Render: Unlucky ── */
-  function renderUnlucky() {
-    var from=parseInt(document.getElementById("ulFrom").value)||1;
-    var to=parseInt(document.getElementById("ulTo").value)||maxGW();
+  function renderLuck() {
+    var from=parseInt(document.getElementById("liFrom").value)||1;
+    var to=parseInt(document.getElementById("liTo").value)||maxGW();
     if(from>to){ alert("From GW must be ≤ To GW"); return; }
-    var matches=filterMatches(from,to);
-    if(!matches.length){ alert("No finished matches in that range."); return; }
-    var form=calcForm(matches);
-    var formRows=buildRows(form);
-    var formPos=assignPos(formRows);
-    document.getElementById("ulBadge").textContent="GW"+from+"–"+to;
+    document.getElementById("liBadge").textContent="GW"+from+"–"+to;
 
-    var ulRows=formRows.slice().sort(function(a,b){
-      if(b.gf!==a.gf) return b.gf-a.gf;
-      return b.ga-a.ga;
+    // Get all finished GWs in range
+    var allMatches = G.data.matches.filter(function(m){ return m.finished && m.event>=from && m.event<=to; });
+    if(!allMatches.length){ alert("No finished matches in that range."); return; }
+
+    var gwList = [];
+    allMatches.forEach(function(m){ if(gwList.indexOf(m.event)===-1) gwList.push(m.event); });
+    gwList.sort(function(a,b){ return a-b; });
+
+    // Per manager tallies
+    var mgrs = Object.keys(G.managers);
+    var stats = {};
+    mgrs.forEach(function(id){
+      stats[id] = { actualW:0, actualD:0, actualL:0, expW:0, expL:0, gf:0, pts:0 };
     });
 
-    var body=document.getElementById("unluckyBody");
+    gwList.forEach(function(gw){
+      var gwMatches = allMatches.filter(function(m){ return m.event===gw; });
+
+      // Collect all scores this GW (each manager plays once)
+      var scores = {};
+      gwMatches.forEach(function(m){
+        scores[m.league_entry_1.toString()] = m.league_entry_1_points;
+        scores[m.league_entry_2.toString()] = m.league_entry_2_points;
+      });
+
+      // Median of all scores this GW
+      var vals = Object.values(scores).slice().sort(function(a,b){ return a-b; });
+      var mid = Math.floor(vals.length/2);
+      var median = vals.length%2===0 ? (vals[mid-1]+vals[mid])/2 : vals[mid];
+
+      // Tally actual results and expected (vs median)
+      gwMatches.forEach(function(m){
+        var id1=m.league_entry_1.toString(), id2=m.league_entry_2.toString();
+        var p1=m.league_entry_1_points, p2=m.league_entry_2_points;
+        if(!stats[id1]) return;
+        if(!stats[id2]) return;
+        stats[id1].gf+=p1; stats[id2].gf+=p2;
+        if(p1>p2){ stats[id1].actualW++; stats[id1].pts+=3; stats[id2].actualL++; }
+        else if(p2>p1){ stats[id2].actualW++; stats[id2].pts+=3; stats[id1].actualL++; }
+        else { stats[id1].actualD++; stats[id1].pts++; stats[id2].actualD++; stats[id2].pts++; }
+      });
+
+      // Expected: did you beat the median this GW?
+      Object.keys(scores).forEach(function(id){
+        if(!stats[id]) return;
+        if(scores[id] > median) stats[id].expW++;
+        else if(scores[id] < median) stats[id].expL++;
+        // exactly median = neither (wash)
+      });
+    });
+
+    // Build rows
+    var rows = mgrs.map(function(id){
+      var m = G.managers[id];
+      var s = stats[id];
+      var luck = s.actualW - s.expW; // negative = unlucky, positive = lucky
+      return { id:id, name:m.name, team:m.team, gf:s.gf, actualW:s.actualW, actualD:s.actualD, actualL:s.actualL, expW:s.expW, luck:luck, pts:s.pts };
+    });
+
+    // Sort by expected wins desc, then actual wins
+    rows.sort(function(a,b){
+      if(b.expW!==a.expW) return b.expW-a.expW;
+      return b.actualW-a.actualW;
+    });
+
+    var body=document.getElementById("luckBody");
     body.innerHTML="";
-    var uPos=0, uDisp=0, uLast=null;
-    ulRows.forEach(function(row){
-      uPos++;
-      if(row.gf!==uLast) uDisp=uPos;
-      uLast=row.gf;
-      var delta=formPos[row.id]-uDisp;
-      var dStr=delta>0?"+"+delta:""+delta;
-      var dClass=delta>0?"delta-up":delta<0?"delta-down":"";
+    rows.forEach(function(row, i){
+      var luck = row.luck;
+      var luckStr = luck>0 ? '+'+luck : ''+luck;
+      var luckClass = luck<-1 ? 'delta-up' : luck>1 ? 'delta-down' : '';
+      var luckEmoji = luck<=-3 ? ' 😭' : luck<=-1 ? ' 😤' : luck>=3 ? ' 🍀' : luck>=1 ? ' 😏' : '';
       var tr=document.createElement("tr");
       tr.innerHTML=
-        '<td class="pos al '+posClass(uDisp)+'">'+uDisp+'</td>'+
-        '<td class="al"><div class="name">'+row.name+'</div><div class="team">'+row.team+'</div></td>'+
-        '<td>'+row.gf+'</td>'+
-        '<td>'+row.ga+'</td>'+
-        '<td class="hide-sm">'+row.w+'</td>'+
-        '<td class="hide-sm">'+row.d+'</td>'+
-        '<td class="hide-sm">'+row.l+'</td>'+
-        '<td class="pts-muted">'+row.pts+'</td>'+
-        '<td class="'+dClass+'">'+(delta===0?"—":dStr)+'</td>';
+        '<td class="pos al '+posClass(i+1)+'">'+(i+1)+'</td>'+
+        '<td class="al"><div class="name">'+row.name.split(' ')[0]+'</div><div class="team">'+row.team+'</div></td>'+
+        '<td style="font-weight:700">'+row.expW+'</td>'+
+        '<td>'+row.actualW+'</td>'+
+        '<td class="'+luckClass+'" style="font-weight:700">'+(luck===0?'—':luckStr)+luckEmoji+'</td>'+
+        '<td class="hide-sm" style="color:rgba(255,255,255,0.4)">'+row.actualD+'</td>'+
+        '<td class="hide-sm" style="color:rgba(255,255,255,0.4)">'+row.actualL+'</td>'+
+        '<td class="pts-muted">'+row.gf+'</td>';
       body.appendChild(tr);
     });
   }
@@ -922,8 +1197,8 @@ select option { background-color: #1a1a2e; color: #fff; }
       var s1=isFirst?m.league_entry_1_points:m.league_entry_2_points;
       var s2=isFirst?m.league_entry_2_points:m.league_entry_1_points;
       var result, rColor;
-      if(s1>s2){ w1++; result=mgr1.name.split(" ")[0]+" Win"; rColor="#00ff87"; }
-      else if(s2>s1){ w2++; result=mgr2.name.split(" ")[0]+" Win"; rColor="#ff2882"; }
+      if(s1>s2){ w1++; result=mgr1.name.split(" ")[0]+" Win"; rColor="#00d4ff"; }
+      else if(s2>s1){ w2++; result=mgr2.name.split(" ")[0]+" Win"; rColor="#f0407a"; }
       else { draws++; result="Draw"; rColor="#f5a623"; }
       var tr=document.createElement("tr");
       tr.innerHTML=
@@ -1083,7 +1358,7 @@ select option { background-color: #1a1a2e; color: #fff; }
       Object.keys(byGW).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
         var rows = byGW[gw];
         var acc = rows.length;
-        var summary = ['<span style="color:#00e676">'+acc+' trade'+(acc!==1?'s':'')+'</span>'];
+        var summary = ['<span style="color:#00d4ff">'+acc+' trade'+(acc!==1?'s':'')+'</span>'];
 
         html += '<div class="gw-block">';
         html += '<div class="gw-block-header" onclick="toggleGW(this)">';
@@ -1098,9 +1373,9 @@ select option { background-color: #1a1a2e; color: #fff; }
           var items = t.tradeitem_set || [];
           var isAcc = x.state==='accepted';
           var isRej = x.state==='rejected';
-          var accent = isAcc ? '#00e676' : isRej ? '#ff6b6b' : '#ffc940';
+          var accent = isAcc ? '#00d4ff' : isRej ? '#ff6b6b' : '#ffc940';
           var badgeStyle = isAcc
-            ? 'background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.25)'
+            ? 'background:rgba(0,230,118,0.12);color:#00d4ff;border:1px solid rgba(0,230,118,0.25)'
             : isRej
             ? 'background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.25)'
             : 'background:rgba(255,201,64,0.1);color:#ffc940;border:1px solid rgba(255,201,64,0.25)';
@@ -1397,10 +1672,18 @@ select option { background-color: #1a1a2e; color: #fff; }
   }
 
   function switchSubTab(btn, targetId) {
+    var container = btn.closest('.sub-tabs').nextElementSibling;
     btn.parentElement.querySelectorAll('.sub-tab').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
+    // Hide all sibling sub-tab-content divs, show the target
+    var parent = btn.closest('.sub-tabs').parentElement;
+    parent.querySelectorAll('.sub-tab-content').forEach(function(el){
+      el.style.display = el.id === targetId ? 'block' : 'none';
+    });
+    // Fallback for trades which uses named IDs
     ['tradesOverview','tradesByManager'].forEach(function(id){
-      document.getElementById(id).style.display = id===targetId ? 'block' : 'none';
+      var el = document.getElementById(id);
+      if (el) el.style.display = id===targetId ? 'block' : 'none';
     });
   }
 
@@ -1441,13 +1724,17 @@ select option { background-color: #1a1a2e; color: #fff; }
     }
 
     G.data = leagueData;
+    G.transactionData = transactionData || null;
+    G.tradeData = tradeData || null;
+
 
     // Build a universal manager lookup that indexes by EVERY numeric field on each entry
     // This handles cases where the ID field name is unknown
     G.managers = {};  // keyed by e.id (internal league entry id)
     G.managerById = {}; // keyed by any numeric field value found on the entry
     leagueData.league_entries.forEach(function(e){
-      var m = { name: e.player_first_name+" "+e.player_last_name, team: e.entry_name };
+      var capFirst = e.player_first_name.charAt(0).toUpperCase()+e.player_first_name.slice(1);
+      var m = { name: capFirst+" "+e.player_last_name, team: e.entry_name };
       G.managers[e.id] = m;
       // Index by every numeric-valued field so we catch whatever ID trades/waivers use
       Object.keys(e).forEach(function(k){
@@ -1480,8 +1767,8 @@ select option { background-color: #1a1a2e; color: #fff; }
     var defFrom = Math.max(1, mg-4);
     document.getElementById("formFrom").value = defFrom;
     document.getElementById("formTo").value = mg;
-    document.getElementById("ulFrom").value = defFrom;
-    document.getElementById("ulTo").value = mg;
+    document.getElementById("liFrom").value = defFrom;
+    document.getElementById("liTo").value = mg;
 
     // H2H dropdowns
     var sorted = Object.keys(G.managers).map(function(id){
@@ -1499,7 +1786,7 @@ select option { background-color: #1a1a2e; color: #fff; }
 
     renderStandings();
     renderForm();
-    renderUnlucky();
+    renderLuck();
     renderTrades(transactionData, tradeData);
 
 
@@ -1513,7 +1800,154 @@ select option { background-color: #1a1a2e; color: #fff; }
 
     window.scrollTo(0,0);
   } // end goInner
+
+  function pTeam(id) {
+    var tid = G.playerTeam[id];
+    return tid ? (G.teamNames[tid] || 'Tm'+tid) : '—';
+  }
+
+  function renderDraft() {
+    var el = document.getElementById('draftContent');
+    if (!el) return;
+    el.innerHTML = '';
+    var html = '';
+    var managers = ['Mark','Conor','Jack','Ben','Darragh','Joe','Daire','Adam','Michael','Peter','Ruairi','John'];
+
+    var mgrInfo = {};
+    if (G.data && G.data.league_entries) {
+      G.data.league_entries.forEach(function(e) {
+        var fn = e.player_first_name.charAt(0).toUpperCase()+e.player_first_name.slice(1);
+        mgrInfo[e.player_first_name] = { name: fn+' '+e.player_last_name, team: e.entry_name };
+        mgrInfo[fn] = { name: fn+' '+e.player_last_name, team: e.entry_name };
+      });
+    }
+
+    // Sub-tabs
+    html += '<div class="sub-tabs">';
+    html += '<button class="sub-tab active" onclick="switchSubTab(this,\'draftOrder\')">All Picks</button>';
+    html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftBoard\')">Draft Board</button>';
+    html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftSquads\')">By Manager</button>';
+    html += '</div>';
+
+    // ── ALL PICKS ────────────────────────────────────────────────────────
+    html += '<div id="draftOrder" class="sub-tab-content">';
+    html += '<div class="section-label" style="margin-bottom:14px">All 180 Picks · Draft Order</div>';
+    html += '<div class="draft-all-list">';
+    html += '<div class="draft-all-header">';
+    html += '<span class="da-pick">Pick</span><span class="da-rd">Rd</span><span class="da-player">Player</span>';
+    html += '<span class="da-pos">Pos</span><span class="da-mgr">Drafted by</span><span class="da-team">Club</span>';
+    html += '</div>';
+    DRAFT_PICKS.forEach(function(p) {
+      html += '<div class="draft-all-row">';
+      html += '<span class="da-pick">#' + p.pick + '</span>';
+      html += '<span class="da-rd">' + p.round + '</span>';
+      html += '<span class="da-player">' + p.player + '</span>';
+      html += '<span class="da-pos"><span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span></span>';
+      html += '<span class="da-mgr">' + p.manager + '</span>';
+      html += '<span class="da-team" style="color:#aaa;font-size:12px">' + p.team + '</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+
+    // ── DRAFT BOARD ──────────────────────────────────────────────────────
+    html += '<div id="draftBoard" class="sub-tab-content" style="display:none">';
+    html += '<div class="section-label" style="margin-bottom:14px">Draft Board</div>';
+    html += '<div class="draft-board-wrap"><table class="draft-board"><thead><tr><th>Rd</th>';
+    managers.forEach(function(m) { html += '<th>' + m + '</th>'; });
+    html += '</tr></thead><tbody>';
+    for (var r = 1; r <= 15; r++) {
+      html += '<tr><td class="draft-round">' + r + '</td>';
+      managers.forEach(function(m) {
+        var p = DRAFT_PICKS.find(function(x){ return x.manager === m && x.round === r; });
+        if (p) {
+          html += '<td><div class="draft-cell">';
+          html += '<span class="draft-pick-num">#' + p.pick + '</span>';
+          html += '<span class="draft-player">' + p.player + '</span>';
+          html += '<span class="draft-meta"><span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span> ' + p.team + '</span>';
+          html += '</div></td>';
+        } else { html += '<td></td>'; }
+      });
+      html += '</tr>';
+    }
+    html += '</tbody></table></div></div>';
+
+    // ── BY MANAGER ───────────────────────────────────────────────────────
+    html += '<div id="draftSquads" class="sub-tab-content" style="display:none">';
+    html += '<div class="section-label" style="margin-bottom:14px">Drafted Squads</div>';
+    managers.forEach(function(m) {
+      var picks = DRAFT_PICKS.filter(function(p){ return p.manager === m; });
+      var info = mgrInfo[m] || { name: m, team: m };
+      var uid = 'dr-' + m.toLowerCase();
+      var fwd = picks.filter(function(p){ return p.pos==='FWD'; }).length;
+      var mid = picks.filter(function(p){ return p.pos==='MID'; }).length;
+      var def = picks.filter(function(p){ return p.pos==='DEF'; }).length;
+      var gkp = picks.filter(function(p){ return p.pos==='GKP'; }).length;
+      html += '<div class="mgr-card">';
+      // Use data-uid attribute so no quote issues
+      html += '<div class="mgr-card-header draft-mgr-toggle" data-uid="' + uid + '">';
+      html += '<div class="mgr-card-info"><div class="mgr-card-name">' + info.name + '</div>';
+      html += '<div class="mgr-card-team">' + info.team + '</div></div>';
+      html += '<div class="mgr-card-stats">';
+      html += '<div class="mgr-mini-stat"><div class="v" style="color:#ff6b6b">' + fwd + '</div><div class="l">FWD</div></div>';
+      html += '<div class="mgr-mini-stat"><div class="v" style="color:#7ec8ff">' + mid + '</div><div class="l">MID</div></div>';
+      html += '<div class="mgr-mini-stat"><div class="v" style="color:#00d4ff">' + def + '</div><div class="l">DEF</div></div>';
+      html += '<div class="mgr-mini-stat"><div class="v" style="color:#ffc940">' + gkp + '</div><div class="l">GKP</div></div>';
+      html += '</div>';
+      html += '<span class="mgr-chevron" id="chv-' + uid + '">&#9660;</span>';
+      html += '</div>';
+      html += '<div class="mgr-card-body" id="' + uid + '">';
+      html += '<div class="mgr-section">';
+      ['FWD','MID','DEF','GKP'].forEach(function(pos) {
+        var group = picks.filter(function(p){ return p.pos === pos; });
+        if (!group.length) return;
+        html += '<div class="draft-pos-group">';
+        html += '<div class="draft-pos-label ' + pos.toLowerCase() + '">' + pos + '</div>';
+        html += '<div class="draft-pos-players">';
+        group.forEach(function(p) {
+          html += '<div class="draft-squad-row">';
+          html += '<span class="draft-pick-tag">#' + p.pick + '</span>';
+          html += '<span class="draft-squad-name">' + p.player + '</span>';
+          html += '<span class="draft-squad-team" style="color:#666;font-size:11px">' + p.team + '</span>';
+          html += '</div>';
+        });
+        html += '</div></div>';
+      });
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+
+    el.innerHTML = html;
+
+    // Wire up draft manager card toggles via event delegation
+    el.addEventListener('click', function(e) {
+      var hdr = e.target.closest('.draft-mgr-toggle');
+      if (!hdr) return;
+      var uid = hdr.dataset.uid;
+      var body = document.getElementById(uid);
+      var chv = document.getElementById('chv-' + uid);
+      if (!body) return;
+      var open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : 'block';
+      if (chv) chv.innerHTML = open ? '&#9660;' : '&#9650;';
+    });
+    // All collapsed by default
+    managers.forEach(function(m) {
+      var uid = 'dr-' + m.toLowerCase();
+      var body = document.getElementById(uid);
+      if (body) body.style.display = 'none';
+    });
+
+    switchSubTab(el.querySelector('.sub-tab.active'), 'draftOrder');
+  }
+
 </script>
+
+```
+<!-- DRAFT -->
+<div id="tab-draft" class="tab-content">
+  <div id="draftContent"></div>
+</div>
+```
 
 </body>
 </html>
