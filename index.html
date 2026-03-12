@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v48 -->
+<!-- v49 -->
 
 <html lang="en">
 <head>
@@ -1623,7 +1623,7 @@ var DRAFT_PICKS = [
 
     var jammiest = positives.slice().sort(function(a,b){
       if(b.luck !== a.luck) return b.luck - a.luck;  // most positive first
-      return b.gf - a.gf;                             // tiebreak: higher pts scored
+      return a.gf - b.gf;                             // tiebreak: lower pts scored (jammier story)
     })[0] || null;
 
     var cardsEl = document.getElementById('verdictCards');
