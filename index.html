@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v42 -->
+<!-- v43 -->
 
 <html lang="en">
 <head>
@@ -94,6 +94,24 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
   margin-bottom: 20px; letter-spacing: 0.5px;
 }
 .btn-ghost:active { background-color: rgba(255,255,255,0.05); }
+
+/* ── Auto-load spinner ── */
+.auto-load-hint {
+  text-align: center;
+  padding: 40px 0 20px;
+  color: rgba(255,255,255,0.35);
+  font-size: 14px;
+}
+.auto-load-hint .spinner {
+  display: inline-block;
+  width: 22px; height: 22px;
+  border: 2px solid rgba(0,212,255,0.2);
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── Top tabs ── */
 .tabs {
@@ -732,12 +750,25 @@ select option { background-color: #150d22; color: #fff; }
       <h2>Welcome back 👋</h2>
       <p>Run your <strong>FPL Form Table</strong> shortcut to copy your league data, then paste it below.</p>
     </div>
-    <div class="card">
-      <p class="hint">The shortcut fetches all the data you need and copies it to your clipboard automatically. Then long-press below and tap <strong>Paste</strong>.</p>
-      <textarea id="pasteArea" placeholder="Paste league data here…"></textarea>
-    </div>
-    <div class="error" id="errorBox"></div>
-    <button class="btn" onclick="go()">Load League</button>
+
+```
+<!-- Spinner: visible while auto-fetch is in flight -->
+<div class="auto-load-hint" id="autoLoadHint">
+  <div class="spinner"></div>
+  <div>Loading league data…</div>
+</div>
+
+<!-- Paste fallback: hidden by default, shown only if auto-load fails -->
+<div id="pasteSection" style="display:none">
+  <div class="card">
+    <p class="hint">The shortcut fetches all the data you need and copies it to your clipboard automatically. Then long-press below and tap <strong>Paste</strong>.</p>
+    <textarea id="pasteArea" placeholder="Paste league data here…"></textarea>
+  </div>
+  <div class="error" id="errorBox"></div>
+  <button class="btn" onclick="go()">Load League</button>
+</div>
+```
+
   </div>
 
   <!-- Results -->
@@ -1249,6 +1280,10 @@ var DRAFT_PICKS = [
     document.getElementById("results").style.display = "none";
     document.getElementById("landing").style.display = "block";
     document.getElementById("pasteArea").value = "";
+    var hint  = document.getElementById('autoLoadHint');
+    var paste = document.getElementById('pasteSection');
+    if (hint)  hint.style.display  = 'block';
+    if (paste) paste.style.display = 'none';
     document.getElementById("h2hResult").style.display = "none";
     // Reset tabs to defaults
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
@@ -1270,6 +1305,28 @@ var DRAFT_PICKS = [
     if (luckCanvas) { luckCanvas._tooltipBound = false; }
     clearError();
     window.scrollTo(0,0);
+    autoLoad();
+  }
+
+  /* ── Auto-load data.json ── */
+  function autoLoad() {
+    var hint  = document.getElementById('autoLoadHint');
+    var paste = document.getElementById('pasteSection');
+
+    fetch('data.json?cb=' + Date.now())
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(parsed) {
+        if (hint)  hint.style.display  = 'none';
+        goInner(parsed);
+      })
+      .catch(function() {
+        // No data.json yet — show paste UI silently
+        if (hint)  hint.style.display  = 'none';
+        if (paste) paste.style.display = 'block';
+      });
   }
 
   /* ── Form calculation ── */
@@ -2888,6 +2945,9 @@ var DRAFT_PICKS = [
       if (canvas && canvas._gwList) drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf);
     }, 120);
   });
+
+  /* ── Kick off auto-load on page start ── */
+  autoLoad();
 </script>
 
 </body>
