@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v50 -->
+<!-- v53 -->
 
 <html lang="en">
 <head>
@@ -837,6 +837,7 @@ select option { background-color: #150d22; color: #fff; }
     <button class="inner-tab" onclick="showInner('results','form',this)">Form</button>
     <button class="inner-tab" onclick="showInner('results','luck',this)">Fixture Luck</button>
     <button class="inner-tab" onclick="showInner('results','h2h',this)">Head to Head</button>
+    <button class="inner-tab" onclick="showInner('results','records',this)">Records</button>
   </div>
 
   <!-- Standings panel -->
@@ -896,7 +897,10 @@ select option { background-color: #150d22; color: #fff; }
       </table>
     </div>
 
-    <div class="section-sep"></div>
+  </div>
+
+  <!-- Records panel -->
+  <div id="inner-results-records" class="inner-panel">
 
     <div class="section-label">Streaks <span class="badge-dim">Full Season</span></div>
     <div class="table-wrap">
@@ -1054,6 +1058,40 @@ select option { background-color: #150d22; color: #fff; }
       <div id="chartEmpty" class="chart-empty" style="display:none">Load league data to see chart.</div>
     </div>
     <div id="chartTooltip" class="chart-tooltip"></div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Points Against <span class="badge-dim">Average per GW</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th>
+          <th title="Average points scored against them per gameweek">Avg PA</th>
+          <th class="hide-sm" title="Total points scored against them">Total PA</th>
+          <th class="hide-sm">P</th>
+        </tr></thead>
+        <tbody id="paBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">League Average Score <span class="badge-dim">Per Gameweek</span></div>
+    <div class="chart-container">
+      <canvas id="paBarChart"></canvas>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Points Against <span class="badge-dim">Week by Week</span></div>
+    <div class="chart-container" id="paLineChartContainer">
+      <div id="paLineToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      <div style="margin-bottom:8px">
+        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Tap name to highlight · dot to show/hide</span>
+      </div>
+      <canvas id="paLineChart"></canvas>
+    </div>
+    <div id="paLineTooltip" class="chart-tooltip"></div>
   </div>
 
   <!-- H2H panel -->
@@ -1110,11 +1148,15 @@ select option { background-color: #150d22; color: #fff; }
 <!-- TRADES -->
 <div id="tab-trades" class="tab-content">
   <div class="sub-tabs">
-    <button class="sub-tab active" onclick="switchSubTab(this,'tradesOverview')">Overview</button>
+    <button class="sub-tab active" onclick="switchSubTab(this,'tradesActivity')">Activity</button>
     <button class="sub-tab" onclick="switchSubTab(this,'tradesByManager')">By Manager</button>
+    <button class="sub-tab" onclick="switchSubTab(this,'tradesPlayers')">Players</button>
+    <button class="sub-tab" onclick="switchSubTab(this,'tradesInsights')">Insights</button>
   </div>
-  <div id="tradesOverview"></div>
+  <div id="tradesActivity"></div>
   <div id="tradesByManager" style="display:none"></div>
+  <div id="tradesPlayers" style="display:none"></div>
+  <div id="tradesInsights" style="display:none"></div>
 </div>
 
 <!-- DRAFT -->
@@ -1310,7 +1352,7 @@ var DRAFT_PICKS = [
 ];
 
   var G = { data: null, managers: {}, managerById: {}, allFinished: [], playerNames: {},
-            luckChartData: null };
+            luckChartData: null, paChartData: null };
 
   /* ── Utilities ── */
   function showError(msg) {
@@ -1357,7 +1399,7 @@ var DRAFT_PICKS = [
       var canvas = document.getElementById('gwChart');
       if (canvas && canvas._gwList) setTimeout(function(){ drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf); }, 50);
     }
-    if (panelName === 'luck') setTimeout(renderLuckChart, 50);
+    if (panelName === 'luck') setTimeout(function(){ renderLuckChart(); if(G.data) renderRecords(); }, 50);
   }
 
   function applyPreset(type, n, btn) {
@@ -1410,6 +1452,9 @@ var DRAFT_PICKS = [
     // Reset toggles so chart rebuilds on next load
     var toggles = document.getElementById('gwChartToggles');
     if (toggles) { toggles._built = false; toggles.innerHTML = ''; }
+    var paToggles = document.getElementById('paLineToggles');
+    if (paToggles) { paToggles._built = false; paToggles.innerHTML = ''; }
+    G.paChartData = null;
     var gwCanvas = document.getElementById('gwChart');
     if (gwCanvas) { gwCanvas._tooltipBound2 = false; }
     var luckCanvas = document.getElementById('luckChart');
@@ -2457,6 +2502,384 @@ var DRAFT_PICKS = [
     });
   }
 
+  /* ── Render: Records panel ── */
+  function renderRecords() {
+    var mgrIds = Object.keys(G.managers);
+
+    // Collect GW list and per-manager points-against per GW
+    var gwSet = {};
+    G.allFinished.forEach(function(m){ gwSet[m.event] = true; });
+    var gwList = Object.keys(gwSet).map(Number).sort(function(a,b){ return a-b; });
+
+    // pa[id][gw] = points scored against that manager in that GW
+    var pa = {};
+    mgrIds.forEach(function(id){ pa[id] = {}; });
+    var gwLeagueTotal = {}; // gw -> sum of all scores (for avg bar chart)
+    var gwLeagueCount = {}; // gw -> count of scores
+
+    G.allFinished.forEach(function(m){
+      var id1 = m.league_entry_1.toString();
+      var id2 = m.league_entry_2.toString();
+      var p1  = m.league_entry_1_points;
+      var p2  = m.league_entry_2_points;
+      var gw  = m.event;
+      if (pa[id1]) pa[id1][gw] = (pa[id1][gw]||0) + p2;
+      if (pa[id2]) pa[id2][gw] = (pa[id2][gw]||0) + p1;
+      gwLeagueTotal[gw] = (gwLeagueTotal[gw]||0) + p1 + p2;
+      gwLeagueCount[gw] = (gwLeagueCount[gw]||0) + 2;
+    });
+
+    // ── PA table ──
+    var paRows = mgrIds.map(function(id){
+      var vals = Object.values(pa[id]);
+      var total = vals.reduce(function(s,v){ return s+v; }, 0);
+      var avg = vals.length ? total/vals.length : 0;
+      return { id:id, avg:avg, total:total, played:vals.length };
+    }).sort(function(a,b){ return b.avg - a.avg; });
+
+    var paBody = document.getElementById('paBody');
+    paBody.innerHTML = '';
+    paRows.forEach(function(row, i){
+      var mgr = G.managers[row.id];
+      if (!mgr) return;
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="pos al '+posClass(i+1)+'">'+(i+1)+'</td>'+
+        '<td class="al"><div class="name">'+mgr.name.split(' ')[0]+'</div><div class="team">'+mgr.team+'</div></td>'+
+        '<td class="pts" style="font-size:18px">'+row.avg.toFixed(1)+'</td>'+
+        '<td class="hide-sm pts-muted">'+row.total+'</td>'+
+        '<td class="hide-sm" style="color:rgba(255,255,255,0.4)">'+row.played+'</td>';
+      paBody.appendChild(tr);
+    });
+
+    // ── Bar chart: league avg score per GW ──
+    (function(){
+      var canvas = document.getElementById('paBarChart');
+      if (!canvas || !gwList.length) return;
+      var dpr = window.devicePixelRatio || 1;
+      var W = (canvas.parentElement.clientWidth||300) - 32;
+      var H = 140;
+      canvas.style.width = W+'px'; canvas.style.height = H+'px';
+      canvas.width = W*dpr; canvas.height = H*dpr;
+      var ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0,0,W,H);
+
+      var avgs = gwList.map(function(gw){
+        return gwLeagueCount[gw] ? gwLeagueTotal[gw]/gwLeagueCount[gw] : 0;
+      });
+      var maxAvg = Math.max.apply(null, avgs);
+      var PAD = { top:12, right:8, bottom:28, left:36 };
+      var plotW = W - PAD.left - PAD.right;
+      var plotH = H - PAD.top - PAD.bottom;
+      var barW = Math.max(2, plotW/gwList.length - 2);
+
+      // Y gridlines
+      var ySteps = [50,60,70,80,90,100,110,120];
+      ctx.font = '9px -apple-system,sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.textAlign = 'right';
+      ySteps.forEach(function(v){
+        if (v > maxAvg * 1.1) return;
+        var y = PAD.top + plotH - (v/maxAvg)*plotH;
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left+plotW, y); ctx.stroke();
+        ctx.fillText(v, PAD.left-4, y+3);
+      });
+
+      // Bars
+      gwList.forEach(function(gw, i){
+        var v = avgs[i];
+        var barH = (v/maxAvg)*plotH;
+        var x = PAD.left + (plotW/gwList.length)*i + (plotW/gwList.length - barW)/2;
+        var y = PAD.top + plotH - barH;
+        ctx.fillStyle = 'rgba(0,212,255,0.55)';
+        ctx.beginPath();
+        ctx.roundRect(x, y, barW, barH, [2,2,0,0]);
+        ctx.fill();
+        // X label
+        if (gwList.length <= 20 || i % 2 === 0) {
+          ctx.fillStyle = 'rgba(255,255,255,0.25)';
+          ctx.textAlign = 'center';
+          ctx.font = '9px -apple-system,sans-serif';
+          ctx.fillText(gw, x + barW/2, H - PAD.bottom + 12);
+        }
+        // Avg label on bar if wide enough
+        if (barW >= 18) {
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.textAlign = 'center';
+          ctx.font = 'bold 9px -apple-system,sans-serif';
+          ctx.fillText(v.toFixed(0), x + barW/2, y - 3);
+        }
+      });
+
+      // Store for tooltip
+      canvas._paBarData = { gwList:gwList, avgs:avgs, PAD:PAD, plotW:plotW, plotH:plotH, maxAvg:maxAvg };
+      if (!canvas._tooltipBound) {
+        canvas._tooltipBound = true;
+        canvas.addEventListener('mousemove', function(e){
+          var d = canvas._paBarData; if (!d) return;
+          var rect = canvas.getBoundingClientRect();
+          var mx = e.clientX - rect.left;
+          var colW = d.plotW / d.gwList.length;
+          var i = Math.floor((mx - d.PAD.left) / colW);
+          var tooltip = document.getElementById('paLineTooltip');
+          if (i < 0 || i >= d.gwList.length) { tooltip.classList.remove('visible'); return; }
+          tooltip.innerHTML = '<div class="ct-gw">GW'+d.gwList[i]+'</div>'+
+            '<div class="ct-row"><span class="ct-swatch" style="background:#00d4ff"></span>'+
+            '<span class="ct-label">League avg</span><span class="ct-val">'+d.avgs[i].toFixed(1)+'</span></div>';
+          var tx = e.clientX+14, ty = e.clientY-10;
+          if (tx+160 > window.innerWidth) tx = e.clientX-170;
+          tooltip.style.left=tx+'px'; tooltip.style.top=ty+'px';
+          tooltip.classList.add('visible');
+        });
+        canvas.addEventListener('mouseleave', function(){
+          document.getElementById('paLineTooltip').classList.remove('visible');
+        });
+      }
+    })();
+
+    // Store for line chart (drawn separately so container has dimensions)
+    G.paChartData = { pa: pa, gwList: gwList, mgrIds: mgrIds };
+    renderPALineChart();
+  }
+
+  /* ── PA line chart (mirrors GW position chart) ── */
+  function renderPALineChart() {
+    var canvas = document.getElementById('paLineChart');
+    if (!canvas || !G.paChartData) return;
+    var d = G.paChartData;
+    var pa = d.pa, gwList = d.gwList, mgrIds = d.mgrIds;
+    if (!gwList.length) return;
+
+    // Build toggles once
+    var togglesEl = document.getElementById('paLineToggles');
+    if (togglesEl && !togglesEl._built) {
+      togglesEl._built = true;
+      togglesEl.innerHTML = '';
+      canvas._hidden = {};
+      canvas._highlighted = null;
+
+      // Sort managers alphabetically for toggle order, colour by index
+      var sorted = mgrIds.slice().sort(function(a,b){
+        return (G.managers[a]||{name:''}).name.localeCompare((G.managers[b]||{name:''}).name);
+      });
+      sorted.forEach(function(id, i){
+        var colour = MGR_COLOURS[i % MGR_COLOURS.length];
+        var mgr = G.managers[id];
+        var rgb = hexToRgb(colour);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'mgr-toggle-btn';
+        wrap.style.background  = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0.12)';
+        wrap.style.borderColor = colour;
+        wrap.style.color       = colour;
+        wrap.dataset.id        = id;
+        wrap.dataset.colour    = colour;
+
+        var dot = document.createElement('span');
+        dot.style.cssText = 'width:9px;height:9px;border-radius:50%;background:'+colour+
+          ';flex-shrink:0;border:2px solid '+colour+';display:inline-block;transition:background 0.15s;cursor:pointer;';
+
+        dot.addEventListener('click', function(e){
+          e.stopPropagation();
+          if (canvas._hidden[id]) { delete canvas._hidden[id]; dot.style.background=colour; wrap.style.opacity='1'; }
+          else { canvas._hidden[id]=true; dot.style.background='transparent'; wrap.style.opacity='0.28'; }
+          drawPALineChart();
+        });
+
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = mgr ? mgr.name.split(' ')[0] : id;
+
+        wrap.appendChild(dot); wrap.appendChild(nameSpan);
+
+        wrap.addEventListener('click', function(e){
+          if (e.target === dot) return;
+          var allBtns = togglesEl.querySelectorAll('.mgr-toggle-btn');
+          if (canvas._highlighted === id) {
+            canvas._highlighted = null;
+            allBtns.forEach(function(b){ b.classList.remove('dimmed'); });
+          } else {
+            canvas._highlighted = id;
+            allBtns.forEach(function(b){ b.classList.toggle('dimmed', b.dataset.id !== id); });
+          }
+          drawPALineChart();
+        });
+
+        togglesEl.appendChild(wrap);
+      });
+
+      // Attach hover tooltip
+      canvas.addEventListener('mousemove', handlePALineHover);
+      canvas.addEventListener('mouseleave', function(){
+        document.getElementById('paLineTooltip').classList.remove('visible');
+      });
+    }
+
+    canvas._paData = { pa:pa, gwList:gwList, mgrIds:mgrIds };
+    setTimeout(drawPALineChart, 60);
+  }
+
+  function drawPALineChart() {
+    var canvas = document.getElementById('paLineChart');
+    if (!canvas || !canvas._paData) return;
+    var d = canvas._paData;
+    var pa = d.pa, gwList = d.gwList, mgrIds = d.mgrIds;
+
+    var togglesEl = document.getElementById('paLineToggles');
+    var sorted = togglesEl
+      ? Array.from(togglesEl.querySelectorAll('.mgr-toggle-btn')).map(function(b){ return b.dataset.id; })
+      : mgrIds;
+
+    var dpr = window.devicePixelRatio || 1;
+    var container = document.getElementById('paLineChartContainer');
+    var W = (container ? container.clientWidth - 32 : 300);
+    if (W < 80) { setTimeout(drawPALineChart, 80); return; }
+    var H = Math.max(240, mgrIds.length * 20 + 60);
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    canvas.width=W*dpr; canvas.height=H*dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0,0,W,H);
+
+    var n = gwList.length;
+    var PAD = { top:16, right:50, bottom:30, left:36 };
+    var plotW = W - PAD.left - PAD.right;
+    var plotH = H - PAD.top - PAD.bottom;
+
+    // Find y range across all visible data
+    var allVals = [];
+    mgrIds.forEach(function(id){ gwList.forEach(function(gw){ if(pa[id]&&pa[id][gw]!=null) allVals.push(pa[id][gw]); }); });
+    var yMin = allVals.length ? Math.min.apply(null,allVals) : 0;
+    var yMax = allVals.length ? Math.max.apply(null,allVals) : 100;
+    yMin = Math.max(0, Math.floor(yMin/10)*10 - 10);
+    yMax = Math.ceil(yMax/10)*10 + 10;
+
+    function xPos(i){ return PAD.left + (n===1 ? plotW/2 : (i/(n-1))*plotW); }
+    function yPos(v){ return PAD.top + plotH - ((v-yMin)/(yMax-yMin))*plotH; }
+
+    // Grid lines
+    ctx.font = '10px -apple-system,sans-serif';
+    for (var y = yMin; y <= yMax; y += 10) {
+      var yy = yPos(y);
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PAD.left,yy); ctx.lineTo(PAD.left+plotW,yy); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.textAlign = 'right';
+      ctx.fillText(y, PAD.left-4, yy+4);
+    }
+
+    // X labels
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.textAlign = 'center';
+    gwList.forEach(function(gw,i){
+      if (n<=15 || i%2===0 || i===n-1) ctx.fillText(gw, xPos(i), H-PAD.bottom+14);
+    });
+
+    var highlighted = canvas._highlighted;
+    var hidden = canvas._hidden || {};
+
+    // Draw non-highlighted first, highlighted on top
+    var drawOrder = sorted.slice();
+    if (highlighted) {
+      drawOrder = drawOrder.filter(function(id){ return id!==highlighted; });
+      drawOrder.push(highlighted);
+    }
+
+    canvas._paPoints = {};
+
+    drawOrder.forEach(function(id){
+      if (hidden[id]) return;
+      var toggleBtn = togglesEl ? togglesEl.querySelector('[data-id="'+id+'"]') : null;
+      var colour = toggleBtn ? toggleBtn.dataset.colour : MGR_COLOURS[0];
+      var isHL = highlighted === id;
+      var isDimmed = highlighted && !isHL;
+
+      var pts = [];
+      gwList.forEach(function(gw, i){
+        var v = pa[id] ? pa[id][gw] : null;
+        if (v == null) return;
+        pts.push({ x:xPos(i), y:yPos(v), gw:gw, val:v });
+      });
+      canvas._paPoints[id] = pts;
+      if (!pts.length) return;
+
+      ctx.save();
+      ctx.globalAlpha = isDimmed ? 0.08 : 1;
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = isHL ? 3 : 1.8;
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.beginPath();
+      pts.forEach(function(p,pi){ if(pi===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+      ctx.stroke();
+
+      pts.forEach(function(p){
+        ctx.beginPath(); ctx.arc(p.x,p.y, isHL?4:2.5, 0, Math.PI*2);
+        ctx.fillStyle = colour; ctx.fill();
+        if (isHL) { ctx.strokeStyle='#0e0818'; ctx.lineWidth=1.5; ctx.stroke(); }
+      });
+
+      if (!isDimmed && pts.length) {
+        var last = pts[pts.length-1];
+        ctx.font = isHL ? 'bold 11px -apple-system,sans-serif' : '10px -apple-system,sans-serif';
+        ctx.fillStyle = colour; ctx.textAlign = 'left';
+        var mgr = G.managers[id];
+        ctx.fillText(mgr ? mgr.name.split(' ')[0] : id, last.x+6, last.y+4);
+      }
+      ctx.restore();
+    });
+  }
+
+  function handlePALineHover(e) {
+    var canvas = e.currentTarget;
+    if (!canvas._paData) return;
+    var gwList = canvas._paData.gwList;
+    var hidden = canvas._hidden || {};
+    var togglesEl = document.getElementById('paLineToggles');
+
+    var rect = canvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var PAD_L = 36, PAD_R = 50;
+    var plotW = canvas.clientWidth - PAD_L - PAD_R;
+    var n = gwList.length;
+
+    var bestI=0, bestDx=Infinity;
+    gwList.forEach(function(gw,i){
+      var x = PAD_L + (n===1 ? plotW/2 : (i/(n-1))*plotW);
+      var dx = Math.abs(x-mx);
+      if (dx<bestDx) { bestDx=dx; bestI=i; }
+    });
+
+    var tooltip = document.getElementById('paLineTooltip');
+    var colSnap = plotW/Math.max(n-1,1);
+    if (bestDx > colSnap*0.55) { tooltip.classList.remove('visible'); return; }
+
+    var gw = gwList[bestI];
+    var rows = [];
+    var sorted = togglesEl
+      ? Array.from(togglesEl.querySelectorAll('.mgr-toggle-btn')).map(function(b){ return {id:b.dataset.id, colour:b.dataset.colour}; })
+      : [];
+    sorted.forEach(function(s){
+      if (hidden[s.id]) return;
+      var val = canvas._paData.pa[s.id] ? canvas._paData.pa[s.id][gw] : null;
+      if (val != null) rows.push({ id:s.id, val:val, colour:s.colour });
+    });
+    rows.sort(function(a,b){ return b.val-a.val; });
+
+    var html = '<div class="ct-gw">GW'+gw+' · Points Against</div>';
+    rows.forEach(function(r){
+      var mgr = G.managers[r.id]||{name:'?'};
+      html += '<div class="ct-row"><span class="ct-swatch" style="background:'+r.colour+'"></span>'+
+        '<span class="ct-label">'+mgr.name.split(' ')[0]+'</span>'+
+        '<span class="ct-val">'+r.val+'</span></div>';
+    });
+
+    tooltip.innerHTML = html;
+    var tx=e.clientX+14, ty=e.clientY-10, tw=180;
+    if (tx+tw > window.innerWidth) tx=e.clientX-tw-10;
+    tooltip.style.left=tx+'px'; tooltip.style.top=ty+'px';
+    tooltip.classList.add('visible');
+  }
+
   /* ── Render: H2H ── */
   function renderH2H() {
     var id1=document.getElementById("h2hM1").value;
@@ -2599,13 +3022,16 @@ var DRAFT_PICKS = [
   }
 
   function renderTradesOverview(approvedWaivers, acceptedTrades, deniedWaivers) {
-    var el = document.getElementById("tradesOverview");
-    var html = '';
-    html += '<div class="trades-summary">';
-    html += '<div class="trades-stat"><div class="stat-val">'+acceptedTrades.length+'</div><div class="stat-lbl">Trades</div></div>';
-    html += '<div class="trades-stat"><div class="stat-val" style="color:#7ec8ff">'+approvedWaivers.length+'</div><div class="stat-lbl">Transfers</div></div>';
-    html += '<div class="trades-stat"><div class="stat-val" style="color:#ff6b6b">'+deniedWaivers.length+'</div><div class="stat-lbl">Waivers Denied</div></div>';
-    html += '</div>';
+
+    // ── ACTIVITY tab ──
+    (function() {
+      var el = document.getElementById("tradesActivity");
+      var html = '';
+      html += '<div class="trades-summary">';
+      html += '<div class="trades-stat"><div class="stat-val">'+acceptedTrades.length+'</div><div class="stat-lbl">Trades</div></div>';
+      html += '<div class="trades-stat"><div class="stat-val" style="color:#7ec8ff">'+approvedWaivers.length+'</div><div class="stat-lbl">Transfers</div></div>';
+      html += '<div class="trades-stat"><div class="stat-val" style="color:#ff6b6b">'+deniedWaivers.length+'</div><div class="stat-lbl">Waivers Denied</div></div>';
+      html += '</div>';
 
     var allTrades = [];
     acceptedTrades.forEach(function(t){ allTrades.push({t:t, state:'accepted'}); });
@@ -2697,124 +3123,136 @@ var DRAFT_PICKS = [
         });
         html += '</div></div>';
       });
-
-      var pIn={}, pOut={};
-      approvedWaivers.forEach(function(t){ pIn[t.element_in]=(pIn[t.element_in]||0)+1; pOut[t.element_out]=(pOut[t.element_out]||0)+1; });
-      var topIn  = Object.keys(pIn).map(function(id){return{id:id,c:pIn[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
-      var topOut = Object.keys(pOut).map(function(id){return{id:id,c:pOut[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
-      html += '<div class="section-label" style="margin-top:8px">Most Transferred In</div>';
-      html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times</th></tr></thead><tbody>';
-      topIn.forEach(function(p){ html+='<tr><td class="al"><span class="chip in" style="display:inline-block">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
-      html += '</tbody></table></div>';
-      html += '<div class="section-label" style="margin-top:8px">Most Transferred Out</div>';
-      html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times</th></tr></thead><tbody>';
-      topOut.forEach(function(p){ html+='<tr><td class="al"><span class="chip out" style="display:inline-block">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
-      html += '</tbody></table></div>';
     }
 
-    if (acceptedTrades.length) {
-      // Sort all trades chronologically
-      var sortedTrades = acceptedTrades.slice().sort(function(a,b){ return (a.event||0)-(b.event||0); });
-
-      // For each player, build chronological ownership chain from trade history.
-      // Each trade moves element_in to the offered_entry, element_out to received_entry.
-      // We track: for each pid, array of {gw, owner (first name)} in order.
-      var tradeCount  = {};
-      var ownerChains = {}; // pid -> [{gw, name}]
-
-      sortedTrades.forEach(function(t) {
-        var offId   = String(t.offered_entry);
-        var recId   = String(t.received_entry);
-        var offFirst = mName(t.offered_entry).split(' ')[0];
-        var recFirst = mName(t.received_entry).split(' ')[0];
-        var gw = t.event || 0;
-
-        (t.tradeitem_set||[]).forEach(function(item) {
-          // element_in goes TO offered_entry (they receive it)
-          // element_out goes TO received_entry (they receive it)
-          var pairs = [
-            { pid: String(item.element_in),  newOwner: offFirst, gw: gw },
-            { pid: String(item.element_out), newOwner: recFirst, gw: gw }
-          ];
-          pairs.forEach(function(pair) {
-            tradeCount[pair.pid] = (tradeCount[pair.pid]||0) + 1;
-            if (!ownerChains[pair.pid]) ownerChains[pair.pid] = [];
-            // Avoid consecutive duplicate names (same manager traded it back immediately)
-            var chain = ownerChains[pair.pid];
-            var last = chain.length ? chain[chain.length-1].name : null;
-            if (pair.newOwner !== last) {
-              chain.push({ gw: pair.gw, name: pair.newOwner });
-            }
-          });
-        });
-      });
-
-      var topTraded = Object.keys(tradeCount)
-        .map(function(id){ return { id:id, c:tradeCount[id], chain:ownerChains[id]||[] }; })
-        .sort(function(a,b){ return b.c-a.c; })
-        .slice(0,12);
-
-      html += '<div class="section-label" style="margin-top:8px;margin-bottom:14px">Most Traded Players</div>';
-      html += '<div class="insight-table">';
-      topTraded.forEach(function(p, i) {
-        html += '<div class="insight-row">';
-        html += '<span class="insight-rank">'+(i+1)+'</span>';
-        html += '<span class="insight-name">'+pName(p.id)+'</span>';
-        html += '<span class="insight-bar-wrap"><span class="insight-bar" style="width:'+Math.round(p.c/topTraded[0].c*100)+'%"></span></span>';
-        html += '<span class="insight-count">'+p.c+'×</span>';
-        html += '</div>';
-        // Render ownership chain as: Name → Name → Name (GW labels on hover via title)
-        if (p.chain.length) {
-          var chainHtml = p.chain.map(function(step, ci) {
-            var arrow = ci === 0 ? '' : '<span class="chain-arrow">→</span>';
-            return arrow + '<span class="chain-name" title="GW'+step.gw+'">'+step.name+'</span>';
-          }).join('');
-          html += '<div class="insight-detail chain-detail">'+chainHtml+'</div>';
-        }
-      });
-      html += '</div>';
-    }
-
-    if (acceptedTrades.length) {
-      var partners = {};
-      acceptedTrades.forEach(function(t) {
-        var a = mName(t.offered_entry);
-        var b = mName(t.received_entry);
-        var key = [a,b].sort().join('|||');
-        if (!partners[key]) partners[key] = { a:a, b:b, count:0, trades:[] };
-        partners[key].count++;
-        var players = (t.tradeitem_set||[]).map(function(i){
-          return pName(i.element_in)+' / '+pName(i.element_out);
-        });
-        partners[key].trades.push({ gw:t.event, players:players });
-      });
-      var sortedPartners = Object.values(partners).sort(function(a,b){ return b.count-a.count; });
-      html += '<div class="section-label" style="margin-top:8px;margin-bottom:14px">Trade Partnerships</div>';
-      html += '<div class="partnerships">';
-      sortedPartners.forEach(function(p) {
-        html += '<div class="partnership-card">';
-        html += '<div class="partnership-header" onclick="togglePartner(this)">';
-        html += '<div class="partnership-names">';
-        html += '<span class="partner-name">'+p.a.split(' ')[0]+' '+p.a.split(' ').slice(-1)[0]+'</span>';
-        html += '<span class="partner-vs">↔</span>';
-        html += '<span class="partner-name">'+p.b.split(' ')[0]+' '+p.b.split(' ').slice(-1)[0]+'</span>';
-        html += '</div>';
-        html += '<span class="partner-count">'+p.count+' trade'+(p.count!==1?'s':'')+'</span>';
-        html += '<span class="partner-chevron">▼</span>';
-        html += '</div>';
-        html += '<div class="partnership-body" style="display:none">';
-        p.trades.sort(function(a,b){return b.gw-a.gw;}).forEach(function(t){
-          html += '<div class="partnership-trade">';
-          html += '<span class="mgr-gw-tag">GW'+t.gw+'</span>';
-          html += '<div class="partnership-players">';
-          t.players.forEach(function(pair){ html += '<span class="partnership-pair">'+pair+'</span>'; });
-          html += '</div></div>';
-        });
-        html += '</div></div>';
-      });
-      html += '</div>';
+    if (!acceptedTrades.length && !approvedWaivers.length) {
+      html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No activity yet.</p>';
     }
     el.innerHTML = html;
+    })(); // end Activity
+
+    // ── PLAYERS tab ──
+    (function() {
+      var el = document.getElementById("tradesPlayers");
+      var html = '';
+
+      if (approvedWaivers.length) {
+        var pIn={}, pOut={};
+        approvedWaivers.forEach(function(t){ pIn[t.element_in]=(pIn[t.element_in]||0)+1; pOut[t.element_out]=(pOut[t.element_out]||0)+1; });
+        var topIn  = Object.keys(pIn).map(function(id){return{id:id,c:pIn[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
+        var topOut = Object.keys(pOut).map(function(id){return{id:id,c:pOut[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
+        html += '<div class="section-label" style="margin-bottom:8px">Most Transferred In</div>';
+        html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times</th></tr></thead><tbody>';
+        topIn.forEach(function(p){ html+='<tr><td class="al"><span class="chip in" style="display:inline-block">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
+        html += '</tbody></table></div>';
+        html += '<div class="section-sep"></div>';
+        html += '<div class="section-label" style="margin-bottom:8px">Most Transferred Out</div>';
+        html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times</th></tr></thead><tbody>';
+        topOut.forEach(function(p){ html+='<tr><td class="al"><span class="chip out" style="display:inline-block">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
+        html += '</tbody></table></div>';
+      }
+
+      if (acceptedTrades.length) {
+        var sortedTrades = acceptedTrades.slice().sort(function(a,b){ return (a.event||0)-(b.event||0); });
+        var tradeCount  = {};
+        var ownerChains = {};
+        sortedTrades.forEach(function(t) {
+          var offFirst = mName(t.offered_entry).split(' ')[0];
+          var recFirst = mName(t.received_entry).split(' ')[0];
+          var gw = t.event || 0;
+          (t.tradeitem_set||[]).forEach(function(item) {
+            var pairs = [
+              { pid: String(item.element_in),  newOwner: offFirst, gw: gw },
+              { pid: String(item.element_out), newOwner: recFirst, gw: gw }
+            ];
+            pairs.forEach(function(pair) {
+              tradeCount[pair.pid] = (tradeCount[pair.pid]||0) + 1;
+              if (!ownerChains[pair.pid]) ownerChains[pair.pid] = [];
+              var chain = ownerChains[pair.pid];
+              var last = chain.length ? chain[chain.length-1].name : null;
+              if (pair.newOwner !== last) chain.push({ gw: pair.gw, name: pair.newOwner });
+            });
+          });
+        });
+        var topTraded = Object.keys(tradeCount)
+          .map(function(id){ return { id:id, c:tradeCount[id], chain:ownerChains[id]||[] }; })
+          .sort(function(a,b){ return b.c-a.c; })
+          .slice(0,12);
+        if (approvedWaivers.length) html += '<div class="section-sep"></div>';
+        html += '<div class="section-label" style="margin-bottom:14px">Most Traded Players</div>';
+        html += '<div class="insight-table">';
+        topTraded.forEach(function(p, i) {
+          html += '<div class="insight-row">';
+          html += '<span class="insight-rank">'+(i+1)+'</span>';
+          html += '<span class="insight-name">'+pName(p.id)+'</span>';
+          html += '<span class="insight-bar-wrap"><span class="insight-bar" style="width:'+Math.round(p.c/topTraded[0].c*100)+'%"></span></span>';
+          html += '<span class="insight-count">'+p.c+'×</span>';
+          html += '</div>';
+          if (p.chain.length) {
+            var chainHtml = p.chain.map(function(step, ci) {
+              var arrow = ci === 0 ? '' : '<span class="chain-arrow">→</span>';
+              return arrow + '<span class="chain-name" title="GW'+step.gw+'">'+step.name+'</span>';
+            }).join('');
+            html += '<div class="insight-detail chain-detail">'+chainHtml+'</div>';
+          }
+        });
+        html += '</div>';
+      }
+
+      if (!acceptedTrades.length && !approvedWaivers.length) {
+        html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No player data yet.</p>';
+      }
+      el.innerHTML = html;
+    })(); // end Players
+
+    // ── INSIGHTS tab ──
+    (function() {
+      var el = document.getElementById("tradesInsights");
+      var html = '';
+
+      if (acceptedTrades.length) {
+        var partners = {};
+        acceptedTrades.forEach(function(t) {
+          var a = mName(t.offered_entry);
+          var b = mName(t.received_entry);
+          var key = [a,b].sort().join('|||');
+          if (!partners[key]) partners[key] = { a:a, b:b, count:0, trades:[] };
+          partners[key].count++;
+          var players = (t.tradeitem_set||[]).map(function(i){
+            return pName(i.element_in)+' / '+pName(i.element_out);
+          });
+          partners[key].trades.push({ gw:t.event, players:players });
+        });
+        var sortedPartners = Object.values(partners).sort(function(a,b){ return b.count-a.count; });
+        html += '<div class="section-label" style="margin-bottom:14px">Trade Partnerships</div>';
+        html += '<div class="partnerships">';
+        sortedPartners.forEach(function(p) {
+          html += '<div class="partnership-card">';
+          html += '<div class="partnership-header" onclick="togglePartner(this)">';
+          html += '<div class="partnership-names">';
+          html += '<span class="partner-name">'+p.a.split(' ')[0]+' '+p.a.split(' ').slice(-1)[0]+'</span>';
+          html += '<span class="partner-vs">↔</span>';
+          html += '<span class="partner-name">'+p.b.split(' ')[0]+' '+p.b.split(' ').slice(-1)[0]+'</span>';
+          html += '</div>';
+          html += '<span class="partner-count">'+p.count+' trade'+(p.count!==1?'s':'')+'</span>';
+          html += '<span class="partner-chevron">▼</span>';
+          html += '</div>';
+          html += '<div class="partnership-body" style="display:none">';
+          p.trades.sort(function(a,b){return b.gw-a.gw;}).forEach(function(t){
+            html += '<div class="partnership-trade">';
+            html += '<span class="mgr-gw-tag">GW'+t.gw+'</span>';
+            html += '<div class="partnership-players">';
+            t.players.forEach(function(pair){ html += '<span class="partnership-pair">'+pair+'</span>'; });
+            html += '</div></div>';
+          });
+          html += '</div></div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No trades yet.</p>';
+      }
+      el.innerHTML = html;
+    })(); // end Insights
   }
 
   function renderTradesByManager(mgrStats) {
@@ -2966,6 +3404,7 @@ var DRAFT_PICKS = [
     G.transactionData = transactionData || null;
     G.tradeData = tradeData || null;
     G.luckChartData = null;
+    G.paChartData = null;
 
     G.managers = {};
     G.managerById = {};
@@ -3021,6 +3460,7 @@ var DRAFT_PICKS = [
     renderForm();
     renderStreaks();
     renderBigGWScores();
+    renderRecords();
     renderLuck();
     renderTrades(transactionData, tradeData);
     G.draftRendered = false;
@@ -3181,6 +3621,7 @@ var DRAFT_PICKS = [
     clearTimeout(window._chartResizeTimer);
     window._chartResizeTimer = setTimeout(function() {
       if (G.luckChartData) renderLuckChart();
+      if (G.paChartData) { renderRecords(); }
       var canvas = document.getElementById('gwChart');
       if (canvas && canvas._gwList) drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf);
     }, 120);
