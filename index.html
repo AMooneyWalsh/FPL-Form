@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v49 -->
+<!-- v50 -->
 
 <html lang="en">
 <head>
@@ -921,6 +921,54 @@ select option { background-color: #150d22; color: #fff; }
           <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
         </tr></thead>
         <tbody id="bigGWBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Lowest GW Scores <span class="badge-dim">All Time</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
+        </tr></thead>
+        <tbody id="lowGWBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Biggest Winning Margins <span class="badge-dim">All Time</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Winner</th><th>Score</th><th class="al">Loser</th><th>Margin</th>
+        </tr></thead>
+        <tbody id="bigMarginBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Lowest Scoring Winners <span class="badge-dim">Scrappy Ws</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Beaten</th>
+        </tr></thead>
+        <tbody id="lowWinBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Biggest Scoring Losers <span class="badge-dim">Gut Punches</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Lost To</th>
+        </tr></thead>
+        <tbody id="bigLossBody"></tbody>
       </table>
     </div>
   </div>
@@ -2329,7 +2377,7 @@ var DRAFT_PICKS = [
     });
   }
 
-  /* ── Render: Biggest GW Scores ── */
+  /* ── Render: GW Score Records ── */
   function renderBigGWScores() {
     var allScores = [];
     G.allFinished.forEach(function(m){
@@ -2340,23 +2388,71 @@ var DRAFT_PICKS = [
       allScores.push({id:id1, gw:m.event, score:p1, result:res1, opp:id2, oppScore:p2});
       allScores.push({id:id2, gw:m.event, score:p2, result:res2, opp:id1, oppScore:p1});
     });
-    allScores.sort(function(a,b){ return b.score-a.score; });
-    var top = allScores.slice(0,15);
 
-    var body = document.getElementById('bigGWBody');
+    // ── Highest scores ──
+    var top = allScores.slice().sort(function(a,b){ return b.score-a.score; }).slice(0,10);
+    fillScoreTable('bigGWBody', top, false);
+
+    // ── Lowest scores ──
+    var low = allScores.slice().sort(function(a,b){ return a.score-b.score; }).slice(0,10);
+    fillScoreTable('lowGWBody', low, false);
+
+    // ── Biggest winning margins (match-level) ──
+    var margins = G.allFinished.map(function(m){
+      var id1=m.league_entry_1.toString(), id2=m.league_entry_2.toString();
+      var p1=m.league_entry_1_points, p2=m.league_entry_2_points;
+      if (p1 === p2) return null; // draws have no margin
+      var winnerId = p1>p2 ? id1 : id2;
+      var loserId  = p1>p2 ? id2 : id1;
+      var winScore = p1>p2 ? p1  : p2;
+      var loseScore= p1>p2 ? p2  : p1;
+      return { gw:m.event, winnerId:winnerId, loserId:loserId, winScore:winScore, loseScore:loseScore, margin:winScore-loseScore };
+    }).filter(Boolean).sort(function(a,b){ return b.margin-a.margin; }).slice(0,10);
+
+    var mBody = document.getElementById('bigMarginBody');
+    mBody.innerHTML = '';
+    margins.forEach(function(row, i){
+      var winner = G.managers[row.winnerId];
+      var loser  = G.managers[row.loserId];
+      if (!winner || !loser) return;
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="pos al '+posClass(i+1)+'">'+(i+1)+'</td>'+
+        '<td class="al"><div class="name">'+winner.name.split(' ')[0]+'</div><div class="team">GW'+row.gw+'</div></td>'+
+        '<td class="pts" style="font-size:16px">'+row.winScore+'</td>'+
+        '<td class="al"><div class="name" style="color:rgba(255,255,255,0.45)">'+loser.name.split(' ')[0]+'</div><div class="team">'+row.loseScore+' pts</div></td>'+
+        '<td style="font-weight:800;color:#00d4ff;font-size:16px">+'+row.margin+'</td>';
+      mBody.appendChild(tr);
+    });
+
+    // ── Lowest scoring winners ──
+    var lowWins = allScores.filter(function(r){ return r.result==='W'; })
+      .sort(function(a,b){ return a.score-b.score; }).slice(0,10);
+    fillScoreTable('lowWinBody', lowWins, true);
+
+    // ── Biggest scoring losers ──
+    var bigLosses = allScores.filter(function(r){ return r.result==='L'; })
+      .sort(function(a,b){ return b.score-a.score; }).slice(0,10);
+    fillScoreTable('bigLossBody', bigLosses, true);
+  }
+
+  function fillScoreTable(bodyId, rows, showOpp) {
+    var body = document.getElementById(bodyId);
     body.innerHTML = '';
-    top.forEach(function(row, i){
+    rows.forEach(function(row, i){
       var mgr = G.managers[row.id];
       var opp = G.managers[row.opp];
       if (!mgr) return;
       var resultColor = row.result==='W'?'#00d4ff':row.result==='L'?'#ff6b6b':'#f5a623';
+      var oppText = showOpp
+        ? '<td style="color:'+resultColor+';font-weight:700;font-size:13px">'+(opp?opp.name.split(' ')[0]:'?')+' ('+row.oppScore+')</td>'
+        : '<td style="color:'+resultColor+';font-weight:700;font-size:13px">'+row.result+' vs '+(opp?opp.name.split(' ')[0]:'?')+' ('+row.oppScore+')</td>';
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td class="pos al '+posClass(i+1)+'">'+(i+1)+'</td>'+
         '<td class="al"><div class="name">'+mgr.name.split(' ')[0]+'</div><div class="team">GW'+row.gw+'</div></td>'+
         '<td class="pts">'+row.score+'</td>'+
-        '<td style="color:'+resultColor+';font-weight:700;font-size:13px">'+
-          row.result+' vs '+(opp?opp.name.split(' ')[0]:'?')+' ('+row.oppScore+')</td>';
+        oppText;
       body.appendChild(tr);
     });
   }
