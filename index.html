@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v43 -->
+<!-- v47 -->
 
 <html lang="en">
 <head>
@@ -10,7 +10,6 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-```
 html { background-color: #0e0818; }
 
 body {
@@ -113,35 +112,35 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Top tabs ── */
+/* ── Top tabs (primary navigation) ── */
 .tabs {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 6px; margin-bottom: 24px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; margin-bottom: 24px;
+  border-bottom: 2px solid rgba(255,255,255,0.08);
 }
 .tab {
-  background-color: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px; color: rgba(255,255,255,0.6);
-  font-size: 12px; font-weight: 700; padding: 10px 4px;
-  cursor: pointer; white-space: nowrap; text-align: center;
-  text-transform: uppercase; letter-spacing: 0.4px;
-  -webkit-appearance: none; transition: all 0.15s;
-  line-height: 1.2;
+  background-color: transparent; border: none;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 700;
+  padding: 12px 4px; cursor: pointer; white-space: nowrap; text-align: center;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  -webkit-appearance: none; transition: color 0.15s, border-color 0.15s;
+  line-height: 1.2; min-height: 44px;
 }
-.tab.active { background-color: #00d4ff; color: #38003c; border-color: #00d4ff; }
-.tab:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); }
+.tab.active { color: #00d4ff; border-bottom-color: #00d4ff; }
+.tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
 
-/* ── Inner sub-nav (pill style) ── */
+/* ── Inner sub-nav (secondary, pill style) ── */
 .inner-tabs {
   display: flex; gap: 6px; margin-bottom: 20px;
   overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px;
 }
 .inner-tab {
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5); border-radius: 20px; padding: 7px 16px;
+  color: rgba(255,255,255,0.5); border-radius: 20px; padding: 9px 18px;
   font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
   letter-spacing: 0.2px; white-space: nowrap; flex-shrink: 0;
-  -webkit-appearance: none;
+  -webkit-appearance: none; min-height: 44px; display: flex; align-items: center;
 }
 .inner-tab.active { background: rgba(0,212,255,0.15); border-color: #00d4ff; color: #00d4ff; }
 .inner-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.4); }
@@ -170,9 +169,10 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .sub-tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sub-tab {
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.45); border-radius: 20px; padding: 8px 18px;
+  color: rgba(255,255,255,0.45); border-radius: 20px; padding: 11px 18px;
   font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
   letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0;
+  min-height: 44px; display: inline-flex; align-items: center;
 }
 .sub-tab.active { background: #00d4ff; border-color: #00d4ff; color: #0e0818; }
 .sub-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.75); }
@@ -225,7 +225,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .mgr-mini-stat .v.xfers { color: #7ec8ff; }
 .mgr-mini-stat .v.denied { color: #ff6b6b; }
 .mgr-mini-stat .l { font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.45); margin-top: 2px; }
-.mgr-chevron { color: rgba(255,255,255,0.45); font-size: 11px; margin-left: 10px; transition: transform 0.2s; }
+.mgr-chevron { color: rgba(255,255,255,0.45); font-size: 13px; margin-left: 10px; transition: transform 0.2s; padding: 8px; margin-right: -8px; display: inline-block; }
 .mgr-chevron.open { transform: rotate(180deg); }
 .mgr-card-body { display: none; border-top: 1px solid rgba(255,255,255,0.06); }
 .mgr-card-body.open { display: block; }
@@ -254,9 +254,10 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 }
 .gw-preset {
   background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.6); border-radius: 20px; padding: 6px 14px;
+  color: rgba(255,255,255,0.6); border-radius: 20px; padding: 10px 16px;
   font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
   -webkit-appearance: none; white-space: nowrap;
+  min-height: 44px; display: inline-flex; align-items: center;
 }
 .gw-preset.active { background: rgba(0,212,255,0.15); border-color: #00d4ff; color: #00d4ff; }
 .gw-preset:active { opacity: 0.7; }
@@ -269,19 +270,31 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 6px; color: #fff;
   font-size: 14px; font-weight: 700;
-  padding: 6px 8px; width: 58px;
+  padding: 10px 8px; width: 58px;
   -webkit-appearance: none; text-align: center;
+  min-height: 44px;
 }
 .gw-custom-row input:focus { outline: none; border-color: #00d4ff; }
 .gw-custom-row .btn-apply {
   background-color: rgba(0,212,255,0.15); color: #00d4ff;
   border: 1px solid #00d4ff; border-radius: 6px;
   font-size: 12px; font-weight: 800;
-  padding: 7px 14px; cursor: pointer;
+  padding: 10px 14px; cursor: pointer;
   text-transform: uppercase; letter-spacing: 0.5px;
   white-space: nowrap; -webkit-appearance: none;
+  min-height: 44px;
 }
 .gw-custom-row .btn-apply:active { opacity: 0.7; }
+
+/* ── Inline alert (replaces browser alert()) ── */
+.inline-alert {
+  background: rgba(255,40,130,0.1);
+  border: 1px solid rgba(255,40,130,0.35);
+  border-radius: 8px; color: #ff6eb0;
+  font-size: 13px; font-weight: 600;
+  padding: 10px 14px; margin-bottom: 12px;
+  display: none;
+}
 
 .table-wrap {
   background-color: #150d22;
@@ -664,7 +677,40 @@ select option { background-color: #150d22; color: #fff; }
 .streak-num { font-size: 16px; font-weight: 900; color: #00d4ff; }
 .streak-best { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); }
 
-/* ── Rolling Chart ── */
+/* ── Robbed / Jammiest callout cards ── */
+.verdict-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+}
+.verdict-card {
+  border-radius: 12px; padding: 16px; text-align: center;
+  border: 1px solid; position: relative; overflow: hidden;
+}
+.verdict-card.robbed {
+  background: rgba(255,107,107,0.07);
+  border-color: rgba(255,107,107,0.25);
+}
+.verdict-card.jammy {
+  background: rgba(0,212,255,0.06);
+  border-color: rgba(0,212,255,0.2);
+}
+.verdict-label {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 8px;
+}
+.verdict-card.robbed .verdict-label { color: rgba(255,107,107,0.8); }
+.verdict-card.jammy  .verdict-label { color: rgba(0,212,255,0.8); }
+.verdict-emoji { font-size: 22px; margin-bottom: 6px; line-height: 1; }
+.verdict-name {
+  font-size: 16px; font-weight: 900; color: #fff;
+  margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.verdict-delta {
+  font-size: 13px; font-weight: 700;
+}
+.verdict-card.robbed .verdict-delta { color: #ff6b6b; }
+.verdict-card.jammy  .verdict-delta { color: #00d4ff; }
+
+/* ── Rolling Win Tracker chart container ── */
 .chart-container {
   background: #150d22;
   border: 1px solid rgba(255,255,255,0.1);
@@ -730,7 +776,6 @@ select option { background-color: #150d22; color: #fff; }
 .ct-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .ct-label { color: rgba(255,255,255,0.55); }
 .ct-val { font-weight: 800; color: #fff; margin-left: auto; padding-left: 12px; }
-```
 
   </style>
 </head>
@@ -739,6 +784,9 @@ select option { background-color: #150d22; color: #fff; }
 <header>
   <h1>FPL Draft <span>Stats</span></h1>
   <p>Drafty In Here · League 6573</p>
+  <div id="headerReset" style="display:none;margin-top:10px">
+    <button onclick="reset()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;letter-spacing:0.3px;cursor:pointer;padding:7px 16px;border-radius:20px;min-height:36px;">↺ Load new data</button>
+  </div>
 </header>
 
 <div class="container">
@@ -751,7 +799,6 @@ select option { background-color: #150d22; color: #fff; }
       <p>Run your <strong>FPL Form Table</strong> shortcut to copy your league data, then paste it below.</p>
     </div>
 
-```
 <!-- Spinner: visible while auto-fetch is in flight -->
 <div class="auto-load-hint" id="autoLoadHint">
   <div class="spinner"></div>
@@ -767,7 +814,6 @@ select option { background-color: #150d22; color: #fff; }
   <div class="error" id="errorBox"></div>
   <button class="btn" onclick="go()">Load League</button>
 </div>
-```
 
   </div>
 
@@ -775,10 +821,8 @@ select option { background-color: #150d22; color: #fff; }
 
   <div id="results" style="display:none">
 
-```
 <div class="tabs">
   <button class="tab active" onclick="showTab('results', this)">Results</button>
-  <button class="tab" onclick="showTab('insights', this)">Insights</button>
   <button class="tab" onclick="showTab('trades', this)">Transfers</button>
   <button class="tab" onclick="showTab('draft', this)">Draft</button>
 </div>
@@ -790,11 +834,13 @@ select option { background-color: #150d22; color: #fff; }
   <div class="inner-tabs">
     <button class="inner-tab active" onclick="showInner('results','standings',this)">Standings</button>
     <button class="inner-tab" onclick="showInner('results','form',this)">Form</button>
+    <button class="inner-tab" onclick="showInner('results','luck',this)">Fixture Luck</button>
+    <button class="inner-tab" onclick="showInner('results','h2h',this)">Head to Head</button>
   </div>
 
   <!-- Standings panel -->
   <div id="inner-results-standings" class="inner-panel active">
-    <div class="section-label">Overall Standings <span class="badge-dim">Full Season</span></div>
+    <div class="section-label">Overall Standings <span class="badge-dim" id="standingsBadge">Full Season</span></div>
     <div class="table-wrap">
       <table>
         <thead><tr>
@@ -871,25 +917,15 @@ select option { background-color: #150d22; color: #fff; }
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th><th>GW</th><th>Score</th><th>Result</th>
+          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
         </tr></thead>
         <tbody id="bigGWBody"></tbody>
       </table>
     </div>
   </div>
-</div>
 
-<!-- INSIGHTS TAB: Luck + H2H -->
-<div id="tab-insights" class="tab-content">
-
-  <!-- Inner nav -->
-  <div class="inner-tabs">
-    <button class="inner-tab active" onclick="showInner('insights','luck',this)">Luck Index</button>
-    <button class="inner-tab" onclick="showInner('insights','h2h',this)">Head to Head</button>
-  </div>
-
-  <!-- Luck panel -->
-  <div id="inner-insights-luck" class="inner-panel active">
+  <!-- Fixture Luck panel -->
+  <div id="inner-results-luck" class="inner-panel">
     <div class="gw-picker">
       <div class="gw-presets">
         <button class="gw-preset" onclick="applyPreset('luck',3,this)">Last 3</button>
@@ -905,9 +941,26 @@ select option { background-color: #150d22; color: #fff; }
         <button class="btn-apply" onclick="renderLuck()">Apply</button>
       </div>
     </div>
-    <div class="section-label">Luck Index <span class="badge" id="liBadge"></span></div>
-    <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">
-      Ranked by <strong style="color:rgba(255,255,255,0.7)">Expected Wins</strong> — gameweeks where you scored above the median. <strong style="color:rgba(255,255,255,0.7)">Luck</strong> = actual minus expected wins. Negative = deserved more. 😭
+
+    <!-- Robbed / Jammiest callout cards -->
+    <div class="verdict-cards" id="verdictCards" style="display:none">
+      <div class="verdict-card robbed">
+        <div class="verdict-label">Who Got Robbed?</div>
+        <div class="verdict-emoji">😭</div>
+        <div class="verdict-name" id="robbedName">—</div>
+        <div class="verdict-delta" id="robbedDelta"></div>
+      </div>
+      <div class="verdict-card jammy">
+        <div class="verdict-label">Who's Been Jammy?</div>
+        <div class="verdict-emoji">🍀</div>
+        <div class="verdict-name" id="jammyName">—</div>
+        <div class="verdict-delta" id="jammyDelta"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Fixture Luck <span class="badge" id="liBadge"></span></div>
+    <p style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:14px;line-height:1.5;">
+      Ranked by <strong style="color:#fff">Expected Wins</strong> — gameweeks where you scored above the median. <strong style="color:#fff">Fixture Luck</strong> = actual minus expected wins. Negative = the schedule robbed you. 😭
     </p>
     <div class="table-wrap">
       <table>
@@ -915,7 +968,7 @@ select option { background-color: #150d22; color: #fff; }
           <th class="al">Pos</th><th class="al">Manager</th>
           <th title="Gameweeks scored above median">Exp W</th>
           <th title="Actual wins">Act W</th>
-          <th title="Luck delta">Luck</th>
+          <th title="Fixture luck delta — positive means jammy, negative means robbed">Luck</th>
           <th class="hide-sm" title="Draws">D</th>
           <th class="hide-sm" title="Losses">L</th>
           <th title="Total points scored">PF</th>
@@ -940,12 +993,12 @@ select option { background-color: #150d22; color: #fff; }
           Actual Wins
         </div>
         <div class="legend-item">
-          <div class="legend-line" style="background:#a090ff;border-top:2px dashed #a090ff;height:0;margin-top:1px"></div>
+          <div class="legend-line" style="background:rgba(255,255,255,0.0);border-top:2px dashed #a090ff;height:0;margin-top:1px;width:18px"></div>
           Expected Wins
         </div>
         <div class="legend-item">
-          <div class="legend-line" style="background:rgba(255,107,107,0.7)"></div>
-          Gap (Luck)
+          <div class="legend-line" id="legendGapSwatch" style="background:rgba(255,107,107,0.7)"></div>
+          <span id="legendGapLabel">Gap (unlucky)</span>
         </div>
       </div>
       <canvas id="luckChart" height="220"></canvas>
@@ -955,7 +1008,7 @@ select option { background-color: #150d22; color: #fff; }
   </div>
 
   <!-- H2H panel -->
-  <div id="inner-insights-h2h" class="inner-panel">
+  <div id="inner-results-h2h" class="inner-panel">
     <div class="section-label">Head to Head <span class="badge-dim">Full Season</span></div>
     <div class="card" style="margin-bottom:16px">
       <div class="h2h-selectors">
@@ -969,6 +1022,10 @@ select option { background-color: #150d22; color: #fff; }
         </div>
         <button class="btn-go" onclick="renderH2H()">Go</button>
       </div>
+      <div class="inline-alert" id="h2hAlert"></div>
+    </div>
+    <div id="h2hPrompt" style="text-align:center;padding:32px 0;color:rgba(255,255,255,0.3);font-size:13px;">
+      Select two managers above and tap <strong style="color:rgba(255,255,255,0.5)">Go</strong> to see their record
     </div>
     <div id="h2hResult" style="display:none">
       <div class="h2h-board">
@@ -997,14 +1054,9 @@ select option { background-color: #150d22; color: #fff; }
       </div>
     </div>
   </div>
-</div>
 
 </div>
 
-<!-- RESET LINK -->
-<div style="text-align:center;padding:24px 0 8px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px">
-  <button onclick="reset()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;padding:4px 8px;">← Load new data</button>
-</div>
 
 <!-- TRADES -->
 <div id="tab-trades" class="tab-content">
@@ -1020,7 +1072,6 @@ select option { background-color: #150d22; color: #fff; }
 <div id="tab-draft" class="tab-content">
   <div id="draftContent"></div>
 </div>
-```
 
   </div>
 </div>
@@ -1229,14 +1280,11 @@ var DRAFT_PICKS = [
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
     document.getElementById("tab-"+name).classList.add("active");
     btn.classList.add("active");
-    if (name === "draft" && G.data) renderDraft();
+    if (name === "draft" && G.data && !G.draftRendered) { renderDraft(); G.draftRendered = true; }
     if (name === "results") {
       var canvas = document.getElementById('gwChart');
       if (canvas && canvas._gwList) setTimeout(function(){ drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf); }, 50);
-    }
-    if (name === "insights") {
-      // Check which inner panel is active
-      var luckPanel = document.getElementById('inner-insights-luck');
+      var luckPanel = document.getElementById('inner-results-luck');
       if (luckPanel && luckPanel.classList.contains('active')) setTimeout(renderLuckChart, 50);
     }
   }
@@ -1270,7 +1318,7 @@ var DRAFT_PICKS = [
     } else {
       document.getElementById('liFrom').value = from;
       document.getElementById('liTo').value = to;
-      document.querySelectorAll('#inner-insights-luck .gw-preset').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('#inner-results-luck .gw-preset').forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
       renderLuck();
     }
@@ -1279,23 +1327,31 @@ var DRAFT_PICKS = [
   function reset() {
     document.getElementById("results").style.display = "none";
     document.getElementById("landing").style.display = "block";
+    var hr = document.getElementById('headerReset');
+    if (hr) hr.style.display = 'none';
     document.getElementById("pasteArea").value = "";
     var hint  = document.getElementById('autoLoadHint');
     var paste = document.getElementById('pasteSection');
     if (hint)  hint.style.display  = 'block';
     if (paste) paste.style.display = 'none';
     document.getElementById("h2hResult").style.display = "none";
+    var prompt = document.getElementById('h2hPrompt');
+    if (prompt) prompt.style.display = 'block';
+    var alertEl = document.getElementById('h2hAlert');
+    if (alertEl) alertEl.style.display = 'none';
     // Reset tabs to defaults
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
     document.querySelectorAll(".tab")[0].classList.add("active");
     document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
     document.getElementById("tab-results").classList.add("active");
     // Reset inner tabs
+    document.querySelectorAll('#tab-results .inner-panel').forEach(function(el){ el.classList.remove('active'); });
     var ri = document.getElementById("inner-results-standings");
-    var rf = document.getElementById("inner-results-form");
-    if (ri) { ri.classList.add("active"); }
-    if (rf) { rf.classList.remove("active"); }
+    if (ri) ri.classList.add("active");
     document.querySelectorAll('#tab-results .inner-tab').forEach(function(b,i){ b.classList.toggle('active',i===0); });
+    // Hide verdict cards
+    var cardsEl = document.getElementById('verdictCards');
+    if (cardsEl) cardsEl.style.display = 'none';
     // Reset toggles so chart rebuilds on next load
     var toggles = document.getElementById('gwChartToggles');
     if (toggles) { toggles._built = false; toggles.innerHTML = ''; }
@@ -1303,6 +1359,8 @@ var DRAFT_PICKS = [
     if (gwCanvas) { gwCanvas._tooltipBound2 = false; }
     var luckCanvas = document.getElementById('luckChart');
     if (luckCanvas) { luckCanvas._tooltipBound = false; }
+    G.draftRendered = false;
+    document.getElementById('draftContent').innerHTML = '';
     clearError();
     window.scrollTo(0,0);
     autoLoad();
@@ -1313,17 +1371,28 @@ var DRAFT_PICKS = [
     var hint  = document.getElementById('autoLoadHint');
     var paste = document.getElementById('pasteSection');
 
+    // Timeout after 5 s so spinner never hangs forever on slow/unresponsive networks
+    var timedOut = false;
+    var fallbackTimer = setTimeout(function() {
+      timedOut = true;
+      if (hint)  hint.style.display  = 'none';
+      if (paste) paste.style.display = 'block';
+    }, 5000);
+
     fetch('data.json?cb=' + Date.now())
       .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
       })
       .then(function(parsed) {
+        clearTimeout(fallbackTimer);
+        if (timedOut) return; // already showed paste UI
         if (hint)  hint.style.display  = 'none';
         goInner(parsed);
       })
       .catch(function() {
-        // No data.json yet — show paste UI silently
+        clearTimeout(fallbackTimer);
+        if (timedOut) return;
         if (hint)  hint.style.display  = 'none';
         if (paste) paste.style.display = 'block';
       });
@@ -1388,12 +1457,16 @@ var DRAFT_PICKS = [
   function renderStandings() {
     var body = document.getElementById("standingsBody");
     body.innerHTML = "";
+    var mg = maxGW();
+    var badge = document.getElementById('standingsBadge');
+    if (badge) badge.textContent = mg ? 'After GW' + mg : 'Full Season';
     var rows = G.data.standings.slice().sort(function(a,b){ return a.rank-b.rank; });
     rows.forEach(function(s){
       var mgr=G.managers[s.league_entry]; if(!mgr) return;
       var gd=s.points_for-s.points_against;
       var played=s.matches_won+s.matches_drawn+s.matches_lost;
       var tr=document.createElement("tr");
+      if (s.rank === 1) tr.style.background = 'rgba(255,215,0,0.04)';
       tr.innerHTML=
         '<td class="pos al '+posClass(s.rank)+'">'+s.rank+'</td>'+
         '<td class="al"><div class="name">'+mgr.name+'</div><div class="team">'+mgr.team+'</div></td>'+
@@ -1422,9 +1495,9 @@ var DRAFT_PICKS = [
       if (from===pFrom && to===pTo) { b.classList.add('active'); matchedPreset=true; }
       else b.classList.remove('active');
     });
-    if(from>to){ alert("From GW must be ≤ To GW"); return; }
+    if(from>to){ showError("From GW must be ≤ To GW"); return; }
     var matches=filterMatches(from,to);
-    if(!matches.length){ alert("No finished matches in that range."); return; }
+    if(!matches.length){ showError("No finished matches in that range."); return; }
     var form=calcForm(matches);
     var rows=buildRows(form);
     var pos=assignPos(rows);
@@ -1458,16 +1531,16 @@ var DRAFT_PICKS = [
     var from=parseInt(document.getElementById("liFrom").value)||1;
     var to=parseInt(document.getElementById("liTo").value)||maxGW();
     var mg = maxGW();
-    document.querySelectorAll('#inner-insights-luck .gw-preset').forEach(function(b){
+    document.querySelectorAll('#inner-results-luck .gw-preset').forEach(function(b){
       var n = parseInt(b.textContent); var isAll = b.textContent==='All';
       var pFrom = isAll ? 1 : Math.max(1,mg-n+1); var pTo = mg;
       if (from===pFrom && to===pTo) b.classList.add('active'); else b.classList.remove('active');
     });
-    if(from>to){ alert("From GW must be ≤ To GW"); return; }
+    if(from>to){ showError("From GW must be ≤ To GW"); return; }
     document.getElementById("liBadge").textContent="GW"+from+"–"+to;
 
     var allMatches = G.data.matches.filter(function(m){ return m.finished && m.event>=from && m.event<=to; });
-    if(!allMatches.length){ alert("No finished matches in that range."); return; }
+    if(!allMatches.length){ showError("No finished matches in that range."); return; }
 
     var gwList = [];
     allMatches.forEach(function(m){ if(gwList.indexOf(m.event)===-1) gwList.push(m.event); });
@@ -1529,6 +1602,47 @@ var DRAFT_PICKS = [
       if(b.expW!==a.expW) return b.expW-a.expW;
       return b.actualW-a.actualW;
     });
+
+    // ── Verdict cards: most robbed and jammiest ──
+    // Only consider managers with a non-zero luck delta.
+    // Tiebreaker: highest points-for (gf) — "scored the most and still got screwed" is the stronger story.
+    var negatives = rows.filter(function(r){ return r.luck < 0; });
+    var positives = rows.filter(function(r){ return r.luck > 0; });
+
+    var mostRobbed = negatives.slice().sort(function(a,b){
+      if(a.luck !== b.luck) return a.luck - b.luck;  // most negative first
+      return b.gf - a.gf;                             // tiebreak: higher pts scored
+    })[0] || null;
+
+    var jammiest = positives.slice().sort(function(a,b){
+      if(b.luck !== a.luck) return b.luck - a.luck;  // most positive first
+      return b.gf - a.gf;                             // tiebreak: higher pts scored
+    })[0] || null;
+
+    var cardsEl = document.getElementById('verdictCards');
+    if (cardsEl) {
+      var robbedCard = cardsEl.querySelector('.verdict-card.robbed');
+      var jammyCard  = cardsEl.querySelector('.verdict-card.jammy');
+
+      if (mostRobbed) {
+        document.getElementById('robbedName').textContent  = mostRobbed.name.split(' ')[0];
+        document.getElementById('robbedDelta').textContent = mostRobbed.luck + ' wins vs expectation';
+        if (robbedCard) robbedCard.style.display = '';
+      } else {
+        if (robbedCard) robbedCard.style.display = 'none';
+      }
+
+      if (jammiest) {
+        document.getElementById('jammyName').textContent  = jammiest.name.split(' ')[0];
+        document.getElementById('jammyDelta').textContent = '+' + jammiest.luck + ' wins vs expectation';
+        if (jammyCard) jammyCard.style.display = '';
+      } else {
+        if (jammyCard) jammyCard.style.display = 'none';
+      }
+
+      // Show grid only if at least one card has content
+      cardsEl.style.display = (mostRobbed || jammiest) ? 'grid' : 'none';
+    }
 
     var body=document.getElementById("luckBody");
     body.innerHTML="";
@@ -1730,6 +1844,13 @@ var DRAFT_PICKS = [
       ctx.fillText(diffStr, fx - 6, fy - 7);
     }
 
+    // Update legend gap swatch to match fill colour
+    var finalLuckForLegend = cumulActual[n-1] - cumulExp[n-1];
+    var swatchEl = document.getElementById('legendGapSwatch');
+    var labelEl  = document.getElementById('legendGapLabel');
+    if (swatchEl) swatchEl.style.background = finalLuckForLegend >= 0 ? 'rgba(0,212,255,0.5)' : 'rgba(255,107,107,0.7)';
+    if (labelEl)  labelEl.textContent = finalLuckForLegend >= 0 ? 'Gap (lucky 🍀)' : 'Gap (unlucky 😭)';
+
     // Store point data for tooltip
     canvas._chartPoints = [];
     for (var i = 0; i < n; i++) {
@@ -1783,7 +1904,7 @@ var DRAFT_PICKS = [
       '<div class="ct-gw">'+closest.gw+(resultBadge?' · '+resultBadge:'')+'</div>'+
       '<div class="ct-row"><span class="ct-swatch" style="background:#00d4ff"></span><span class="ct-label">Actual</span><span class="ct-val">'+closest.actual+'</span></div>'+
       '<div class="ct-row"><span class="ct-swatch" style="background:#a090ff"></span><span class="ct-label">Expected</span><span class="ct-val">'+closest.exp+'</span></div>'+
-      '<div class="ct-row"><span class="ct-swatch" style="background:'+luckColor+'"></span><span class="ct-label">Luck</span><span class="ct-val" style="color:'+luckColor+'">'+luckStr+'</span></div>';
+      '<div class="ct-row"><span class="ct-swatch" style="background:'+luckColor+'"></span><span class="ct-label">Fixture Luck</span><span class="ct-val" style="color:'+luckColor+'">'+luckStr+'</span></div>';
     var tx = e.clientX + 14, ty = e.clientY - 10;
     var tw = 160;
     if (tx + tw > window.innerWidth) tx = e.clientX - tw - 10;
@@ -2226,7 +2347,6 @@ var DRAFT_PICKS = [
       tr.innerHTML =
         '<td class="pos al '+posClass(i+1)+'">'+(i+1)+'</td>'+
         '<td class="al"><div class="name">'+mgr.name.split(' ')[0]+'</div><div class="team">GW'+row.gw+'</div></td>'+
-        '<td style="color:rgba(255,255,255,0.4);font-size:13px">'+row.gw+'</td>'+
         '<td class="pts">'+row.score+'</td>'+
         '<td style="color:'+resultColor+';font-weight:700;font-size:13px">'+
           row.result+' vs '+(opp?opp.name.split(' ')[0]:'?')+' ('+row.oppScore+')</td>';
@@ -2238,7 +2358,12 @@ var DRAFT_PICKS = [
   function renderH2H() {
     var id1=document.getElementById("h2hM1").value;
     var id2=document.getElementById("h2hM2").value;
-    if(id1===id2){ alert("Please select two different managers."); return; }
+    var alertEl = document.getElementById('h2hAlert');
+    if(id1===id2){
+      if(alertEl){ alertEl.textContent='Please select two different managers.'; alertEl.style.display='block'; }
+      return;
+    }
+    if(alertEl) alertEl.style.display='none';
     var mgr1=G.managers[id1], mgr2=G.managers[id2];
 
     var games=G.data.matches.filter(function(m){
@@ -2280,6 +2405,8 @@ var DRAFT_PICKS = [
     document.getElementById("h2hSub").textContent=
       games.length+" meeting"+(games.length!==1?"s":"")+" · "+draws+" draw"+(draws!==1?"s":"");
     document.getElementById("h2hResult").style.display="block";
+    var prompt = document.getElementById('h2hPrompt');
+    if (prompt) prompt.style.display = 'none';
   }
 
   /* ── Render: Trades ── */
@@ -2684,15 +2811,20 @@ var DRAFT_PICKS = [
   }
 
   function switchSubTab(btn, targetId) {
-    btn.parentElement.querySelectorAll('.sub-tab').forEach(function(b){ b.classList.remove('active'); });
+    var subTabsEl = btn.parentElement;
+    subTabsEl.querySelectorAll('.sub-tab').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
-    var parent = btn.closest('.sub-tabs').parentElement;
-    parent.querySelectorAll('.sub-tab-content').forEach(function(el){
-      el.style.display = el.id === targetId ? 'block' : 'none';
+    var parent = subTabsEl.parentElement;
+    // Collect panel IDs from the sibling buttons' onclick attributes
+    var panelIds = [];
+    subTabsEl.querySelectorAll('.sub-tab').forEach(function(b){
+      var m = b.getAttribute('onclick') && b.getAttribute('onclick').match(/switchSubTab\(this,'([^']+)'\)/);
+      if (m) panelIds.push(m[1]);
     });
-    ['tradesOverview','tradesByManager'].forEach(function(id){
-      var el = document.getElementById(id);
-      if (el) el.style.display = id===targetId ? 'block' : 'none';
+    // Show/hide each panel
+    panelIds.forEach(function(id){
+      var el = parent.querySelector('#'+id) || document.getElementById(id);
+      if (el) el.style.display = id === targetId ? 'block' : 'none';
     });
   }
 
@@ -2730,6 +2862,7 @@ var DRAFT_PICKS = [
     G.data = leagueData;
     G.transactionData = transactionData || null;
     G.tradeData = tradeData || null;
+    G.luckChartData = null;
 
     G.managers = {};
     G.managerById = {};
@@ -2762,8 +2895,7 @@ var DRAFT_PICKS = [
     G.allFinished = leagueData.matches.filter(function(m){ return m.finished; });
 
     var mg = maxGW();
-    var defFrom = Math.max(1, mg-4);
-    document.getElementById("formFrom").value = defFrom;
+    document.getElementById("formFrom").value = 1;
     document.getElementById("formTo").value = mg;
     document.getElementById("liFrom").value = 1;
     document.getElementById("liTo").value = mg;
@@ -2788,25 +2920,32 @@ var DRAFT_PICKS = [
     renderBigGWScores();
     renderLuck();
     renderTrades(transactionData, tradeData);
+    G.draftRendered = false;
 
     document.getElementById("landing").style.display="none";
     document.getElementById("results").style.display="block";
+    var hr = document.getElementById('headerReset');
+    if (hr) hr.style.display = 'block';
 
     document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
     document.getElementById("tab-results").classList.add("active");
     document.querySelectorAll(".tab")[0].classList.add("active");
 
-    // Set All preset active by default
-    var allPresets = document.querySelectorAll('.gw-preset');
-    allPresets.forEach(function(b){ if(b.textContent==='All') b.classList.add('active'); else b.classList.remove('active'); });
+    // Sync GW preset pills — both default to All
+    document.querySelectorAll('#inner-results-form .gw-preset').forEach(function(b){
+      b.classList.toggle('active', b.textContent === 'All');
+    });
+    document.querySelectorAll('#inner-results-luck .gw-preset').forEach(function(b){
+      b.classList.toggle('active', b.textContent === 'All');
+    });
 
     window.scrollTo(0,0);
   }
 
   function pTeam(id) {
-    var tid = G.playerTeam[id];
-    return tid ? (G.teamNames[tid] || 'Tm'+tid) : '—';
+    // G.playerTeam / G.teamNames not populated — placeholder for future API data
+    return '—';
   }
 
   function renderDraft() {
@@ -2891,8 +3030,7 @@ var DRAFT_PICKS = [
       html += '<div class="mgr-mini-stat"><div class="v" style="color:#00d4ff">' + def + '</div><div class="l">DEF</div></div>';
       html += '<div class="mgr-mini-stat"><div class="v" style="color:#ffc940">' + gkp + '</div><div class="l">GKP</div></div>';
       html += '</div>';
-      html += '<span class="mgr-chevron" id="chv-' + uid + '">&#9660;</span>';
-      html += '</div>';
+      html += '<span class="mgr-chevron" id="chv-' + uid + '">&#9660;</span>';      html += '</div>';
       html += '<div class="mgr-card-body" id="' + uid + '">';
       html += '<div class="mgr-section">';
       ['FWD','MID','DEF','GKP'].forEach(function(pos) {
@@ -2923,14 +3061,15 @@ var DRAFT_PICKS = [
       var body = document.getElementById(uid);
       var chv = document.getElementById('chv-' + uid);
       if (!body) return;
-      var open = body.style.display !== 'none';
-      body.style.display = open ? 'none' : 'block';
-      if (chv) chv.innerHTML = open ? '&#9660;' : '&#9650;';
+      var isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      body.style.display = isOpen ? 'none' : 'block';
+      if (chv) chv.classList.toggle('open', !isOpen);
     });
     managers.forEach(function(m) {
       var uid = 'dr-' + m.toLowerCase();
       var body = document.getElementById(uid);
-      if (body) body.style.display = 'none';
+      if (body) { body.style.display = 'none'; body.classList.remove('open'); }
     });
 
     switchSubTab(el.querySelector('.sub-tab.active'), 'draftOrder');
