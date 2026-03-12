@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v41b -->
+<!-- v42 -->
 
 <html lang="en">
 <head>
@@ -95,24 +95,49 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 }
 .btn-ghost:active { background-color: rgba(255,255,255,0.05); }
 
+/* ── Top tabs ── */
 .tabs {
-  display: flex; gap: 6px; margin-bottom: 20px;
-  overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 6px; margin-bottom: 24px;
 }
-
 .tab {
   background-color: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; color: rgba(255,255,255,0.75);
-  font-size: 13px; font-weight: 700; padding: 8px 14px;
-  cursor: pointer; white-space: nowrap;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  -webkit-appearance: none; flex-shrink: 0;
+  border-radius: 10px; color: rgba(255,255,255,0.6);
+  font-size: 12px; font-weight: 700; padding: 10px 4px;
+  cursor: pointer; white-space: nowrap; text-align: center;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  -webkit-appearance: none; transition: all 0.15s;
+  line-height: 1.2;
 }
 .tab.active { background-color: #00d4ff; color: #38003c; border-color: #00d4ff; }
+.tab:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); }
+
+/* ── Inner sub-nav (pill style) ── */
+.inner-tabs {
+  display: flex; gap: 6px; margin-bottom: 20px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+}
+.inner-tab {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5); border-radius: 20px; padding: 7px 16px;
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.2px; white-space: nowrap; flex-shrink: 0;
+  -webkit-appearance: none;
+}
+.inner-tab.active { background: rgba(0,212,255,0.15); border-color: #00d4ff; color: #00d4ff; }
+.inner-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.4); }
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
+.inner-panel { display: none; }
+.inner-panel.active { display: block; }
+
+/* ── Section separator ── */
+.section-sep {
+  height: 1px; background: rgba(255,255,255,0.07);
+  margin: 24px 0;
+}
 
 .section-label {
   font-size: 12px; font-weight: 700; text-transform: uppercase;
@@ -123,13 +148,13 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .badge { background-color: #00d4ff; color: #38003c; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 .badge-dim { background-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
 
-/* ── Sub-tabs ── */
-.sub-tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+/* ── Sub-tabs (trades/draft internal) ── */
+.sub-tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sub-tab {
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.45); border-radius: 20px; padding: 8px 18px;
   font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0;
 }
 .sub-tab.active { background: #00d4ff; border-color: #00d4ff; color: #0e0818; }
 .sub-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.75); }
@@ -202,31 +227,43 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .mgr-waiver-item:last-child { border-bottom: none; }
 .mgr-gw-tag { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.75); min-width: 28px; }
 
+/* ── GW Range Picker ── */
 .gw-picker {
-  display: flex; align-items: flex-end; gap: 10px; margin-bottom: 16px;
-  background-color: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px; padding: 12px;
+  margin-bottom: 16px;
 }
-.gw-picker label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.65); display: block; margin-bottom: 5px; }
-.gw-picker input {
-  background-color: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
+.gw-presets {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.gw-preset {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6); border-radius: 20px; padding: 6px 14px;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  -webkit-appearance: none; white-space: nowrap;
+}
+.gw-preset.active { background: rgba(0,212,255,0.15); border-color: #00d4ff; color: #00d4ff; }
+.gw-preset:active { opacity: 0.7; }
+.gw-custom-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.gw-custom-row label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); }
+.gw-custom-row input {
+  background-color: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 6px; color: #fff;
-  font-size: 16px; font-weight: 700;
-  padding: 8px 10px; width: 70px;
+  font-size: 14px; font-weight: 700;
+  padding: 6px 8px; width: 58px;
   -webkit-appearance: none; text-align: center;
 }
-.gw-picker input:focus { outline: none; border-color: #00d4ff; }
-.gw-picker .btn-apply {
-  background-color: #00d4ff; color: #38003c;
-  border: none; border-radius: 6px;
-  font-size: 13px; font-weight: 800;
-  padding: 9px 16px; cursor: pointer;
+.gw-custom-row input:focus { outline: none; border-color: #00d4ff; }
+.gw-custom-row .btn-apply {
+  background-color: rgba(0,212,255,0.15); color: #00d4ff;
+  border: 1px solid #00d4ff; border-radius: 6px;
+  font-size: 12px; font-weight: 800;
+  padding: 7px 14px; cursor: pointer;
   text-transform: uppercase; letter-spacing: 0.5px;
-  white-space: nowrap; -webkit-appearance: none; flex-shrink: 0;
+  white-space: nowrap; -webkit-appearance: none;
 }
-.gw-picker .btn-apply:active { background-color: #00aacc; }
+.gw-custom-row .btn-apply:active { opacity: 0.7; }
 
 .table-wrap {
   background-color: #150d22;
@@ -574,6 +611,107 @@ select option { background-color: #150d22; color: #fff; }
 .owner-changed { color: #ffc940; font-weight: 800; }
 .owner-same { color: rgba(0,230,118,0.4); font-size: 12px; }
 .draft-all-row.player-moved { background: rgba(255,201,64,0.04); }
+
+/* ── Ownership chain ── */
+.chain-detail {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 2px; padding: 4px 0 8px 28px;
+}
+.chain-name {
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.07); border-radius: 4px;
+  padding: 2px 6px; white-space: nowrap;
+}
+.chain-arrow {
+  font-size: 11px; color: rgba(0,212,255,0.5); padding: 0 1px;
+}
+
+/* ── GW Chart manager toggles ── */
+.mgr-toggle-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px 5px 8px; border-radius: 20px; cursor: pointer;
+  font-size: 12px; font-weight: 700; border: 1px solid transparent;
+  transition: opacity 0.15s; user-select: none; -webkit-user-select: none;
+}
+.mgr-toggle-btn.dimmed { opacity: 0.25; }
+
+/* streak current badge */
+.streak-badge {
+  display: inline-block; padding: 3px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.3px;
+}
+.streak-badge.W { background: rgba(0,168,120,0.15); color: #00d4ff; border: 1px solid rgba(0,168,120,0.3); }
+.streak-badge.D { background: rgba(245,166,35,0.12); color: #f5a623; border: 1px solid rgba(245,166,35,0.25); }
+.streak-badge.L { background: rgba(232,25,60,0.12); color: #ff6b6b; border: 1px solid rgba(232,25,60,0.25); }
+.streak-num { font-size: 16px; font-weight: 900; color: #00d4ff; }
+.streak-best { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); }
+
+/* ── Rolling Chart ── */
+.chart-container {
+  background: #150d22;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px 16px 12px;
+  margin-bottom: 20px;
+}
+.chart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
+}
+.chart-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: rgba(255,255,255,0.65);
+}
+.chart-mgr-select {
+  display: flex; align-items: center; gap: 8px;
+}
+.chart-mgr-select label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.4px; color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+.chart-mgr-select select {
+  width: auto; min-width: 140px;
+  padding: 7px 28px 7px 10px; font-size: 13px; font-weight: 700;
+}
+.chart-legend {
+  display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.55);
+}
+.legend-line {
+  width: 18px; height: 3px; border-radius: 2px; flex-shrink: 0;
+}
+.legend-dot-marker {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+#luckChart { width: 100%; display: block; }
+.chart-empty {
+  text-align: center; color: rgba(255,255,255,0.3);
+  font-size: 13px; padding: 40px 0;
+}
+.chart-tooltip {
+  position: fixed;
+  background: #1a0f2e;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+  z-index: 100;
+  white-space: nowrap;
+}
+.chart-tooltip.visible { opacity: 1; }
+.ct-gw { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
+.ct-row { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+.ct-row:last-child { margin-bottom: 0; }
+.ct-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ct-label { color: rgba(255,255,255,0.55); }
+.ct-val { font-weight: 800; color: #fff; margin-left: auto; padding-left: 12px; }
 ```
 
   </style>
@@ -607,134 +745,234 @@ select option { background-color: #150d22; color: #fff; }
   <div id="results" style="display:none">
 
 ```
-<button class="btn btn-ghost" onclick="reset()">&#8592; Paste New Data</button>
-
 <div class="tabs">
-  <button class="tab active" onclick="showTab('standings', this)">Standings</button>
-  <button class="tab" onclick="showTab('form', this)">Form</button>
-  <button class="tab" onclick="showTab('luck', this)">Luck Index</button>
-  <button class="tab" onclick="showTab('h2h', this)">Head to Head</button>
-  <button class="tab" onclick="showTab('trades', this)">Transactions</button>
-<button class="tab" onclick="showTab('draft', this)">Draft</button>
+  <button class="tab active" onclick="showTab('results', this)">Results</button>
+  <button class="tab" onclick="showTab('insights', this)">Insights</button>
+  <button class="tab" onclick="showTab('trades', this)">Transfers</button>
+  <button class="tab" onclick="showTab('draft', this)">Draft</button>
 </div>
 
-<!-- STANDINGS -->
-<div id="tab-standings" class="tab-content active">
-  <div class="section-label">Overall Standings <span class="badge-dim">Full Season</span></div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th class="al">Pos</th><th class="al">Manager</th>
-        <th class="hide-sm">P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
-        <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th class="hide-sm">GD</th><th>Pts</th>
-      </tr></thead>
-      <tbody id="standingsBody"></tbody>
-    </table>
-  </div>
-</div>
+<!-- RESULTS TAB: Standings + Form -->
+<div id="tab-results" class="tab-content active">
 
-<!-- FORM -->
-<div id="tab-form" class="tab-content">
-  <div class="gw-picker">
-    <div>
-      <label for="formFrom">From GW</label>
-      <input type="number" id="formFrom" placeholder="1" min="1" max="38">
-    </div>
-    <div>
-      <label for="formTo">To GW</label>
-      <input type="number" id="formTo" placeholder="38" min="1" max="38">
-    </div>
-    <button class="btn-apply" onclick="renderForm()">Apply</button>
+  <!-- Inner nav -->
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInner('results','standings',this)">Standings</button>
+    <button class="inner-tab" onclick="showInner('results','form',this)">Form</button>
   </div>
-  <div class="section-label">Form Table <span class="badge" id="formBadge"></span></div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th class="al">Pos</th><th class="al">Manager</th>
-        <th class="hide-sm">P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
-        <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th class="hide-sm">GD</th>
-        <th>Pts</th><th>Form</th>
-      </tr></thead>
-      <tbody id="formBody"></tbody>
-    </table>
-  </div>
-</div>
 
-<!-- UNLUCKY -->
-<div id="tab-luck" class="tab-content">
-  <div class="gw-picker">
-    <div>
-      <label for="liFrom">From GW</label>
-      <input type="number" id="liFrom" placeholder="1" min="1" max="38">
-    </div>
-    <div>
-      <label for="liTo">To GW</label>
-      <input type="number" id="liTo" placeholder="38" min="1" max="38">
-    </div>
-    <button class="btn-apply" onclick="renderLuck()">Apply</button>
-  </div>
-  <div class="section-label">Luck Index <span class="badge" id="liBadge"></span></div>
-  <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">
-    Ranked by <strong style="color:rgba(255,255,255,0.7)">Expected Wins</strong> — gameweeks where you scored above the median score across all managers. <strong style="color:rgba(255,255,255,0.7)">Luck</strong> = actual wins minus expected wins. Negative means you deserved more. 😭
-  </p>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th class="al">Pos</th><th class="al">Manager</th>
-        <th title="Gameweeks scored above median">Exp W</th>
-        <th title="Actual wins">Act W</th>
-        <th title="Luck delta (actual minus expected wins)">Luck</th>
-        <th class="hide-sm" title="Draws">D</th>
-        <th class="hide-sm" title="Losses">L</th>
-        <th title="Total points scored">PF</th>
-      </tr></thead>
-      <tbody id="luckBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- H2H -->
-<div id="tab-h2h" class="tab-content">
-  <div class="section-label">Head to Head <span class="badge-dim">Full Season</span></div>
-  <div class="card" style="margin-bottom:16px">
-    <div class="h2h-selectors">
-      <div class="sel-group">
-        <label>Manager 1</label>
-        <select id="h2hM1"></select>
-      </div>
-      <div class="sel-group">
-        <label>Manager 2</label>
-        <select id="h2hM2"></select>
-      </div>
-      <button class="btn-go" onclick="renderH2H()">Go</button>
-    </div>
-  </div>
-  <div id="h2hResult" style="display:none">
-    <div class="h2h-board">
-      <div class="h2h-names">
-        <div class="h2h-mgr" id="h2hN1"></div>
-        <div class="h2h-vs">vs</div>
-        <div class="h2h-mgr" id="h2hN2"></div>
-      </div>
-      <div class="h2h-scores">
-        <div class="h2h-score" id="h2hS1"></div>
-        <div class="h2h-dash">—</div>
-        <div class="h2h-score" id="h2hS2"></div>
-      </div>
-      <div class="h2h-sub" id="h2hSub"></div>
-    </div>
+  <!-- Standings panel -->
+  <div id="inner-results-standings" class="inner-panel active">
+    <div class="section-label">Overall Standings <span class="badge-dim">Full Season</span></div>
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>GW</th>
-          <th id="h2hC1"></th>
-          <th id="h2hC2"></th>
-          <th>Result</th>
+          <th class="al">Pos</th><th class="al">Manager</th>
+          <th class="hide-sm">P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
+          <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th class="hide-sm">GD</th><th>Pts</th>
         </tr></thead>
-        <tbody id="h2hBody"></tbody>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">League Position <span class="badge-dim">Week by Week</span></div>
+    <div class="chart-container" id="gwChartContainer">
+      <div id="gwChartToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      <div style="margin-bottom:8px">
+        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Tap name to highlight · dot to show/hide</span>
+      </div>
+      <canvas id="gwChart"></canvas>
+    </div>
+    <div id="gwChartTooltip" class="chart-tooltip"></div>
+  </div>
+
+  <!-- Form panel -->
+  <div id="inner-results-form" class="inner-panel">
+    <div class="gw-picker">
+      <div class="gw-presets">
+        <button class="gw-preset" onclick="applyPreset('form',3,this)">Last 3</button>
+        <button class="gw-preset" onclick="applyPreset('form',5,this)">Last 5</button>
+        <button class="gw-preset" onclick="applyPreset('form',10,this)">Last 10</button>
+        <button class="gw-preset active" onclick="applyPreset('form',0,this)">All</button>
+      </div>
+      <div class="gw-custom-row">
+        <label>GW</label>
+        <input type="number" id="formFrom" placeholder="1" min="1" max="38">
+        <label>–</label>
+        <input type="number" id="formTo" placeholder="38" min="1" max="38">
+        <button class="btn-apply" onclick="renderForm()">Apply</button>
+      </div>
+    </div>
+    <div class="section-label">Form Table <span class="badge" id="formBadge"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th>
+          <th class="hide-sm">P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th>
+          <th class="hide-sm">GF</th><th class="hide-sm">GA</th><th class="hide-sm">GD</th>
+          <th>Pts</th><th>Form</th>
+        </tr></thead>
+        <tbody id="formBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Streaks <span class="badge-dim">Full Season</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Manager</th>
+          <th title="Current streak">Now</th>
+          <th title="Longest winning streak">W🔥</th>
+          <th title="Longest unbeaten streak">Unb.</th>
+          <th title="Longest losing streak">L💀</th>
+        </tr></thead>
+        <tbody id="streaksBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Biggest GW Scores <span class="badge-dim">All Time</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th><th>GW</th><th>Score</th><th>Result</th>
+        </tr></thead>
+        <tbody id="bigGWBody"></tbody>
       </table>
     </div>
   </div>
+</div>
+
+<!-- INSIGHTS TAB: Luck + H2H -->
+<div id="tab-insights" class="tab-content">
+
+  <!-- Inner nav -->
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInner('insights','luck',this)">Luck Index</button>
+    <button class="inner-tab" onclick="showInner('insights','h2h',this)">Head to Head</button>
+  </div>
+
+  <!-- Luck panel -->
+  <div id="inner-insights-luck" class="inner-panel active">
+    <div class="gw-picker">
+      <div class="gw-presets">
+        <button class="gw-preset" onclick="applyPreset('luck',3,this)">Last 3</button>
+        <button class="gw-preset" onclick="applyPreset('luck',5,this)">Last 5</button>
+        <button class="gw-preset" onclick="applyPreset('luck',10,this)">Last 10</button>
+        <button class="gw-preset active" onclick="applyPreset('luck',0,this)">All</button>
+      </div>
+      <div class="gw-custom-row">
+        <label>GW</label>
+        <input type="number" id="liFrom" placeholder="1" min="1" max="38">
+        <label>–</label>
+        <input type="number" id="liTo" placeholder="38" min="1" max="38">
+        <button class="btn-apply" onclick="renderLuck()">Apply</button>
+      </div>
+    </div>
+    <div class="section-label">Luck Index <span class="badge" id="liBadge"></span></div>
+    <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">
+      Ranked by <strong style="color:rgba(255,255,255,0.7)">Expected Wins</strong> — gameweeks where you scored above the median. <strong style="color:rgba(255,255,255,0.7)">Luck</strong> = actual minus expected wins. Negative = deserved more. 😭
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="al">Pos</th><th class="al">Manager</th>
+          <th title="Gameweeks scored above median">Exp W</th>
+          <th title="Actual wins">Act W</th>
+          <th title="Luck delta">Luck</th>
+          <th class="hide-sm" title="Draws">D</th>
+          <th class="hide-sm" title="Losses">L</th>
+          <th title="Total points scored">PF</th>
+        </tr></thead>
+        <tbody id="luckBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <div class="section-label">Rolling Win Tracker <span class="badge-dim">Cumulative by GW</span></div>
+    <div class="chart-container">
+      <div class="chart-header">
+        <div class="chart-mgr-select">
+          <label for="chartMgrSelect">Manager</label>
+          <select id="chartMgrSelect" onchange="renderLuckChart()"></select>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-line" style="background:#00d4ff"></div>
+          Actual Wins
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:#a090ff;border-top:2px dashed #a090ff;height:0;margin-top:1px"></div>
+          Expected Wins
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:rgba(255,107,107,0.7)"></div>
+          Gap (Luck)
+        </div>
+      </div>
+      <canvas id="luckChart" height="220"></canvas>
+      <div id="chartEmpty" class="chart-empty" style="display:none">Load league data to see chart.</div>
+    </div>
+    <div id="chartTooltip" class="chart-tooltip"></div>
+  </div>
+
+  <!-- H2H panel -->
+  <div id="inner-insights-h2h" class="inner-panel">
+    <div class="section-label">Head to Head <span class="badge-dim">Full Season</span></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="h2h-selectors">
+        <div class="sel-group">
+          <label>Manager 1</label>
+          <select id="h2hM1"></select>
+        </div>
+        <div class="sel-group">
+          <label>Manager 2</label>
+          <select id="h2hM2"></select>
+        </div>
+        <button class="btn-go" onclick="renderH2H()">Go</button>
+      </div>
+    </div>
+    <div id="h2hResult" style="display:none">
+      <div class="h2h-board">
+        <div class="h2h-names">
+          <div class="h2h-mgr" id="h2hN1"></div>
+          <div class="h2h-vs">vs</div>
+          <div class="h2h-mgr" id="h2hN2"></div>
+        </div>
+        <div class="h2h-scores">
+          <div class="h2h-score" id="h2hS1"></div>
+          <div class="h2h-dash">—</div>
+          <div class="h2h-score" id="h2hS2"></div>
+        </div>
+        <div class="h2h-sub" id="h2hSub"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>GW</th>
+            <th id="h2hC1"></th>
+            <th id="h2hC2"></th>
+            <th>Result</th>
+          </tr></thead>
+          <tbody id="h2hBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- RESET LINK -->
+<div style="text-align:center;padding:24px 0 8px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px">
+  <button onclick="reset()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;padding:4px 8px;">← Load new data</button>
 </div>
 
 <!-- TRADES -->
@@ -746,6 +984,11 @@ select option { background-color: #150d22; color: #fff; }
   <div id="tradesOverview"></div>
   <div id="tradesByManager" style="display:none"></div>
 </div>
+
+<!-- DRAFT -->
+<div id="tab-draft" class="tab-content">
+  <div id="draftContent"></div>
+</div>
 ```
 
   </div>
@@ -754,14 +997,14 @@ select option { background-color: #150d22; color: #fff; }
 <script>
 var DRAFT_PICKS = [
   {pick:1,round:1,manager:"Mark",player:"Haaland",pos:"FWD",team:"MCI",id:3},
-  {pick:2,round:1,manager:"Conor",player:"M.Salah",pos:"MID",team:"LIV",id:1},
+  {pick:2,round:1,manager:"Conor",player:"Salah",pos:"MID",team:"LIV",id:1},
   {pick:3,round:1,manager:"Jack",player:"Palmer",pos:"MID",team:"CHE",id:3},
   {pick:4,round:1,manager:"Ben",player:"Saka",pos:"MID",team:"ARS",id:5},
-  {pick:5,round:1,manager:"Darragh",player:"B.Fernandes",pos:"MID",team:"MUN",id:7},
+  {pick:5,round:1,manager:"Darragh",player:"Fernandes",pos:"MID",team:"MUN",id:7},
   {pick:6,round:1,manager:"Joe",player:"Isak",pos:"FWD",team:"NEW",id:4},
   {pick:7,round:1,manager:"Daire",player:"Gyökeres",pos:"FWD",team:"ARS",id:8},
   {pick:8,round:1,manager:"Adam",player:"Watkins",pos:"FWD",team:"AVL",id:6},
-  {pick:9,round:1,manager:"Michael",player:"Wirtz",pos:"FWD",team:"AVL",id:6},
+  {pick:9,round:1,manager:"Michael",player:"Wirtz",pos:"MID",team:"LIV",id:6},
   {pick:10,round:1,manager:"Peter",player:"Marmoush",pos:"MID",team:"MCI",id:10},
   {pick:11,round:1,manager:"Ruairi",player:"João Pedro",pos:"FWD",team:"CHE",id:19},
   {pick:12,round:1,manager:"John",player:"Bowen",pos:"FWD",team:"WHU",id:13},
@@ -775,7 +1018,7 @@ var DRAFT_PICKS = [
   {pick:20,round:2,manager:"Darragh",player:"Cherki",pos:"MID",team:"MCI",id:45},
   {pick:21,round:2,manager:"Ben",player:"Gakpo",pos:"MID",team:"LIV",id:28},
   {pick:22,round:2,manager:"Jack",player:"Gordon",pos:"MID",team:"NEW",id:26},
-  {pick:23,round:2,manager:"Conor",player:"S.Larsen",pos:"FWD",team:"WOL",id:49},
+  {pick:23,round:2,manager:"Conor",player:"Larsen",pos:"FWD",team:"WOL",id:49},
   {pick:24,round:2,manager:"Mark",player:"Elanga",pos:"MID",team:"NEW",id:31},
   {pick:25,round:3,manager:"Mark",player:"Cunha",pos:"MID",team:"MUN",id:15},
   {pick:26,round:3,manager:"Conor",player:"Rogers",pos:"MID",team:"AVL",id:30},
@@ -785,7 +1028,7 @@ var DRAFT_PICKS = [
   {pick:30,round:3,manager:"Joe",player:"Wissa",pos:"FWD",team:"BRE",id:22},
   {pick:31,round:3,manager:"Daire",player:"Foden",pos:"MID",team:"MCI",id:16},
   {pick:32,round:3,manager:"Adam",player:"Minteh",pos:"MID",team:"BHA",id:67},
-  {pick:33,round:3,manager:"Michael",player:"Kluivert",pos:"FWD",team:"BOU",id:34},
+  {pick:33,round:3,manager:"Michael",player:"Kluivert",pos:"MID",team:"BOU",id:34},
   {pick:34,round:3,manager:"Peter",player:"Raúl",pos:"FWD",team:"FUL",id:56},
   {pick:35,round:3,manager:"Ruairi",player:"Welbeck",pos:"FWD",team:"BHA",id:47},
   {pick:36,round:3,manager:"John",player:"Havertz",pos:"FWD",team:"ARS",id:27},
@@ -798,7 +1041,7 @@ var DRAFT_PICKS = [
   {pick:43,round:4,manager:"Joe",player:"Amad",pos:"MID",team:"MUN",id:53},
   {pick:44,round:4,manager:"Darragh",player:"Trossard",pos:"MID",team:"ARS",id:42},
   {pick:45,round:4,manager:"Ben",player:"Cucurella",pos:"DEF",team:"CHE",id:82},
-  {pick:46,round:4,manager:"Jack",player:"Mitoma",pos:"MID",team:"EVE",id:50},
+  {pick:46,round:4,manager:"Jack",player:"Mitoma",pos:"MID",team:"BHA",id:50},
   {pick:47,round:4,manager:"Conor",player:"Ndiaye",pos:"MID",team:"EVE",id:46},
   {pick:48,round:4,manager:"Mark",player:"Virgil",pos:"DEF",team:"LIV",id:84},
   {pick:49,round:5,manager:"Mark",player:"Tielemans",pos:"MID",team:"AVL",id:91},
@@ -823,9 +1066,9 @@ var DRAFT_PICKS = [
   {pick:68,round:6,manager:"Darragh",player:"Richarlison",pos:"FWD",team:"TOT",id:64},
   {pick:69,round:6,manager:"Ben",player:"McNeil",pos:"MID",team:"EVE",id:94},
   {pick:70,round:6,manager:"Jack",player:"Pickford",pos:"GKP",team:"EVE",id:118},
-  {pick:71,round:6,manager:"Conor",player:"Kerkez",pos:"DEF",team:"BOU",id:85},
+  {pick:71,round:6,manager:"Conor",player:"Kerkez",pos:"DEF",team:"LIV",id:85},
   {pick:72,round:6,manager:"Mark",player:"Madueke",pos:"MID",team:"ARS",id:39},
-  {pick:73,round:7,manager:"Mark",player:"A.Becker",pos:"GKP",team:"LIV",id:119},
+  {pick:73,round:7,manager:"Mark",player:"Alisson",pos:"GKP",team:"LIV",id:119},
   {pick:74,round:7,manager:"Conor",player:"White",pos:"DEF",team:"ARS",id:50},
   {pick:75,round:7,manager:"Jack",player:"Tarkowski",pos:"DEF",team:"EVE",id:125},
   {pick:76,round:7,manager:"Ben",player:"Wilson",pos:"MID",team:"FUL",id:172},
@@ -833,28 +1076,28 @@ var DRAFT_PICKS = [
   {pick:78,round:7,manager:"Joe",player:"Chalobah",pos:"DEF",team:"CHE",id:247},
   {pick:79,round:7,manager:"Daire",player:"Rodrigo",pos:"MID",team:"MCI",id:58},
   {pick:80,round:7,manager:"Adam",player:"Damsgaard",pos:"MID",team:"BRE",id:92},
-  {pick:81,round:7,manager:"Michael",player:"J.Timber",pos:"DEF",team:"ARS",id:134},
-  {pick:82,round:7,manager:"Peter",player:"AWB",pos:"DEF",team:"WHU",id:357},
+  {pick:81,round:7,manager:"Michael",player:"Timber",pos:"DEF",team:"ARS",id:134},
+  {pick:82,round:7,manager:"Peter",player:"Wan-Bissaka",pos:"DEF",team:"WHU",id:357},
   {pick:83,round:7,manager:"Ruairi",player:"Savinho",pos:"MID",team:"MCI",id:40},
-  {pick:84,round:7,manager:"John",player:"J.Murphy",pos:"MID",team:"NEW",id:55},
-  {pick:85,round:8,manager:"John",player:"J.Arias",pos:"MID",team:"WOL",id:208},
+  {pick:84,round:7,manager:"John",player:"Murphy",pos:"MID",team:"NEW",id:55},
+  {pick:85,round:8,manager:"John",player:"Arias",pos:"MID",team:"WOL",id:208},
   {pick:86,round:8,manager:"Ruairi",player:"Igor Jesus",pos:"FWD",team:"NFO",id:90},
   {pick:87,round:8,manager:"Peter",player:"Enzo",pos:"MID",team:"CHE",id:52},
   {pick:88,round:8,manager:"Michael",player:"Sánchez",pos:"GKP",team:"CHE",id:216},
-  {pick:89,round:8,manager:"Adam",player:"L.Paquetá",pos:"MID",team:"WHU",id:102},
+  {pick:89,round:8,manager:"Adam",player:"Paquetá",pos:"MID",team:"WHU",id:102},
   {pick:90,round:8,manager:"Daire",player:"Lewis-Skelly",pos:"DEF",team:"ARS",id:123},
   {pick:91,round:8,manager:"Joe",player:"Sels",pos:"GKP",team:"NFO",id:214},
   {pick:92,round:8,manager:"Darragh",player:"Barry",pos:"FWD",team:"EVE",id:89},
-  {pick:93,round:8,manager:"Ben",player:"Ederson M.",pos:"GKP",team:"MCI",id:128},
+  {pick:93,round:8,manager:"Ben",player:"Ederson",pos:"GKP",team:"MCI",id:128},
   {pick:94,round:8,manager:"Jack",player:"Lacroix",pos:"DEF",team:"CRY",id:245},
   {pick:95,round:8,manager:"Conor",player:"Georginio",pos:"MID",team:"BHA",id:101},
   {pick:96,round:8,manager:"Mark",player:"Collins",pos:"DEF",team:"BRE",id:234},
   {pick:97,round:9,manager:"Mark",player:"Branthwaite",pos:"DEF",team:"EVE",id:137},
   {pick:98,round:9,manager:"Conor",player:"Pope",pos:"GKP",team:"NEW",id:221},
-  {pick:99,round:9,manager:"Jack",player:"Malen",pos:"MID",team:"AVL",id:148},
+  {pick:99,round:9,manager:"Jack",player:"Malen",pos:"FWD",team:"AVL",id:148},
   {pick:100,round:9,manager:"Ben",player:"Marc Guiu",pos:"FWD",team:"SUN",id:395},
   {pick:101,round:9,manager:"Darragh",player:"James",pos:"DEF",team:"CHE",id:126},
-  {pick:102,round:9,manager:"Joe",player:"Bruno G.",pos:"MID",team:"NEW",id:60},
+  {pick:102,round:9,manager:"Joe",player:"Guimarães",pos:"MID",team:"NEW",id:60},
   {pick:103,round:9,manager:"Daire",player:"Szoboszlai",pos:"MID",team:"LIV",id:63},
   {pick:104,round:9,manager:"Adam",player:"Konaté",pos:"DEF",team:"LIV",id:135},
   {pick:105,round:9,manager:"Michael",player:"Aina",pos:"DEF",team:"NFO",id:215},
@@ -864,13 +1107,13 @@ var DRAFT_PICKS = [
   {pick:109,round:10,manager:"John",player:"Caicedo",pos:"MID",team:"CHE",id:122},
   {pick:110,round:10,manager:"Ruairi",player:"Robinson",pos:"DEF",team:"FUL",id:217},
   {pick:111,round:10,manager:"Peter",player:"Nketiah",pos:"FWD",team:"CRY",id:142},
-  {pick:112,round:10,manager:"Michael",player:"CHO",pos:"MID",team:"MCI",id:88},
+  {pick:112,round:10,manager:"Michael",player:"Hudson-Odoi",pos:"MID",team:"NFO",id:88},
   {pick:113,round:10,manager:"Adam",player:"Leno",pos:"GKP",team:"FUL",id:231},
   {pick:114,round:10,manager:"Daire",player:"Van de Ven",pos:"DEF",team:"TOT",id:360},
-  {pick:115,round:10,manager:"Joe",player:"Rúben",pos:"MID",team:"LIV",id:138},
+  {pick:115,round:10,manager:"Joe",player:"Dias",pos:"DEF",team:"MCI",id:138},
   {pick:116,round:10,manager:"Darragh",player:"Awoniyi",pos:"FWD",team:"NFO",id:147},
   {pick:117,round:10,manager:"Ben",player:"N.Williams",pos:"DEF",team:"NFO",id:233},
-  {pick:118,round:10,manager:"Jack",player:"Matheus N.",pos:"DEF",team:"MCI",id:152},
+  {pick:118,round:10,manager:"Jack",player:"Nunes",pos:"DEF",team:"MCI",id:152},
   {pick:119,round:10,manager:"Conor",player:"Piroe",pos:"FWD",team:"LEE",id:130},
   {pick:120,round:10,manager:"Mark",player:"Guéhi",pos:"DEF",team:"CRY",id:359},
   {pick:121,round:11,manager:"Mark",player:"Smith Rowe",pos:"MID",team:"FUL",id:96},
@@ -885,7 +1128,7 @@ var DRAFT_PICKS = [
   {pick:130,round:11,manager:"Peter",player:"Trippier",pos:"DEF",team:"NEW",id:237},
   {pick:131,round:11,manager:"Ruairi",player:"Dorgu",pos:"DEF",team:"MUN",id:378},
   {pick:132,round:11,manager:"John",player:"Burn",pos:"DEF",team:"NEW",id:227},
-  {pick:133,round:12,manager:"John",player:"JWP",pos:"MID",team:"WHU",id:104},
+  {pick:133,round:12,manager:"John",player:"Ward-Prowse",pos:"MID",team:"WHU",id:104},
   {pick:134,round:12,manager:"Ruairi",player:"Reijnders",pos:"MID",team:"MCI",id:127},
   {pick:135,round:12,manager:"Peter",player:"Mazraoui",pos:"DEF",team:"MUN",id:236},
   {pick:136,round:12,manager:"Michael",player:"Digne",pos:"DEF",team:"AVL",id:383},
@@ -893,9 +1136,9 @@ var DRAFT_PICKS = [
   {pick:138,round:12,manager:"Daire",player:"Diouf",pos:"DEF",team:"WHU",id:398},
   {pick:139,round:12,manager:"Joe",player:"Gusto",pos:"DEF",team:"CHE",id:228},
   {pick:140,round:12,manager:"Darragh",player:"Akanji",pos:"DEF",team:"MCI",id:159},
-  {pick:141,round:12,manager:"Ben",player:"N.Jackson",pos:"FWD",team:"CHE",id:74},
+  {pick:141,round:12,manager:"Ben",player:"Jackson",pos:"FWD",team:"CHE",id:74},
   {pick:142,round:12,manager:"Jack",player:"Truffert",pos:"DEF",team:"BOU",id:376},
-  {pick:143,round:12,manager:"Conor",player:"O.Dango",pos:"MID",team:"BOU",id:105},
+  {pick:143,round:12,manager:"Conor",player:"Dango",pos:"MID",team:"BOU",id:105},
   {pick:144,round:12,manager:"Mark",player:"Udogie",pos:"DEF",team:"TOT",id:362},
   {pick:145,round:13,manager:"Mark",player:"Verbruggen",pos:"GKP",team:"BHA",id:365},
   {pick:146,round:13,manager:"Conor",player:"Cash",pos:"DEF",team:"AVL",id:381},
@@ -903,22 +1146,22 @@ var DRAFT_PICKS = [
   {pick:148,round:13,manager:"Ben",player:"Zirkzee",pos:"FWD",team:"MUN",id:93},
   {pick:149,round:13,manager:"Darragh",player:"Romero",pos:"DEF",team:"TOT",id:232},
   {pick:150,round:13,manager:"Joe",player:"Højlund",pos:"FWD",team:"MUN",id:65},
-  {pick:151,round:13,manager:"Daire",player:"J.Palhinha",pos:"MID",team:"TOT",id:212},
+  {pick:151,round:13,manager:"Daire",player:"Palhinha",pos:"MID",team:"TOT",id:212},
   {pick:152,round:13,manager:"Adam",player:"Botman",pos:"DEF",team:"NEW",id:256},
   {pick:153,round:13,manager:"Michael",player:"Tonali",pos:"MID",team:"NEW",id:136},
   {pick:154,round:13,manager:"Peter",player:"Tavernier",pos:"MID",team:"BOU",id:157},
   {pick:155,round:13,manager:"Ruairi",player:"Anderson",pos:"MID",team:"NFO",id:141},
-  {pick:156,round:13,manager:"John",player:"Bradley",pos:"DEF",team:"FUL",id:242},
-  {pick:157,round:14,manager:"John",player:"Aké",pos:"MID",team:"MCI",id:161},
+  {pick:156,round:13,manager:"John",player:"Bradley",pos:"DEF",team:"LIV",id:242},
+  {pick:157,round:14,manager:"John",player:"Aké",pos:"DEF",team:"MCI",id:161},
   {pick:158,round:14,manager:"Ruairi",player:"Stones",pos:"DEF",team:"MCI",id:164},
   {pick:159,round:14,manager:"Peter",player:"Khusanov",pos:"DEF",team:"MCI",id:173},
-  {pick:160,round:14,manager:"Michael",player:"Kroupi Jr.",pos:"FWD",team:"BOU",id:377},
-  {pick:161,round:14,manager:"Adam",player:"Nmecha",pos:"MID",team:"FUL",id:235},
-  {pick:162,round:14,manager:"Daire",player:"Lewis-P",pos:"DEF",team:"BRE",id:261},
+  {pick:160,round:14,manager:"Michael",player:"Kroupi",pos:"FWD",team:"BOU",id:377},
+  {pick:161,round:14,manager:"Adam",player:"Nmecha",pos:"FWD",team:"LEE",id:235},
+  {pick:162,round:14,manager:"Daire",player:"Lewis-Potter",pos:"DEF",team:"BRE",id:261},
   {pick:163,round:14,manager:"Joe",player:"O'Brien",pos:"DEF",team:"EVE",id:258},
   {pick:164,round:14,manager:"Darragh",player:"Ramsdale",pos:"GKP",team:"NEW",id:354},
   {pick:165,round:14,manager:"Ben",player:"Andersen",pos:"DEF",team:"FUL",id:405},
-  {pick:166,round:14,manager:"Jack",player:"Barnes",pos:"FWD",team:"BOU",id:368},
+  {pick:166,round:14,manager:"Jack",player:"Barnes",pos:"MID",team:"NEW",id:368},
   {pick:167,round:14,manager:"Conor",player:"Hato",pos:"DEF",team:"CHE",id:353},
   {pick:168,round:14,manager:"Mark",player:"Wilson",pos:"FWD",team:"WHU",id:115},
   {pick:169,round:15,manager:"Mark",player:"Bamford",pos:"FWD",team:"LEE",id:223},
@@ -932,10 +1175,11 @@ var DRAFT_PICKS = [
   {pick:177,round:15,manager:"Michael",player:"Jörgensen",pos:"GKP",team:"MUN",id:332},
   {pick:178,round:15,manager:"Peter",player:"Ortega",pos:"GKP",team:"MCI",id:249},
   {pick:179,round:15,manager:"Ruairi",player:"Bayindir",pos:"GKP",team:"MUN",id:252},
-  {pick:180,round:15,manager:"John",player:"Meslier",pos:"GKP",team:"MCI",id:380}
+  {pick:180,round:15,manager:"John",player:"Meslier",pos:"GKP",team:"LEE",id:380}
 ];
 
-  var G = { data: null, managers: {}, managerById: {}, allFinished: [], playerNames: {} };
+  var G = { data: null, managers: {}, managerById: {}, allFinished: [], playerNames: {},
+            luckChartData: null };
 
   /* ── Utilities ── */
   function showError(msg) {
@@ -955,6 +1199,50 @@ var DRAFT_PICKS = [
     document.getElementById("tab-"+name).classList.add("active");
     btn.classList.add("active");
     if (name === "draft" && G.data) renderDraft();
+    if (name === "results") {
+      var canvas = document.getElementById('gwChart');
+      if (canvas && canvas._gwList) setTimeout(function(){ drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf); }, 50);
+    }
+    if (name === "insights") {
+      // Check which inner panel is active
+      var luckPanel = document.getElementById('inner-insights-luck');
+      if (luckPanel && luckPanel.classList.contains('active')) setTimeout(renderLuckChart, 50);
+    }
+  }
+
+  function showInner(tabName, panelName, btn) {
+    var tabEl = document.getElementById('tab-'+tabName);
+    tabEl.querySelectorAll('.inner-panel').forEach(function(el){ el.classList.remove('active'); });
+    tabEl.querySelectorAll('.inner-tab').forEach(function(el){ el.classList.remove('active'); });
+    document.getElementById('inner-'+tabName+'-'+panelName).classList.add('active');
+    btn.classList.add('active');
+    // Trigger chart redraws when switching to chart panels
+    if (panelName === 'standings') {
+      var canvas = document.getElementById('gwChart');
+      if (canvas && canvas._gwList) setTimeout(function(){ drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf); }, 50);
+    }
+    if (panelName === 'luck') setTimeout(renderLuckChart, 50);
+  }
+
+  function applyPreset(type, n, btn) {
+    var mg = maxGW();
+    var from, to;
+    if (n === 0) { from = 1; to = mg; }
+    else { from = Math.max(1, mg - n + 1); to = mg; }
+    if (type === 'form') {
+      document.getElementById('formFrom').value = from;
+      document.getElementById('formTo').value = to;
+      // Mark preset active
+      document.querySelectorAll('#inner-results-form .gw-preset').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      renderForm();
+    } else {
+      document.getElementById('liFrom').value = from;
+      document.getElementById('liTo').value = to;
+      document.querySelectorAll('#inner-insights-luck .gw-preset').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      renderLuck();
+    }
   }
 
   function reset() {
@@ -962,6 +1250,24 @@ var DRAFT_PICKS = [
     document.getElementById("landing").style.display = "block";
     document.getElementById("pasteArea").value = "";
     document.getElementById("h2hResult").style.display = "none";
+    // Reset tabs to defaults
+    document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
+    document.querySelectorAll(".tab")[0].classList.add("active");
+    document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
+    document.getElementById("tab-results").classList.add("active");
+    // Reset inner tabs
+    var ri = document.getElementById("inner-results-standings");
+    var rf = document.getElementById("inner-results-form");
+    if (ri) { ri.classList.add("active"); }
+    if (rf) { rf.classList.remove("active"); }
+    document.querySelectorAll('#tab-results .inner-tab').forEach(function(b,i){ b.classList.toggle('active',i===0); });
+    // Reset toggles so chart rebuilds on next load
+    var toggles = document.getElementById('gwChartToggles');
+    if (toggles) { toggles._built = false; toggles.innerHTML = ''; }
+    var gwCanvas = document.getElementById('gwChart');
+    if (gwCanvas) { gwCanvas._tooltipBound2 = false; }
+    var luckCanvas = document.getElementById('luckChart');
+    if (luckCanvas) { luckCanvas._tooltipBound = false; }
     clearError();
     window.scrollTo(0,0);
   }
@@ -1050,6 +1356,15 @@ var DRAFT_PICKS = [
   function renderForm() {
     var from=parseInt(document.getElementById("formFrom").value)||1;
     var to=parseInt(document.getElementById("formTo").value)||maxGW();
+    // Clear preset highlights when manually applying
+    var mg = maxGW();
+    var matchedPreset = false;
+    document.querySelectorAll('#inner-results-form .gw-preset').forEach(function(b){
+      var n = parseInt(b.textContent); var isAll = b.textContent==='All';
+      var pFrom = isAll ? 1 : Math.max(1,mg-n+1); var pTo = mg;
+      if (from===pFrom && to===pTo) { b.classList.add('active'); matchedPreset=true; }
+      else b.classList.remove('active');
+    });
     if(from>to){ alert("From GW must be ≤ To GW"); return; }
     var matches=filterMatches(from,to);
     if(!matches.length){ alert("No finished matches in that range."); return; }
@@ -1081,14 +1396,19 @@ var DRAFT_PICKS = [
     });
   }
 
-  /* ── Render: Unlucky ── */
+  /* ── Render: Luck table ── */
   function renderLuck() {
     var from=parseInt(document.getElementById("liFrom").value)||1;
     var to=parseInt(document.getElementById("liTo").value)||maxGW();
+    var mg = maxGW();
+    document.querySelectorAll('#inner-insights-luck .gw-preset').forEach(function(b){
+      var n = parseInt(b.textContent); var isAll = b.textContent==='All';
+      var pFrom = isAll ? 1 : Math.max(1,mg-n+1); var pTo = mg;
+      if (from===pFrom && to===pTo) b.classList.add('active'); else b.classList.remove('active');
+    });
     if(from>to){ alert("From GW must be ≤ To GW"); return; }
     document.getElementById("liBadge").textContent="GW"+from+"–"+to;
 
-    // Get all finished GWs in range
     var allMatches = G.data.matches.filter(function(m){ return m.finished && m.event>=from && m.event<=to; });
     if(!allMatches.length){ alert("No finished matches in that range."); return; }
 
@@ -1096,58 +1416,58 @@ var DRAFT_PICKS = [
     allMatches.forEach(function(m){ if(gwList.indexOf(m.event)===-1) gwList.push(m.event); });
     gwList.sort(function(a,b){ return a-b; });
 
-    // Per manager tallies
     var mgrs = Object.keys(G.managers);
     var stats = {};
     mgrs.forEach(function(id){
-      stats[id] = { actualW:0, actualD:0, actualL:0, expW:0, expL:0, gf:0, pts:0 };
+      stats[id] = { actualW:0, actualD:0, actualL:0, expW:0, expL:0, gf:0, pts:0,
+                    gwActual:{}, gwExp:{} };
     });
 
     gwList.forEach(function(gw){
       var gwMatches = allMatches.filter(function(m){ return m.event===gw; });
-
-      // Collect all scores this GW (each manager plays once)
       var scores = {};
       gwMatches.forEach(function(m){
         scores[m.league_entry_1.toString()] = m.league_entry_1_points;
         scores[m.league_entry_2.toString()] = m.league_entry_2_points;
       });
-
-      // Median of all scores this GW
       var vals = Object.values(scores).slice().sort(function(a,b){ return a-b; });
       var mid = Math.floor(vals.length/2);
       var median = vals.length%2===0 ? (vals[mid-1]+vals[mid])/2 : vals[mid];
 
-      // Tally actual results and expected (vs median)
       gwMatches.forEach(function(m){
         var id1=m.league_entry_1.toString(), id2=m.league_entry_2.toString();
         var p1=m.league_entry_1_points, p2=m.league_entry_2_points;
-        if(!stats[id1]) return;
-        if(!stats[id2]) return;
+        if(!stats[id1]||!stats[id2]) return;
         stats[id1].gf+=p1; stats[id2].gf+=p2;
-        if(p1>p2){ stats[id1].actualW++; stats[id1].pts+=3; stats[id2].actualL++; }
-        else if(p2>p1){ stats[id2].actualW++; stats[id2].pts+=3; stats[id1].actualL++; }
-        else { stats[id1].actualD++; stats[id1].pts++; stats[id2].actualD++; stats[id2].pts++; }
+        if(p1>p2){ stats[id1].actualW++; stats[id1].pts+=3; stats[id2].actualL++;
+          stats[id1].gwActual[gw]='W'; stats[id2].gwActual[gw]='L';
+        } else if(p2>p1){ stats[id2].actualW++; stats[id2].pts+=3; stats[id1].actualL++;
+          stats[id2].gwActual[gw]='W'; stats[id1].gwActual[gw]='L';
+        } else {
+          stats[id1].actualD++; stats[id1].pts++; stats[id2].actualD++; stats[id2].pts++;
+          stats[id1].gwActual[gw]='D'; stats[id2].gwActual[gw]='D';
+        }
       });
 
-      // Expected: did you beat the median this GW?
       Object.keys(scores).forEach(function(id){
         if(!stats[id]) return;
-        if(scores[id] > median) stats[id].expW++;
-        else if(scores[id] < median) stats[id].expL++;
-        // exactly median = neither (wash)
+        if(scores[id] > median){ stats[id].expW++; stats[id].gwExp[gw]=1; }
+        else if(scores[id] < median){ stats[id].expL++; stats[id].gwExp[gw]=0; }
+        else { stats[id].gwExp[gw]=0; }
       });
     });
 
-    // Build rows
+    // Store for chart
+    G.luckChartData = { stats: stats, gwList: gwList, mgrs: mgrs };
+    populateChartDropdown();
+    renderLuckChart();
+
     var rows = mgrs.map(function(id){
       var m = G.managers[id];
       var s = stats[id];
-      var luck = s.actualW - s.expW; // negative = unlucky, positive = lucky
+      var luck = s.actualW - s.expW;
       return { id:id, name:m.name, team:m.team, gf:s.gf, actualW:s.actualW, actualD:s.actualD, actualL:s.actualL, expW:s.expW, luck:luck, pts:s.pts };
     });
-
-    // Sort by expected wins desc, then actual wins
     rows.sort(function(a,b){
       if(b.expW!==a.expW) return b.expW-a.expW;
       return b.actualW-a.actualW;
@@ -1170,6 +1490,689 @@ var DRAFT_PICKS = [
         '<td class="hide-sm" style="color:rgba(255,255,255,0.4)">'+row.actualD+'</td>'+
         '<td class="hide-sm" style="color:rgba(255,255,255,0.4)">'+row.actualL+'</td>'+
         '<td class="pts-muted">'+row.gf+'</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  /* ── Chart: populate dropdown ── */
+  function populateChartDropdown() {
+    var sel = document.getElementById('chartMgrSelect');
+    var prev = sel.value;
+    sel.innerHTML = '';
+    if (!G.luckChartData) return;
+    var sorted = G.luckChartData.mgrs.map(function(id){
+      return { id: id, name: G.managers[id] ? G.managers[id].name : 'Manager '+id };
+    }).sort(function(a,b){ return a.name.localeCompare(b.name); });
+    sorted.forEach(function(m) {
+      var opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    });
+    if (prev) sel.value = prev;
+  }
+
+  /* ── Chart: render ── */
+  function renderLuckChart() {
+    var canvas = document.getElementById('luckChart');
+    var emptyEl = document.getElementById('chartEmpty');
+    if (!canvas) return;
+
+    if (!G.luckChartData) {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'block';
+      return;
+    }
+
+    var mgrId = document.getElementById('chartMgrSelect').value;
+    var data = G.luckChartData;
+    var stats = data.stats[mgrId];
+    if (!stats) { canvas.style.display = 'none'; emptyEl.style.display = 'block'; return; }
+
+    canvas.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    var gwList = data.gwList;
+
+    // Build cumulative series
+    var cumulActual = [], cumulExp = [];
+    var runA = 0, runE = 0;
+    cumulActual.push(0); cumulExp.push(0);
+    gwList.forEach(function(gw) {
+      runA += (stats.gwActual[gw] === 'W') ? 1 : 0;
+      runE += (stats.gwExp[gw] === 1) ? 1 : 0;
+      cumulActual.push(runA);
+      cumulExp.push(runE);
+    });
+
+    var labels = ['GW0'].concat(gwList.map(function(g){ return 'GW'+g; }));
+    var n = labels.length;
+
+    // Canvas sizing
+    var dpr = window.devicePixelRatio || 1;
+    var W = canvas.parentElement.clientWidth - 32;
+    var H = 220;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var PAD = { top: 16, right: 16, bottom: 32, left: 32 };
+    var plotW = W - PAD.left - PAD.right;
+    var plotH = H - PAD.top - PAD.bottom;
+
+    ctx.clearRect(0, 0, W, H);
+
+    var maxVal = Math.max.apply(null, cumulActual.concat(cumulExp).concat([1]));
+    var yMax = Math.ceil(maxVal + 0.5);
+
+    function xPos(i) { return PAD.left + (i / (n-1)) * plotW; }
+    function yPos(v) { return PAD.top + plotH - (v / yMax) * plotH; }
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    for (var yi = 0; yi <= yMax; yi++) {
+      var yy = yPos(yi);
+      ctx.beginPath(); ctx.moveTo(PAD.left, yy); ctx.lineTo(PAD.left + plotW, yy); ctx.stroke();
+    }
+
+    // Y axis labels
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '10px -apple-system, sans-serif';
+    ctx.textAlign = 'right';
+    for (var yi2 = 0; yi2 <= yMax; yi2++) {
+      ctx.fillText(yi2, PAD.left - 5, yPos(yi2) + 4);
+    }
+
+    // X axis labels (skip GW0, show every other GW)
+    ctx.textAlign = 'center';
+    for (var xi = 1; xi < n; xi++) {
+      if (n <= 12 || xi % 2 === 1) {
+        ctx.fillText(gwList[xi-1], xPos(xi), H - PAD.bottom + 14);
+      }
+    }
+
+    // Fill gap area between lines
+    ctx.save();
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var px = xPos(i), py = yPos(cumulExp[i]);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    for (var i = n-1; i >= 0; i--) {
+      ctx.lineTo(xPos(i), yPos(cumulActual[i]));
+    }
+    ctx.closePath();
+    // Color the fill based on whether manager is lucky or unlucky overall
+    var finalLuck = cumulActual[n-1] - cumulExp[n-1];
+    if (finalLuck >= 0) {
+      ctx.fillStyle = 'rgba(0,212,255,0.07)'; // lucky = cyan tint
+    } else {
+      ctx.fillStyle = 'rgba(255,107,107,0.1)'; // unlucky = red tint
+    }
+    ctx.fill();
+    ctx.restore();
+
+    // Expected wins line (dashed purple)
+    ctx.save();
+    ctx.setLineDash([5, 4]);
+    ctx.strokeStyle = '#a090ff';
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var px = xPos(i), py = yPos(cumulExp[i]);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // Actual wins line (solid cyan)
+    ctx.save();
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var px = xPos(i), py = yPos(cumulActual[i]);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // Dots on actual wins line for each GW
+    for (var i = 1; i < n; i++) {
+      var result = stats.gwActual[gwList[i-1]];
+      var dotColor = result === 'W' ? '#00d4ff' : result === 'D' ? '#f5a623' : 'rgba(255,107,107,0.8)';
+      ctx.beginPath();
+      ctx.arc(xPos(i), yPos(cumulActual[i]), 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = dotColor;
+      ctx.fill();
+      ctx.strokeStyle = '#0e0818';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Luck delta annotation at final point
+    if (n > 1) {
+      var finalA = cumulActual[n-1];
+      var finalE = cumulExp[n-1];
+      var diff = finalA - finalE;
+      var diffStr = diff > 0 ? '+'+diff : ''+diff;
+      var diffColor = diff > 0 ? '#00d4ff' : diff < 0 ? '#ff6b6b' : 'rgba(255,255,255,0.4)';
+      var fx = xPos(n-1);
+      var fy = yPos(finalA);
+      ctx.font = 'bold 11px -apple-system, sans-serif';
+      ctx.fillStyle = diffColor;
+      ctx.textAlign = 'right';
+      ctx.fillText(diffStr, fx - 6, fy - 7);
+    }
+
+    // Store point data for tooltip
+    canvas._chartPoints = [];
+    for (var i = 0; i < n; i++) {
+      canvas._chartPoints.push({
+        x: xPos(i), gw: labels[i],
+        actual: cumulActual[i], exp: cumulExp[i],
+        result: i > 0 ? stats.gwActual[gwList[i-1]] : null
+      });
+    }
+    canvas._dpr = dpr;
+
+    // Attach mouse + touch events (once)
+    if (!canvas._tooltipBound) {
+      canvas._tooltipBound = true;
+      canvas.addEventListener('mousemove', handleChartHover);
+      canvas.addEventListener('mouseleave', function() {
+        document.getElementById('chartTooltip').classList.remove('visible');
+      });
+      canvas.addEventListener('touchstart', function(e){
+        e.preventDefault();
+        var tooltip = document.getElementById('chartTooltip');
+        if (tooltip.classList.contains('visible')) { tooltip.classList.remove('visible'); return; }
+        var touch = e.touches[0];
+        var fakeEvt = { clientX: touch.clientX, clientY: touch.clientY, currentTarget: canvas };
+        handleChartHover(fakeEvt);
+      }, { passive: false });
+    }
+  }
+
+  function handleChartHover(e) {
+    var canvas = e.currentTarget;
+    var pts = canvas._chartPoints;
+    if (!pts || !pts.length) return;
+    var rect = canvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    // Find nearest point
+    var closest = null, minDist = 999;
+    pts.forEach(function(p) {
+      var d = Math.abs(p.x - mx);
+      if (d < minDist) { minDist = d; closest = p; }
+    });
+    var tooltip = document.getElementById('chartTooltip');
+    if (!closest || minDist > 30) { tooltip.classList.remove('visible'); return; }
+    var luck = closest.actual - closest.exp;
+    var luckStr = luck > 0 ? '+'+luck : ''+luck;
+    var luckColor = luck > 0 ? '#00d4ff' : luck < 0 ? '#ff6b6b' : 'rgba(255,255,255,0.4)';
+    var resultBadge = closest.result
+      ? '<span style="font-weight:800;color:'+(closest.result==='W'?'#00d4ff':closest.result==='D'?'#f5a623':'#ff6b6b')+'">'+closest.result+'</span>'
+      : '';
+    tooltip.innerHTML =
+      '<div class="ct-gw">'+closest.gw+(resultBadge?' · '+resultBadge:'')+'</div>'+
+      '<div class="ct-row"><span class="ct-swatch" style="background:#00d4ff"></span><span class="ct-label">Actual</span><span class="ct-val">'+closest.actual+'</span></div>'+
+      '<div class="ct-row"><span class="ct-swatch" style="background:#a090ff"></span><span class="ct-label">Expected</span><span class="ct-val">'+closest.exp+'</span></div>'+
+      '<div class="ct-row"><span class="ct-swatch" style="background:'+luckColor+'"></span><span class="ct-label">Luck</span><span class="ct-val" style="color:'+luckColor+'">'+luckStr+'</span></div>';
+    var tx = e.clientX + 14, ty = e.clientY - 10;
+    var tw = 160;
+    if (tx + tw > window.innerWidth) tx = e.clientX - tw - 10;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+    tooltip.classList.add('visible');
+  }
+
+  /* ── Render: League Position Chart ── */
+
+  var MGR_COLOURS = [
+    '#00d4ff','#f5a623','#00e676','#ff6b6b','#a090ff','#ffc940',
+    '#7ec8ff','#ff8fab','#69f0ae','#ff9800','#b39ddb','#80cbc4'
+  ];
+
+  function hexToRgb(hex) {
+    var h = hex.replace('#','');
+    return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
+  }
+
+  function renderGWChart() {
+    var canvas = document.getElementById('gwChart');
+    if (!canvas || !G.data) return;
+
+    var mgrIds = Object.keys(G.managers);
+    var numMgrs = mgrIds.length;
+
+    // Collect all GWs that have finished matches
+    var gwSet = {};
+    G.allFinished.forEach(function(m){ gwSet[m.event] = true; });
+    var gwList = Object.keys(gwSet).map(Number).sort(function(a,b){ return a-b; });
+    if (!gwList.length) return;
+
+    // Build cumulative H2H points per manager after each GW
+    // (same logic as standings but computed progressively)
+    var cumPts   = {};   // cumPts[id][gw]   = H2H pts after this GW
+    var cumGf    = {};   // tiebreak: points scored
+    mgrIds.forEach(function(id){ cumPts[id] = {}; cumGf[id] = {}; });
+
+    // running totals
+    var runPts = {}, runGf = {};
+    mgrIds.forEach(function(id){ runPts[id] = 0; runGf[id] = 0; });
+
+    gwList.forEach(function(gw){
+      var gwMatches = G.allFinished.filter(function(m){ return m.event === gw; });
+      gwMatches.forEach(function(m){
+        var id1 = m.league_entry_1.toString();
+        var id2 = m.league_entry_2.toString();
+        var p1  = m.league_entry_1_points;
+        var p2  = m.league_entry_2_points;
+        // H2H points
+        if (p1 > p2)      { runPts[id1] += 3; }
+        else if (p2 > p1) { runPts[id2] += 3; }
+        else              { runPts[id1] += 1; runPts[id2] += 1; }
+        // GF tiebreak
+        runGf[id1] = (runGf[id1]||0) + p1;
+        runGf[id2] = (runGf[id2]||0) + p2;
+      });
+      mgrIds.forEach(function(id){
+        cumPts[id][gw] = runPts[id] || 0;
+        cumGf[id][gw]  = runGf[id]  || 0;
+      });
+    });
+
+    // Derive position after each GW
+    var positions = {};  // positions[id][gw] = 1-based rank
+    mgrIds.forEach(function(id){ positions[id] = {}; });
+    gwList.forEach(function(gw){
+      var ranked = mgrIds.slice().sort(function(a,b){
+        var dp = (cumPts[b][gw]||0) - (cumPts[a][gw]||0);
+        if (dp !== 0) return dp;
+        return (cumGf[b][gw]||0) - (cumGf[a][gw]||0);
+      });
+      ranked.forEach(function(id, i){ positions[id][gw] = i+1; });
+    });
+
+    // Sort managers by final position for colour consistency
+    var mgrOrder = mgrIds.slice().sort(function(a,b){
+      var lastGw = gwList[gwList.length-1];
+      return (positions[a][lastGw]||99) - (positions[b][lastGw]||99);
+    });
+
+    // Build toggle buttons once
+    var togglesEl = document.getElementById('gwChartToggles');
+    if (!togglesEl._built) {
+      togglesEl._built = true;
+      togglesEl.innerHTML = '';
+      canvas._hidden = {};
+      canvas._highlighted = null;
+
+      mgrOrder.forEach(function(id, i) {
+        var colour = MGR_COLOURS[i % MGR_COLOURS.length];
+        var mgr    = G.managers[id];
+        var rgb    = hexToRgb(colour);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'mgr-toggle-btn';
+        wrap.style.background  = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0.12)';
+        wrap.style.borderColor = colour;
+        wrap.style.color       = colour;
+        wrap.dataset.id        = id;
+
+        var dot = document.createElement('span');
+        dot.style.cssText = 'width:9px;height:9px;border-radius:50%;background:'+colour+
+          ';flex-shrink:0;border:2px solid '+colour+';display:inline-block;transition:background 0.15s;cursor:pointer;';
+
+        dot.addEventListener('click', function(e){
+          e.stopPropagation();
+          if (canvas._hidden[id]) {
+            delete canvas._hidden[id];
+            dot.style.background = colour;
+            wrap.style.opacity = '1';
+          } else {
+            canvas._hidden[id] = true;
+            dot.style.background = 'transparent';
+            wrap.style.opacity = '0.28';
+          }
+          drawGWChart(canvas, gwList, mgrOrder, positions, cumPts, cumGf);
+        });
+
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = mgr.name.split(' ')[0];
+
+        wrap.appendChild(dot);
+        wrap.appendChild(nameSpan);
+
+        wrap.addEventListener('click', function(e){
+          if (e.target === dot) return;
+          var allBtns = togglesEl.querySelectorAll('.mgr-toggle-btn');
+          if (canvas._highlighted === id) {
+            canvas._highlighted = null;
+            allBtns.forEach(function(b){ b.classList.remove('dimmed'); });
+          } else {
+            canvas._highlighted = id;
+            allBtns.forEach(function(b){
+              b.classList.toggle('dimmed', b.dataset.id !== id);
+            });
+          }
+          drawGWChart(canvas, gwList, mgrOrder, positions, cumPts, cumGf);
+        });
+
+        togglesEl.appendChild(wrap);
+      });
+    }
+
+    canvas._gwList     = gwList;
+    canvas._mgrOrder   = mgrOrder;
+    canvas._positions  = positions;
+    canvas._cumPts     = cumPts;
+    canvas._cumGf      = cumGf;
+    canvas._numMgrs    = numMgrs;
+    if (!canvas._hidden)    canvas._hidden = {};
+    if (canvas._highlighted === undefined) canvas._highlighted = null;
+
+    // Defer initial draw so the container has painted and has real dimensions
+    setTimeout(function(){
+      drawGWChart(canvas, gwList, mgrOrder, positions, cumPts, cumGf);
+    }, 60);
+
+    if (!canvas._tooltipBound2) {
+      canvas._tooltipBound2 = true;
+      canvas.addEventListener('mousemove', handleGWChartHover);
+      canvas.addEventListener('mouseleave', function(){
+        document.getElementById('gwChartTooltip').classList.remove('visible');
+      });
+    }
+  }
+
+  function gwChartWidth() {
+    // Walk up until we find a container with real width
+    var el = document.getElementById('gwChartContainer');
+    if (el && el.offsetWidth > 100) return el.offsetWidth - 32;
+    el = document.getElementById('tab-results');
+    if (el && el.offsetWidth > 100) return el.offsetWidth - 32;
+    return Math.min(window.innerWidth, 800) - 32;
+  }
+
+  function drawGWChart(canvas, gwList, mgrOrder, positions, cumPts, cumGf) {
+    var numMgrs = canvas._numMgrs || mgrOrder.length;
+    var dpr = window.devicePixelRatio || 1;
+    var W   = gwChartWidth();
+    if (W < 80) { setTimeout(function(){ drawGWChart(canvas, gwList, mgrOrder, positions, cumPts, cumGf); }, 80); return; }
+    // Height scales with number of managers so positions aren't squished
+    var H   = Math.max(260, numMgrs * 36 + 60);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, W, H);
+
+    var n = gwList.length;
+    if (!n) return;
+
+    var PAD = { top: 20, right: 50, bottom: 30, left: 30 };
+    var plotW = W - PAD.left - PAD.right;
+    var plotH = H - PAD.top  - PAD.bottom;
+
+    // y: position 1 at top, numMgrs at bottom
+    function xPos(i) { return PAD.left + (n===1 ? plotW/2 : (i/(n-1))*plotW); }
+    function yPos(p) { return PAD.top  + ((p-1)/(numMgrs-1||1)) * plotH; }
+
+    // Horizontal position lines + labels
+    ctx.font = '10px -apple-system,sans-serif';
+    for (var pos = 1; pos <= numMgrs; pos++) {
+      var yy = yPos(pos);
+      ctx.strokeStyle = pos === 1 ? 'rgba(255,215,0,0.15)' : 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PAD.left, yy); ctx.lineTo(PAD.left+plotW, yy); ctx.stroke();
+      ctx.fillStyle = pos === 1 ? 'rgba(255,215,0,0.5)' : 'rgba(255,255,255,0.2)';
+      ctx.textAlign = 'right';
+      ctx.fillText(pos, PAD.left-5, yy+4);
+    }
+
+    // X axis GW labels
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.textAlign = 'center';
+    gwList.forEach(function(gw, i){
+      if (n <= 15 || i % 2 === 0 || i === n-1) {
+        ctx.fillText(gw, xPos(i), H-PAD.bottom+14);
+      }
+    });
+
+    var highlighted = canvas._highlighted;
+    var hidden      = canvas._hidden || {};
+
+    // Draw non-highlighted first, then highlighted on top
+    var drawOrder = mgrOrder.slice();
+    if (highlighted) {
+      drawOrder = drawOrder.filter(function(id){ return id !== highlighted; });
+      drawOrder.push(highlighted);
+    }
+
+    canvas._points = {};
+
+    drawOrder.forEach(function(id){
+      if (hidden[id]) return;
+      var ci          = mgrOrder.indexOf(id);
+      var colour      = MGR_COLOURS[ci % MGR_COLOURS.length];
+      var isHL        = highlighted === id;
+      var isDimmed    = highlighted && !isHL;
+
+      var pts = [];
+      gwList.forEach(function(gw, i){
+        var p = (positions[id]||{})[gw];
+        if (p === undefined) return;
+        pts.push({
+          x: xPos(i), y: yPos(p),
+          gw: gw, pos: p,
+          pts: (cumPts[id]||{})[gw],
+          gf:  (cumGf[id] ||{})[gw]
+        });
+      });
+      canvas._points[id] = pts;
+      if (!pts.length) return;
+
+      ctx.save();
+      ctx.globalAlpha = isDimmed ? 0.1 : 1;
+      ctx.strokeStyle = colour;
+      ctx.lineWidth   = isHL ? 3 : 1.8;
+      ctx.lineJoin    = 'round';
+      ctx.lineCap     = 'round';
+
+      // Draw line
+      ctx.beginPath();
+      pts.forEach(function(p, pi){
+        if (pi === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      });
+      ctx.stroke();
+
+      // Dots
+      pts.forEach(function(p){
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, isHL ? 4 : 2.5, 0, Math.PI*2);
+        ctx.fillStyle = colour;
+        ctx.fill();
+        if (isHL) {
+          ctx.strokeStyle = '#0e0818'; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+      });
+
+      // End-of-line name label (right side)
+      if (!isDimmed && pts.length) {
+        var last = pts[pts.length-1];
+        ctx.font      = isHL ? 'bold 11px -apple-system,sans-serif' : '10px -apple-system,sans-serif';
+        ctx.fillStyle = colour;
+        ctx.textAlign = 'left';
+        var mgr       = G.managers[id];
+        ctx.fillText(mgr ? mgr.name.split(' ')[0] : id, last.x + 6, last.y + 4);
+      }
+
+      ctx.restore();
+    });
+  }
+
+  function handleGWChartHover(e) {
+    var canvas   = e.currentTarget;
+    var gwList   = canvas._gwList   || [];
+    var mgrOrder = canvas._mgrOrder || [];
+    var hidden   = canvas._hidden   || {};
+    if (!gwList.length) return;
+
+    var rect  = canvas.getBoundingClientRect();
+    var mx    = e.clientX - rect.left;
+    var PAD_L = 30, PAD_R = 50;
+    var plotW = canvas.clientWidth - PAD_L - PAD_R;
+    var n     = gwList.length;
+
+    // Snap to nearest GW column
+    var bestI = 0, bestDx = Infinity;
+    gwList.forEach(function(gw, i){
+      var x  = PAD_L + (n===1 ? plotW/2 : (i/(n-1))*plotW);
+      var dx = Math.abs(x - mx);
+      if (dx < bestDx) { bestDx = dx; bestI = i; }
+    });
+
+    var tooltip = document.getElementById('gwChartTooltip');
+    var colSnap = plotW / Math.max(n-1, 1);
+    if (bestDx > colSnap * 0.55) { tooltip.classList.remove('visible'); return; }
+
+    var gw = gwList[bestI];
+
+    // All visible managers sorted by position this GW
+    var rows = [];
+    mgrOrder.forEach(function(id, i){
+      if (hidden[id]) return;
+      var pos = ((canvas._positions||{})[id]||{})[gw];
+      var pts = ((canvas._cumPts||{})[id]||{})[gw];
+      var gf  = ((canvas._cumGf ||{})[id]||{})[gw];
+      if (pos !== undefined) rows.push({ id:id, pos:pos, pts:pts, gf:gf, colour: MGR_COLOURS[i%MGR_COLOURS.length] });
+    });
+    rows.sort(function(a,b){ return a.pos - b.pos; });
+
+    var html = '<div class="ct-gw">After GW'+gw+'</div>';
+    rows.forEach(function(x){
+      var mgr = G.managers[x.id] || { name:'?' };
+      var posLabel = x.pos === 1 ? '🥇' : x.pos === 2 ? '🥈' : x.pos === 3 ? '🥉' : x.pos;
+      html += '<div class="ct-row">';
+      html += '<span class="ct-swatch" style="background:'+x.colour+'"></span>';
+      html += '<span class="ct-label">'+mgr.name.split(' ')[0]+'</span>';
+      html += '<span class="ct-val">'+posLabel+'</span>';
+      html += '<span style="font-size:10px;color:rgba(255,255,255,0.4);margin-left:5px">'+x.pts+'pts</span>';
+      html += '</div>';
+    });
+
+    tooltip.innerHTML = html;
+    var tx = e.clientX+14, ty = e.clientY-10, tw = 180;
+    if (tx+tw > window.innerWidth) tx = e.clientX-tw-10;
+    tooltip.style.left = tx+'px';
+    tooltip.style.top  = ty+'px';
+    tooltip.classList.add('visible');
+  }
+
+      /* ── Render: Streaks ── */
+  function renderStreaks() {
+    // Build full-season match results per manager in GW order
+    var mgrIds = Object.keys(G.managers);
+    var resultsById = {};
+    mgrIds.forEach(function(id){ resultsById[id] = []; });
+
+    var sorted = G.allFinished.slice().sort(function(a,b){ return a.event-b.event; });
+    sorted.forEach(function(m){
+      var id1=m.league_entry_1.toString(), id2=m.league_entry_2.toString();
+      var p1=m.league_entry_1_points, p2=m.league_entry_2_points;
+      var r1,r2;
+      if(p1>p2){ r1='W'; r2='L'; } else if(p2>p1){ r1='L'; r2='W'; } else { r1='D'; r2='D'; }
+      if(resultsById[id1]) resultsById[id1].push(r1);
+      if(resultsById[id2]) resultsById[id2].push(r2);
+    });
+
+    function calcStreaks(results) {
+      // Current streak
+      var cur = 0, curType = null;
+      for (var i = results.length-1; i >= 0; i--) {
+        if (curType === null) { curType = results[i]; cur = 1; }
+        else if (results[i] === curType) cur++;
+        else break;
+      }
+      // Longest win streak
+      var bestW=0, run=0;
+      results.forEach(function(r){ if(r==='W'){ run++; bestW=Math.max(bestW,run); } else run=0; });
+      // Longest unbeaten streak
+      var bestU=0; run=0;
+      results.forEach(function(r){ if(r!=='L'){ run++; bestU=Math.max(bestU,run); } else run=0; });
+      // Longest losing streak
+      var bestL=0; run=0;
+      results.forEach(function(r){ if(r==='L'){ run++; bestL=Math.max(bestL,run); } else run=0; });
+      return { cur:cur, curType:curType, bestW:bestW, bestU:bestU, bestL:bestL };
+    }
+
+    // Sort by standing rank
+    var rows = mgrIds.map(function(id){
+      var s = G.data.standings.find(function(x){ return x.league_entry.toString()===id; });
+      var st = calcStreaks(resultsById[id]);
+      return Object.assign({ id:id, rank: s?s.rank:99 }, st);
+    }).sort(function(a,b){ return a.rank-b.rank; });
+
+    var body = document.getElementById('streaksBody');
+    body.innerHTML = '';
+    rows.forEach(function(row){
+      var mgr = G.managers[row.id];
+      if (!mgr) return;
+      var curLabel = row.curType
+        ? '<span class="streak-badge '+row.curType+'">'+row.cur+row.curType+'</span>'
+        : '—';
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="al"><div class="name">'+mgr.name.split(' ')[0]+'</div><div class="team">'+mgr.team+'</div></td>'+
+        '<td>'+curLabel+'</td>'+
+        '<td><span class="streak-best">'+row.bestW+'</span></td>'+
+        '<td><span class="streak-best">'+row.bestU+'</span></td>'+
+        '<td><span class="streak-best" style="color:rgba(255,107,107,0.8)">'+row.bestL+'</span></td>';
+      body.appendChild(tr);
+    });
+  }
+
+  /* ── Render: Biggest GW Scores ── */
+  function renderBigGWScores() {
+    var allScores = [];
+    G.allFinished.forEach(function(m){
+      var id1=m.league_entry_1.toString(), id2=m.league_entry_2.toString();
+      var p1=m.league_entry_1_points, p2=m.league_entry_2_points;
+      var res1 = p1>p2?'W':p1<p2?'L':'D';
+      var res2 = p2>p1?'W':p2<p1?'L':'D';
+      allScores.push({id:id1, gw:m.event, score:p1, result:res1, opp:id2, oppScore:p2});
+      allScores.push({id:id2, gw:m.event, score:p2, result:res2, opp:id1, oppScore:p1});
+    });
+    allScores.sort(function(a,b){ return b.score-a.score; });
+    var top = allScores.slice(0,15);
+
+    var body = document.getElementById('bigGWBody');
+    body.innerHTML = '';
+    top.forEach(function(row, i){
+      var mgr = G.managers[row.id];
+      var opp = G.managers[row.opp];
+      if (!mgr) return;
+      var resultColor = row.result==='W'?'#00d4ff':row.result==='L'?'#ff6b6b':'#f5a623';
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="pos al '+posClass(i+1)+'">'+(i+1)+'</td>'+
+        '<td class="al"><div class="name">'+mgr.name.split(' ')[0]+'</div><div class="team">GW'+row.gw+'</div></td>'+
+        '<td style="color:rgba(255,255,255,0.4);font-size:13px">'+row.gw+'</td>'+
+        '<td class="pts">'+row.score+'</td>'+
+        '<td style="color:'+resultColor+';font-weight:700;font-size:13px">'+
+          row.result+' vs '+(opp?opp.name.split(' ')[0]:'?')+' ('+row.oppScore+')</td>';
       body.appendChild(tr);
     });
   }
@@ -1238,10 +2241,8 @@ var DRAFT_PICKS = [
     return m ? m.team : "";
   }
 
-  /* Build stats for all managers across trades + waivers */
   function buildMgrStats(approvedWaivers, acceptedTrades, deniedWaivers) {
     var statsById = {};
-
     G.data.league_entries.forEach(function(e) {
       var obj = {
         name: e.player_first_name + ' ' + e.player_last_name,
@@ -1256,19 +2257,16 @@ var DRAFT_PICKS = [
         if (typeof v === 'string' && /^\d+$/.test(v)) statsById[v] = obj;
       });
     });
-
     approvedWaivers.forEach(function(t) {
       var s = statsById[String(t.entry)];
       if (!s) return;
       if (t.kind === 'w') s.waivers++; else s.freeAgents++;
       s.waiverHistory.push({ gw: t.event, kind: t.kind, inId: t.element_in, outId: t.element_out, priority: t.priority||9999 });
     });
-
     deniedWaivers.forEach(function(t) {
       var s = statsById[String(t.entry)];
       if (s) s.deniedWaivers++;
     });
-
     acceptedTrades.forEach(function(t) {
       var off = statsById[String(t.offered_entry)];
       var rec = statsById[String(t.received_entry)];
@@ -1285,7 +2283,6 @@ var DRAFT_PICKS = [
           gave: t.tradeitem_set.map(function(i){ return i.element_in; }) });
       }
     });
-
     var seen = {}, unique = [];
     Object.keys(statsById).forEach(function(k){
       var o = statsById[k];
@@ -1294,22 +2291,7 @@ var DRAFT_PICKS = [
     return unique.sort(function(a,b){ return a.name.localeCompare(b.name); });
   }
 
-
-  function mName(id) {
-    var m = G.managerById[id] || G.managerById[id ? id.toString() : '']
-         || G.managers[id]    || G.managers[id ? id.toString() : ''];
-    return m ? m.name : "Manager #"+id;
-  }
-  function mTeam(id) {
-    var m = G.managerById[id] || G.managerById[id ? id.toString() : '']
-         || G.managers[id]    || G.managers[id ? id.toString() : ''];
-    return m ? m.team : "";
-  }
-
-  /* Build stats for all managers across trades + waivers */
-
   function renderTrades(transactionData, tradeData) {
-    // ── Waivers / free agents ─────────────────────────────────
     var rawList = [];
     if (transactionData) {
       if (Array.isArray(transactionData)) rawList = transactionData;
@@ -1317,21 +2299,14 @@ var DRAFT_PICKS = [
     }
     var approvedWaivers = rawList.filter(function(t){ return (t.kind==='w'||t.kind==='f') && t.result==='a'; });
     var deniedWaivers   = rawList.filter(function(t){ return t.result==='di'; });
-
-    // ── Manager-to-manager trades ─────────────────────────────
     var rawTrades = [];
     if (tradeData) {
       if (Array.isArray(tradeData)) rawTrades = tradeData;
       else if (tradeData.trades) rawTrades = tradeData.trades;
       else { try { var td=typeof tradeData==='string'?JSON.parse(tradeData):tradeData; rawTrades=td.trades||(Array.isArray(td)?td:[]); } catch(e){} }
     }
-    // API only returns state='p' (accepted) trades — rejected/withdrawn are not exposed
     var acceptedTrades = rawTrades.filter(function(t){ return t.state==='p'; });
-
-    // ── Build manager stats ────────────────────────────────────
     var mgrStats = buildMgrStats(approvedWaivers, acceptedTrades, deniedWaivers);
-
-    // ── Render ────────────────────────────────────────────────
     renderTradesOverview(approvedWaivers, acceptedTrades, deniedWaivers);
     renderTradesByManager(mgrStats);
   }
@@ -1339,15 +2314,12 @@ var DRAFT_PICKS = [
   function renderTradesOverview(approvedWaivers, acceptedTrades, deniedWaivers) {
     var el = document.getElementById("tradesOverview");
     var html = '';
-
-    // ── Summary bar ──────────────────────────────────────────────────────
     html += '<div class="trades-summary">';
     html += '<div class="trades-stat"><div class="stat-val">'+acceptedTrades.length+'</div><div class="stat-lbl">Trades</div></div>';
     html += '<div class="trades-stat"><div class="stat-val" style="color:#7ec8ff">'+approvedWaivers.length+'</div><div class="stat-lbl">Transfers</div></div>';
     html += '<div class="trades-stat"><div class="stat-val" style="color:#ff6b6b">'+deniedWaivers.length+'</div><div class="stat-lbl">Waivers Denied</div></div>';
     html += '</div>';
 
-    // ── All manager trades by GW ─────────────────────────────────────────
     var allTrades = [];
     acceptedTrades.forEach(function(t){ allTrades.push({t:t, state:'accepted'}); });
 
@@ -1359,13 +2331,11 @@ var DRAFT_PICKS = [
         var rows = byGW[gw];
         var acc = rows.length;
         var summary = ['<span style="color:#00d4ff">'+acc+' trade'+(acc!==1?'s':'')+'</span>'];
-
         html += '<div class="gw-block">';
         html += '<div class="gw-block-header" onclick="toggleGW(this)">';
         html += '<span class="gw-title">Gameweek '+gw+'</span>';
         html += '<span style="display:flex;align-items:center;gap:8px"><span class="gw-count">'+summary.join(' · ')+'</span><span class="gw-chevron">▼</span></span>';
         html += '</div><div class="gw-block-body">';
-
         rows.forEach(function(x){
           var t = x.t;
           var offName = mName(t.offered_entry);
@@ -1380,10 +2350,7 @@ var DRAFT_PICKS = [
             ? 'background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.25)'
             : 'background:rgba(255,201,64,0.1);color:#ffc940;border:1px solid rgba(255,201,64,0.25)';
           var badgeText = isAcc ? '✓ Accepted' : isRej ? '✕ Rejected' : '↩ Withdrawn';
-
           html += '<div class="trade-card" style="border-left:3px solid '+accent+';border-color:rgba(255,255,255,0.08);border-left-color:'+accent+'">';
-
-          // Header row: offerer → receiver + outcome badge
           html += '<div class="trade-card-header">';
           html += '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">';
           html += '<span style="font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+offName+'</span>';
@@ -1392,8 +2359,6 @@ var DRAFT_PICKS = [
           html += '</div>';
           html += '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;border-radius:20px;padding:3px 10px;margin-left:8px;'+badgeStyle+'">'+badgeText+'</span>';
           html += '</div>';
-
-          // Body: what each side gets (only show for accepted; for rejected/withdrawn show what was on the table)
           html += '<div class="trade-card-body"><div class="trade-columns">';
           html += '<div class="trade-col">';
           html += '<div class="trade-col-header"><span class="trade-col-manager">'+offName.split(' ')[0]+'</span><span class="trade-col-direction gets" style="margin-left:6px">'+(isAcc?'gets':'would get')+'</span></div>';
@@ -1403,24 +2368,20 @@ var DRAFT_PICKS = [
           html += '<div class="trade-col-header"><span class="trade-col-manager">'+recName.split(' ')[0]+'</span><span class="trade-col-direction '+(isAcc?'gets':'gives')+' " style="margin-left:6px">'+(isAcc?'gets':'would give')+'</span></div>';
           items.forEach(function(i){ html += '<div class="chip '+(isAcc?'in':'out')+'">'+pName(i.element_out)+'</div>'; });
           html += '</div>';
-          html += '</div></div></div>'; // columns, body, card
+          html += '</div></div></div>';
         });
-        html += '</div></div>'; // gw-block-body, gw-block
+        html += '</div></div>';
       });
     } else {
       html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No trades yet.</p>';
     }
 
-    // ── Waivers by GW ────────────────────────────────────────────────────
     if (approvedWaivers.length) {
       html += '<div class="section-label" style="margin-top:8px;margin-bottom:14px">Transfers <span class="badge-dim">'+approvedWaivers.length+'</span></div>';
-      var byGW2 = {};
-      // Group by GW, then sort each GW by priority asc (waiver order), FA after waivers
       var byGW2 = {};
       approvedWaivers.forEach(function(t){ var g=t.event||0; if(!byGW2[g])byGW2[g]=[]; byGW2[g].push(t); });
       Object.keys(byGW2).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
         var gwList = byGW2[gw].slice().sort(function(a,b){
-          // Waivers (w) before free agents (f), then by priority asc
           if (a.kind !== b.kind) return a.kind==='w' ? -1 : 1;
           return (a.priority||9999) - (b.priority||9999);
         });
@@ -1437,7 +2398,6 @@ var DRAFT_PICKS = [
           var mgr = G.managerById[String(t.entry)]||G.managers[String(t.entry)]||{name:'Unknown',team:''};
           html += '<div class="waiver-card">';
           html += '<div class="waiver-card-top">';
-          // Show priority number for waivers
           var priorityTag = t.kind==='w' && t.priority ? '<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);margin-right:4px">#'+t.priority+'</span>' : '';
           html += '<span class="waiver-manager">'+priorityTag+mgr.name+'</span>';
           html += '<span class="waiver-type-badge '+(t.kind==='w'?'w':'f')+'">'+(t.kind==='w'?'Waiver':'Free Agent')+'</span>';
@@ -1451,7 +2411,6 @@ var DRAFT_PICKS = [
         html += '</div></div>';
       });
 
-      // Most transferred in/out tables
       var pIn={}, pOut={};
       approvedWaivers.forEach(function(t){ pIn[t.element_in]=(pIn[t.element_in]||0)+1; pOut[t.element_out]=(pOut[t.element_out]||0)+1; });
       var topIn  = Object.keys(pIn).map(function(id){return{id:id,c:pIn[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
@@ -1466,24 +2425,45 @@ var DRAFT_PICKS = [
       html += '</tbody></table></div>';
     }
 
-    // ── Most traded players (via manager trades) ─────────────────────────
     if (acceptedTrades.length) {
-      var tradeCount = {}, tradeManagers = {};
-      acceptedTrades.forEach(function(t) {
-        var offName = mName(t.offered_entry);
-        var recName = mName(t.received_entry);
-        (t.tradeitem_set||[]).forEach(function(i) {
-          // element_in goes to offerer, element_out goes to receiver
-          [i.element_in, i.element_out].forEach(function(pid) {
-            pid = String(pid);
-            tradeCount[pid] = (tradeCount[pid]||0) + 1;
-            if (!tradeManagers[pid]) tradeManagers[pid] = [];
-            tradeManagers[pid].push(offName.split(' ')[0]+' ↔ '+recName.split(' ')[0]);
+      // Sort all trades chronologically
+      var sortedTrades = acceptedTrades.slice().sort(function(a,b){ return (a.event||0)-(b.event||0); });
+
+      // For each player, build chronological ownership chain from trade history.
+      // Each trade moves element_in to the offered_entry, element_out to received_entry.
+      // We track: for each pid, array of {gw, owner (first name)} in order.
+      var tradeCount  = {};
+      var ownerChains = {}; // pid -> [{gw, name}]
+
+      sortedTrades.forEach(function(t) {
+        var offId   = String(t.offered_entry);
+        var recId   = String(t.received_entry);
+        var offFirst = mName(t.offered_entry).split(' ')[0];
+        var recFirst = mName(t.received_entry).split(' ')[0];
+        var gw = t.event || 0;
+
+        (t.tradeitem_set||[]).forEach(function(item) {
+          // element_in goes TO offered_entry (they receive it)
+          // element_out goes TO received_entry (they receive it)
+          var pairs = [
+            { pid: String(item.element_in),  newOwner: offFirst, gw: gw },
+            { pid: String(item.element_out), newOwner: recFirst, gw: gw }
+          ];
+          pairs.forEach(function(pair) {
+            tradeCount[pair.pid] = (tradeCount[pair.pid]||0) + 1;
+            if (!ownerChains[pair.pid]) ownerChains[pair.pid] = [];
+            // Avoid consecutive duplicate names (same manager traded it back immediately)
+            var chain = ownerChains[pair.pid];
+            var last = chain.length ? chain[chain.length-1].name : null;
+            if (pair.newOwner !== last) {
+              chain.push({ gw: pair.gw, name: pair.newOwner });
+            }
           });
         });
       });
+
       var topTraded = Object.keys(tradeCount)
-        .map(function(id){ return {id:id, c:tradeCount[id], mgrs:tradeManagers[id]}; })
+        .map(function(id){ return { id:id, c:tradeCount[id], chain:ownerChains[id]||[] }; })
         .sort(function(a,b){ return b.c-a.c; })
         .slice(0,12);
 
@@ -1496,16 +2476,19 @@ var DRAFT_PICKS = [
         html += '<span class="insight-bar-wrap"><span class="insight-bar" style="width:'+Math.round(p.c/topTraded[0].c*100)+'%"></span></span>';
         html += '<span class="insight-count">'+p.c+'×</span>';
         html += '</div>';
-        // Show which partnerships this player featured in (deduplicated)
-        var uniqMgrs = p.mgrs.filter(function(v,i,a){return a.indexOf(v)===i;});
-        html += '<div class="insight-detail">'+uniqMgrs.join(' &nbsp;·&nbsp; ')+'</div>';
+        // Render ownership chain as: Name → Name → Name (GW labels on hover via title)
+        if (p.chain.length) {
+          var chainHtml = p.chain.map(function(step, ci) {
+            var arrow = ci === 0 ? '' : '<span class="chain-arrow">→</span>';
+            return arrow + '<span class="chain-name" title="GW'+step.gw+'">'+step.name+'</span>';
+          }).join('');
+          html += '<div class="insight-detail chain-detail">'+chainHtml+'</div>';
+        }
       });
       html += '</div>';
     }
 
-    // ── Trade partners ────────────────────────────────────────────────────
     if (acceptedTrades.length) {
-      // Build partnership map
       var partners = {};
       acceptedTrades.forEach(function(t) {
         var a = mName(t.offered_entry);
@@ -1518,16 +2501,11 @@ var DRAFT_PICKS = [
         });
         partners[key].trades.push({ gw:t.event, players:players });
       });
-
-      var sortedPartners = Object.values(partners)
-        .sort(function(a,b){ return b.count-a.count; });
-
+      var sortedPartners = Object.values(partners).sort(function(a,b){ return b.count-a.count; });
       html += '<div class="section-label" style="margin-top:8px;margin-bottom:14px">Trade Partnerships</div>';
       html += '<div class="partnerships">';
       sortedPartners.forEach(function(p) {
-        var uid = 'tp-'+p.a.replace(/\s/g,'').slice(0,6)+p.b.replace(/\s/g,'').slice(0,6);
         html += '<div class="partnership-card">';
-        // Header
         html += '<div class="partnership-header" onclick="togglePartner(this)">';
         html += '<div class="partnership-names">';
         html += '<span class="partner-name">'+p.a.split(' ')[0]+' '+p.a.split(' ').slice(-1)[0]+'</span>';
@@ -1537,44 +2515,33 @@ var DRAFT_PICKS = [
         html += '<span class="partner-count">'+p.count+' trade'+(p.count!==1?'s':'')+'</span>';
         html += '<span class="partner-chevron">▼</span>';
         html += '</div>';
-        // Detail rows (collapsed by default)
         html += '<div class="partnership-body" style="display:none">';
         p.trades.sort(function(a,b){return b.gw-a.gw;}).forEach(function(t){
           html += '<div class="partnership-trade">';
           html += '<span class="mgr-gw-tag">GW'+t.gw+'</span>';
           html += '<div class="partnership-players">';
-          t.players.forEach(function(pair){
-            html += '<span class="partnership-pair">'+pair+'</span>';
-          });
+          t.players.forEach(function(pair){ html += '<span class="partnership-pair">'+pair+'</span>'; });
           html += '</div></div>';
         });
         html += '</div></div>';
       });
       html += '</div>';
     }
-
     el.innerHTML = html;
   }
 
-
   function renderTradesByManager(mgrStats) {
     var el = document.getElementById("tradesByManager");
-
-    // Sort by most active overall
     var sorted = mgrStats.slice().sort(function(a,b){
       var ta = (a.tradesAcceptedOffered+a.tradesAcceptedReceived) + (a.waivers+a.freeAgents);
       var tb = (b.tradesAcceptedOffered+b.tradesAcceptedReceived) + (b.waivers+b.freeAgents);
       return tb-ta;
     });
-
     var html = '';
-
     sorted.forEach(function(m, idx) {
       var totalAccepted = m.tradesAcceptedOffered + m.tradesAcceptedReceived;
       var totalXfers    = m.waivers + m.freeAgents;
       var uid = 'mc'+(m.leagueId||idx);
-
-      // ── Card header ────────────────────────────────────────────────────
       html += '<div class="mgr-card">';
       html += '<div class="mgr-card-header" onclick="toggleMgrCard(this,\'' + uid + '\')">';
       html += '<div class="mgr-card-info">';
@@ -1588,17 +2555,12 @@ var DRAFT_PICKS = [
       html += '</div>';
       html += '<span class="mgr-chevron" id="chv-'+uid+'">▼</span>';
       html += '</div>';
-
-      // ── Card body ──────────────────────────────────────────────────────
       html += '<div class="mgr-card-body" id="'+uid+'">';
-
-      // Accepted trades
       if (m.tradeHistory.length) {
         html += '<div class="mgr-section">';
         html += '<div class="mgr-section-title">'+totalAccepted+' Trade'+(totalAccepted!==1?'s':'')+' · <span style="color:rgba(255,255,255,0.5)">'+m.tradesAcceptedOffered+' offered · '+m.tradesAcceptedReceived+' received</span></div>';
         m.tradeHistory.slice().sort(function(a,b){return b.gw-a.gw;}).forEach(function(t){
           html += '<div class="mgr-trade-row">';
-          // Row header: GW tag + partner + role badge
           var roleBadge = t.role === 'offered'
             ? '<span class="role-badge offered">Offered</span>'
             : '<span class="role-badge received">Received</span>';
@@ -1607,7 +2569,6 @@ var DRAFT_PICKS = [
           html += '<span class="mgr-trade-partner">'+t.withName+'</span>';
           html += roleBadge;
           html += '</div>';
-          // Chips: Got / Gave on same row with labels
           html += '<div class="mgr-trade-chips">';
           html += '<div class="mgr-trade-group"><div class="mgr-trade-group-label got">Got</div>';
           t.got.forEach(function(id){ html += '<div class="chip in">'+pName(id)+'</div>'; });
@@ -1618,8 +2579,6 @@ var DRAFT_PICKS = [
         });
         html += '</div>';
       }
-
-      // Waivers
       if (m.waiverHistory.length) {
         html += '<div class="mgr-section">';
         html += '<div class="mgr-section-title">Transfers · <span style="color:rgba(255,255,255,0.5)">'+m.waivers+' waiver · '+m.freeAgents+' free agent · '+m.deniedWaivers+' waiver denied</span></div>';
@@ -1636,17 +2595,13 @@ var DRAFT_PICKS = [
       } else {
         html += '<div class="mgr-section"><p style="font-size:13px;color:rgba(255,255,255,0.35);margin:0">No transfers this season.</p></div>';
       }
-
       if (!m.tradeHistory.length && !m.waiverHistory.length) {
         html += '<div class="mgr-section"><p style="font-size:13px;color:rgba(255,255,255,0.35);margin:0">No activity this season.</p></div>';
       }
-
-      html += '</div></div>'; // body, card
+      html += '</div></div>';
     });
-
     el.innerHTML = html;
   }
-
 
   function togglePartner(header) {
     var body = header.nextElementSibling;
@@ -1672,15 +2627,12 @@ var DRAFT_PICKS = [
   }
 
   function switchSubTab(btn, targetId) {
-    var container = btn.closest('.sub-tabs').nextElementSibling;
     btn.parentElement.querySelectorAll('.sub-tab').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
-    // Hide all sibling sub-tab-content divs, show the target
     var parent = btn.closest('.sub-tabs').parentElement;
     parent.querySelectorAll('.sub-tab-content').forEach(function(el){
       el.style.display = el.id === targetId ? 'block' : 'none';
     });
-    // Fallback for trades which uses named IDs
     ['tradesOverview','tradesByManager'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.style.display = id===targetId ? 'block' : 'none';
@@ -1692,23 +2644,18 @@ var DRAFT_PICKS = [
     clearError();
     var raw = document.getElementById("pasteArea").value.trim();
     if (!raw) { showError("Please paste your league data first."); return; }
-
     var parsed;
     try { parsed = JSON.parse(raw); }
     catch(e) { showError("Could not parse JSON: " + e.message); return; }
-
-    try {
-      goInner(parsed);
-    } catch(e) {
+    try { goInner(parsed); }
+    catch(e) {
       showError("Error loading data: " + e.message + (e.stack ? " | " + e.stack.split("\n")[1] : ""));
       console.error(e);
     }
   }
 
   function goInner(parsed) {
-
     var leagueData, transactionData, tradeData, bootstrapData;
-
     if (parsed.leagueData && parsed.leagueData.league_entries) {
       leagueData     = parsed.leagueData;
       transactionData = parsed.transactionData || null;
@@ -1727,16 +2674,12 @@ var DRAFT_PICKS = [
     G.transactionData = transactionData || null;
     G.tradeData = tradeData || null;
 
-
-    // Build a universal manager lookup that indexes by EVERY numeric field on each entry
-    // This handles cases where the ID field name is unknown
-    G.managers = {};  // keyed by e.id (internal league entry id)
-    G.managerById = {}; // keyed by any numeric field value found on the entry
+    G.managers = {};
+    G.managerById = {};
     leagueData.league_entries.forEach(function(e){
       var capFirst = e.player_first_name.charAt(0).toUpperCase()+e.player_first_name.slice(1);
       var m = { name: capFirst+" "+e.player_last_name, team: e.entry_name };
       G.managers[e.id] = m;
-      // Index by every numeric-valued field so we catch whatever ID trades/waivers use
       Object.keys(e).forEach(function(k){
         var v = e[k];
         if (typeof v === 'number' && v > 0) G.managerById[v] = m;
@@ -1744,7 +2687,6 @@ var DRAFT_PICKS = [
       });
     });
 
-    // Build player name lookup — prefer bootstrap, fall back to leagueData.elements
     G.playerNames = {};
     var elemSrc = null;
     if (bootstrapData) {
@@ -1760,17 +2702,15 @@ var DRAFT_PICKS = [
       });
     }
 
-    // All finished matches
     G.allFinished = leagueData.matches.filter(function(m){ return m.finished; });
 
     var mg = maxGW();
     var defFrom = Math.max(1, mg-4);
     document.getElementById("formFrom").value = defFrom;
     document.getElementById("formTo").value = mg;
-    document.getElementById("liFrom").value = defFrom;
+    document.getElementById("liFrom").value = 1;
     document.getElementById("liTo").value = mg;
 
-    // H2H dropdowns
     var sorted = Object.keys(G.managers).map(function(id){
       return { id:id, name:G.managers[id].name };
     }).sort(function(a,b){ return a.name.localeCompare(b.name); });
@@ -1785,21 +2725,27 @@ var DRAFT_PICKS = [
     document.getElementById("h2hResult").style.display="none";
 
     renderStandings();
+    renderGWChart();
     renderForm();
+    renderStreaks();
+    renderBigGWScores();
     renderLuck();
     renderTrades(transactionData, tradeData);
-
 
     document.getElementById("landing").style.display="none";
     document.getElementById("results").style.display="block";
 
     document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
-    document.getElementById("tab-standings").classList.add("active");
+    document.getElementById("tab-results").classList.add("active");
     document.querySelectorAll(".tab")[0].classList.add("active");
 
+    // Set All preset active by default
+    var allPresets = document.querySelectorAll('.gw-preset');
+    allPresets.forEach(function(b){ if(b.textContent==='All') b.classList.add('active'); else b.classList.remove('active'); });
+
     window.scrollTo(0,0);
-  } // end goInner
+  }
 
   function pTeam(id) {
     var tid = G.playerTeam[id];
@@ -1822,14 +2768,12 @@ var DRAFT_PICKS = [
       });
     }
 
-    // Sub-tabs
     html += '<div class="sub-tabs">';
     html += '<button class="sub-tab active" onclick="switchSubTab(this,\'draftOrder\')">All Picks</button>';
     html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftBoard\')">Draft Board</button>';
     html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftSquads\')">By Manager</button>';
     html += '</div>';
 
-    // ── ALL PICKS ────────────────────────────────────────────────────────
     html += '<div id="draftOrder" class="sub-tab-content">';
     html += '<div class="section-label" style="margin-bottom:14px">All 180 Picks · Draft Order</div>';
     html += '<div class="draft-all-list">';
@@ -1849,7 +2793,6 @@ var DRAFT_PICKS = [
     });
     html += '</div></div>';
 
-    // ── DRAFT BOARD ──────────────────────────────────────────────────────
     html += '<div id="draftBoard" class="sub-tab-content" style="display:none">';
     html += '<div class="section-label" style="margin-bottom:14px">Draft Board</div>';
     html += '<div class="draft-board-wrap"><table class="draft-board"><thead><tr><th>Rd</th>';
@@ -1871,7 +2814,6 @@ var DRAFT_PICKS = [
     }
     html += '</tbody></table></div></div>';
 
-    // ── BY MANAGER ───────────────────────────────────────────────────────
     html += '<div id="draftSquads" class="sub-tab-content" style="display:none">';
     html += '<div class="section-label" style="margin-bottom:14px">Drafted Squads</div>';
     managers.forEach(function(m) {
@@ -1883,7 +2825,6 @@ var DRAFT_PICKS = [
       var def = picks.filter(function(p){ return p.pos==='DEF'; }).length;
       var gkp = picks.filter(function(p){ return p.pos==='GKP'; }).length;
       html += '<div class="mgr-card">';
-      // Use data-uid attribute so no quote issues
       html += '<div class="mgr-card-header draft-mgr-toggle" data-uid="' + uid + '">';
       html += '<div class="mgr-card-info"><div class="mgr-card-name">' + info.name + '</div>';
       html += '<div class="mgr-card-team">' + info.team + '</div></div>';
@@ -1918,7 +2859,6 @@ var DRAFT_PICKS = [
 
     el.innerHTML = html;
 
-    // Wire up draft manager card toggles via event delegation
     el.addEventListener('click', function(e) {
       var hdr = e.target.closest('.draft-mgr-toggle');
       if (!hdr) return;
@@ -1930,7 +2870,6 @@ var DRAFT_PICKS = [
       body.style.display = open ? 'none' : 'block';
       if (chv) chv.innerHTML = open ? '&#9660;' : '&#9650;';
     });
-    // All collapsed by default
     managers.forEach(function(m) {
       var uid = 'dr-' + m.toLowerCase();
       var body = document.getElementById(uid);
@@ -1940,14 +2879,16 @@ var DRAFT_PICKS = [
     switchSubTab(el.querySelector('.sub-tab.active'), 'draftOrder');
   }
 
+  // Re-render charts on window resize
+  window.addEventListener('resize', function() {
+    clearTimeout(window._chartResizeTimer);
+    window._chartResizeTimer = setTimeout(function() {
+      if (G.luckChartData) renderLuckChart();
+      var canvas = document.getElementById('gwChart');
+      if (canvas && canvas._gwList) drawGWChart(canvas, canvas._gwList, canvas._mgrOrder, canvas._positions, canvas._cumPts, canvas._cumGf);
+    }, 120);
+  });
 </script>
-
-```
-<!-- DRAFT -->
-<div id="tab-draft" class="tab-content">
-  <div id="draftContent"></div>
-</div>
-```
 
 </body>
 </html>
