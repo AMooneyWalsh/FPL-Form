@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v47 -->
+<!-- v48 -->
 
 <html lang="en">
 <head>
@@ -784,9 +784,7 @@ select option { background-color: #150d22; color: #fff; }
 <header>
   <h1>FPL Draft <span>Stats</span></h1>
   <p>Drafty In Here · League 6573</p>
-  <div id="headerReset" style="display:none;margin-top:10px">
-    <button onclick="reset()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.65);font-size:12px;font-weight:700;letter-spacing:0.3px;cursor:pointer;padding:7px 16px;border-radius:20px;min-height:36px;">↺ Load new data</button>
-  </div>
+
 </header>
 
 <div class="container">
@@ -826,6 +824,9 @@ select option { background-color: #150d22; color: #fff; }
   <button class="tab" onclick="showTab('trades', this)">Transfers</button>
   <button class="tab" onclick="showTab('draft', this)">Draft</button>
 </div>
+
+<!-- In-app error banner (shown when data is already loaded) -->
+<div class="error" id="resultsErrorBox" style="margin-bottom:12px"></div>
 
 <!-- RESULTS TAB: Standings + Form -->
 <div id="tab-results" class="tab-content active">
@@ -1265,12 +1266,20 @@ var DRAFT_PICKS = [
 
   /* ── Utilities ── */
   function showError(msg) {
-    var b = document.getElementById("errorBox");
-    b.textContent = msg; b.style.display = "block";
+    // Use the results-view error box if data is loaded, otherwise the landing box
+    var resultsVisible = document.getElementById('results').style.display !== 'none';
+    var boxId = resultsVisible ? 'resultsErrorBox' : 'errorBox';
+    var b = document.getElementById(boxId);
+    b.textContent = msg; b.style.display = 'block';
+    // Auto-hide after 4s so it doesn't linger
+    clearTimeout(showError._timer);
+    showError._timer = setTimeout(function(){ b.style.display = 'none'; }, 4000);
   }
   function clearError() {
     var b = document.getElementById("errorBox");
     b.style.display = "none"; b.textContent = "";
+    var rb = document.getElementById("resultsErrorBox");
+    if (rb) { rb.style.display = "none"; rb.textContent = ""; }
   }
   function posClass(p) { return p===1?"gold":p===2?"silver":p===3?"bronze":""; }
   function gdStr(gd) { return gd>=0?"+"+gd:""+gd; }
@@ -1327,8 +1336,6 @@ var DRAFT_PICKS = [
   function reset() {
     document.getElementById("results").style.display = "none";
     document.getElementById("landing").style.display = "block";
-    var hr = document.getElementById('headerReset');
-    if (hr) hr.style.display = 'none';
     document.getElementById("pasteArea").value = "";
     var hint  = document.getElementById('autoLoadHint');
     var paste = document.getElementById('pasteSection');
@@ -2924,8 +2931,6 @@ var DRAFT_PICKS = [
 
     document.getElementById("landing").style.display="none";
     document.getElementById("results").style.display="block";
-    var hr = document.getElementById('headerReset');
-    if (hr) hr.style.display = 'block';
 
     document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
