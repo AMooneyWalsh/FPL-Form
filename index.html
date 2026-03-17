@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v53 -->
+<!-- v54 -->
 
 <html lang="en">
 <head>
@@ -13,18 +13,18 @@
 html { background-color: #0e0818; }
 
 body {
-  background-color: #0e0818;
-  color: #e8e8f0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  min-height: 100vh;
+background-color: #0e0818;
+color: #e8e8f0;
+font-family: -apple-system, BlinkMacSystemFont, “Segoe UI”, Helvetica, Arial, sans-serif;
+font-size: 16px;
+min-height: 100vh;
 }
 
 header {
-  background-color: #38003c;
-  padding: 20px 16px;
-  text-align: center;
-  border-bottom: 3px solid #00d4ff;
+background-color: #38003c;
+padding: 20px 16px;
+text-align: center;
+border-bottom: 3px solid #00d4ff;
 }
 
 header h1 { color: #fff; font-size: 26px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
@@ -38,109 +38,111 @@ header p { color: rgba(255,255,255,0.45); font-size: 13px; margin-top: 4px; }
 .landing-intro p { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.5; }
 
 .card {
-  background-color: #150d22;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 16px;
+background-color: #150d22;
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 10px;
+padding: 20px;
+margin-bottom: 16px;
 }
 
 .hint { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 12px; }
 .hint strong { color: rgba(255,255,255,0.85); }
 
 textarea {
-  background-color: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  color: #fff;
-  font-family: monospace;
-  font-size: 12px;
-  padding: 10px 12px;
-  width: 100%;
-  height: 110px;
-  resize: none;
-  display: block;
+background-color: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 8px;
+color: #fff;
+font-family: monospace;
+font-size: 12px;
+padding: 10px 12px;
+width: 100%;
+height: 110px;
+resize: none;
+display: block;
 }
 textarea:focus { outline: none; border-color: #00d4ff; }
 textarea::placeholder { color: rgba(255,255,255,0.2); }
 
 .error {
-  background-color: rgba(255,40,130,0.15);
-  border: 1px solid rgba(255,40,130,0.4);
-  border-radius: 8px;
-  color: #ff6eb0;
-  font-size: 14px;
-  padding: 12px;
-  margin-bottom: 14px;
-  display: none;
+background-color: rgba(255,40,130,0.15);
+border: 1px solid rgba(255,40,130,0.4);
+border-radius: 8px;
+color: #ff6eb0;
+font-size: 14px;
+padding: 12px;
+margin-bottom: 14px;
+display: none;
 }
 
 .btn {
-  display: block; width: 100%; padding: 16px;
-  background-color: #00d4ff; color: #38003c;
-  border: none; border-radius: 8px;
-  font-size: 17px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: 1px;
-  cursor: pointer; -webkit-appearance: none;
+display: block; width: 100%; padding: 16px;
+background-color: #00d4ff; color: #38003c;
+border: none; border-radius: 8px;
+font-size: 17px; font-weight: 800;
+text-transform: uppercase; letter-spacing: 1px;
+cursor: pointer; -webkit-appearance: none;
 }
 .btn:active { background-color: #00aacc; }
 
-.btn-ghost {
-  background-color: transparent;
-  color: rgba(255,255,255,0.75);
-  border: 1px solid rgba(255,255,255,0.2);
-  font-size: 14px; padding: 10px;
-  margin-bottom: 20px; letter-spacing: 0.5px;
-}
-.btn-ghost:active { background-color: rgba(255,255,255,0.05); }
-
 /* ── Auto-load spinner ── */
 .auto-load-hint {
-  text-align: center;
-  padding: 40px 0 20px;
-  color: rgba(255,255,255,0.35);
-  font-size: 14px;
+text-align: center;
+padding: 40px 0 20px;
+color: rgba(255,255,255,0.35);
+font-size: 14px;
 }
 .auto-load-hint .spinner {
-  display: inline-block;
-  width: 22px; height: 22px;
-  border: 2px solid rgba(0,212,255,0.2);
-  border-top-color: #00d4ff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 10px;
+display: inline-block;
+width: 22px; height: 22px;
+border: 2px solid rgba(0,212,255,0.2);
+border-top-color: #00d4ff;
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+margin-bottom: 10px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── Top tabs (primary navigation) ── */
 .tabs {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 0; margin-bottom: 24px;
-  border-bottom: 2px solid rgba(255,255,255,0.08);
+display: grid; grid-template-columns: repeat(3, 1fr);
+gap: 0; margin-bottom: 24px;
+border-bottom: 2px solid rgba(255,255,255,0.08);
 }
 .tab {
-  background-color: transparent; border: none;
-  border-bottom: 3px solid transparent; margin-bottom: -2px;
-  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 700;
-  padding: 12px 4px; cursor: pointer; white-space: nowrap; text-align: center;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  -webkit-appearance: none; transition: color 0.15s, border-color 0.15s;
-  line-height: 1.2; min-height: 44px;
+background-color: transparent; border: none;
+border-bottom: 3px solid transparent; margin-bottom: -2px;
+color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 700;
+padding: 12px 4px; cursor: pointer; white-space: nowrap; text-align: center;
+text-transform: uppercase; letter-spacing: 0.5px;
+-webkit-appearance: none; transition: color 0.15s, border-color 0.15s;
+line-height: 1.2; min-height: 44px;
 }
 .tab.active { color: #00d4ff; border-bottom-color: #00d4ff; }
 .tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
 
 /* ── Inner sub-nav (secondary, pill style) ── */
 .inner-tabs {
-  display: flex; gap: 6px; margin-bottom: 20px;
-  overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+display: flex; gap: 6px; margin-bottom: 20px;
+overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+scrollbar-width: none; -ms-overflow-style: none;
+}
+.inner-tabs::-webkit-scrollbar { display: none; }
+.inner-tabs-wrap {
+position: relative; margin-bottom: 20px;
+}
+.inner-tabs-wrap .inner-tabs { margin-bottom: 0; }
+.inner-tabs-wrap::after {
+content: ‘’; position: absolute; right: 0; top: 0; bottom: 0;
+width: 32px; pointer-events: none;
+background: linear-gradient(to right, transparent, #0e0818);
 }
 .inner-tab {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5); border-radius: 20px; padding: 9px 18px;
-  font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-  letter-spacing: 0.2px; white-space: nowrap; flex-shrink: 0;
-  -webkit-appearance: none; min-height: 44px; display: flex; align-items: center;
+background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+color: rgba(255,255,255,0.5); border-radius: 20px; padding: 9px 18px;
+font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+letter-spacing: 0.2px; white-space: nowrap; flex-shrink: 0;
+-webkit-appearance: none; min-height: 44px; display: flex; align-items: center;
 }
 .inner-tab.active { background: rgba(0,212,255,0.15); border-color: #00d4ff; color: #00d4ff; }
 .inner-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.4); }
@@ -152,14 +154,14 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 
 /* ── Section separator ── */
 .section-sep {
-  height: 1px; background: rgba(255,255,255,0.07);
-  margin: 24px 0;
+height: 1px; background: rgba(255,255,255,0.07);
+margin: 24px 0;
 }
 
 .section-label {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px; color: rgba(255,255,255,0.65);
-  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+font-size: 12px; font-weight: 700; text-transform: uppercase;
+letter-spacing: 1px; color: rgba(255,255,255,0.65);
+margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
 }
 
 .badge { background-color: #00d4ff; color: #38003c; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
@@ -168,11 +170,11 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 /* ── Sub-tabs (trades/draft internal) ── */
 .sub-tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sub-tab {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.45); border-radius: 20px; padding: 11px 18px;
-  font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-  letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0;
-  min-height: 44px; display: inline-flex; align-items: center;
+background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+color: rgba(255,255,255,0.45); border-radius: 20px; padding: 11px 18px;
+font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0;
+min-height: 44px; display: inline-flex; align-items: center;
 }
 .sub-tab.active { background: #00d4ff; border-color: #00d4ff; color: #0e0818; }
 .sub-tab:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.75); }
@@ -180,10 +182,7 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 /* ── Trade card (Overview) ── */
 .trade-card { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #1a0f2e; }
 .trade-card-header { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.07); }
-.trade-offerer { display: flex; align-items: center; gap: 6px; }
-.trade-offerer-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.55); }
-.trade-offerer-name { font-size: 14px; font-weight: 800; color: #fff; }
-.trade-accepted-badge { background: rgba(0,255,135,0.12); color: #00d4ff; border: 1px solid rgba(0,255,135,0.25); font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; padding: 3px 10px; }
+
 .trade-card-body { padding: 12px 14px; }
 .trade-columns { display: flex; gap: 0; }
 .trade-col { flex: 1; }
@@ -231,86 +230,75 @@ textarea::placeholder { color: rgba(255,255,255,0.2); }
 .mgr-card-body.open { display: block; }
 .mgr-section { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .mgr-section:last-child { border-bottom: none; }
-.mgr-section-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
-.mgr-trade-row { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.mgr-trade-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.mgr-trade-meta { font-size: 11px; color: rgba(255,255,255,0.55); margin-bottom: 6px; }
-.mgr-trade-meta b { color: rgba(255,255,255,0.65); font-weight: 700; }
-.mgr-trade-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.mgr-trade-group { min-width: 0; }
-.mgr-trade-group-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
-.mgr-trade-group-label.got { color: #00d4ff; }
-.mgr-trade-group-label.gave { color: #ff6b6b; }
-.mgr-waiver-item { display: flex; align-items: center; gap: 6px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-.mgr-waiver-item:last-child { border-bottom: none; }
+
 .mgr-gw-tag { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.75); min-width: 28px; }
 
 /* ── GW Range Picker ── */
 .gw-picker {
-  margin-bottom: 16px;
+margin-bottom: 16px;
 }
 .gw-presets {
-  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
 }
 .gw-preset {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.6); border-radius: 20px; padding: 10px 16px;
-  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-  -webkit-appearance: none; white-space: nowrap;
-  min-height: 44px; display: inline-flex; align-items: center;
+background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+color: rgba(255,255,255,0.6); border-radius: 20px; padding: 10px 16px;
+font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+-webkit-appearance: none; white-space: nowrap;
+min-height: 44px; display: inline-flex; align-items: center;
 }
 .gw-preset.active { background: rgba(0,212,255,0.15); border-color: #00d4ff; color: #00d4ff; }
 .gw-preset:active { opacity: 0.7; }
 .gw-custom-row {
-  display: flex; align-items: center; gap: 8px;
+display: flex; align-items: center; gap: 8px;
 }
 .gw-custom-row label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); }
 .gw-custom-row input {
-  background-color: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px; color: #fff;
-  font-size: 14px; font-weight: 700;
-  padding: 10px 8px; width: 58px;
-  -webkit-appearance: none; text-align: center;
-  min-height: 44px;
+background-color: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.12);
+border-radius: 6px; color: #fff;
+font-size: 14px; font-weight: 700;
+padding: 10px 8px; width: 58px;
+-webkit-appearance: none; text-align: center;
+min-height: 44px;
 }
 .gw-custom-row input:focus { outline: none; border-color: #00d4ff; }
 .gw-custom-row .btn-apply {
-  background-color: rgba(0,212,255,0.15); color: #00d4ff;
-  border: 1px solid #00d4ff; border-radius: 6px;
-  font-size: 12px; font-weight: 800;
-  padding: 10px 14px; cursor: pointer;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  white-space: nowrap; -webkit-appearance: none;
-  min-height: 44px;
+background-color: rgba(0,212,255,0.15); color: #00d4ff;
+border: 1px solid #00d4ff; border-radius: 6px;
+font-size: 12px; font-weight: 800;
+padding: 10px 14px; cursor: pointer;
+text-transform: uppercase; letter-spacing: 0.5px;
+white-space: nowrap; -webkit-appearance: none;
+min-height: 44px;
 }
 .gw-custom-row .btn-apply:active { opacity: 0.7; }
 
 /* ── Inline alert (replaces browser alert()) ── */
 .inline-alert {
-  background: rgba(255,40,130,0.1);
-  border: 1px solid rgba(255,40,130,0.35);
-  border-radius: 8px; color: #ff6eb0;
-  font-size: 13px; font-weight: 600;
-  padding: 10px 14px; margin-bottom: 12px;
-  display: none;
+background: rgba(255,40,130,0.1);
+border: 1px solid rgba(255,40,130,0.35);
+border-radius: 8px; color: #ff6eb0;
+font-size: 13px; font-weight: 600;
+padding: 10px 14px; margin-bottom: 12px;
+display: none;
 }
 
 .table-wrap {
-  background-color: #150d22;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px; overflow: hidden;
-  margin-bottom: 24px; overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+background-color: #150d22;
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 10px; overflow: hidden;
+margin-bottom: 24px; overflow-x: auto;
+-webkit-overflow-scrolling: touch;
 }
 
 table { width: 100%; border-collapse: collapse; min-width: 300px; }
 thead tr { background-color: rgba(255,255,255,0.05); }
 th {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: rgba(255,255,255,0.35);
-  padding: 10px 8px; text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap;
+font-size: 11px; font-weight: 700; text-transform: uppercase;
+letter-spacing: 0.5px; color: rgba(255,255,255,0.35);
+padding: 10px 8px; text-align: center;
+border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap;
 }
 th.al { text-align: left; }
 tbody tr { border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -331,9 +319,9 @@ td.al { text-align: left; }
 
 .dots { display: flex; gap: 4px; justify-content: center; align-items: center; }
 .dot {
-  width: 22px; height: 22px; border-radius: 50%;
-  font-size: 10px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+width: 22px; height: 22px; border-radius: 50%;
+font-size: 10px; font-weight: 800;
+display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .dot.W { background-color: #00a878; color: #002a17; }
 .dot.D { background-color: #f5a623; color: #4a2f00; }
@@ -347,98 +335,68 @@ td.al { text-align: left; }
 .sel-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.65); display: block; margin-bottom: 5px; }
 
 select {
-  background-color: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px; color: #fff;
-  font-size: 14px; font-weight: 600;
-  padding: 10px 30px 10px 10px; width: 100%;
-  -webkit-appearance: none; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='rgba(255,255,255,0.35)' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center;
+background-color: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 8px; color: #fff;
+font-size: 14px; font-weight: 600;
+padding: 10px 30px 10px 10px; width: 100%;
+-webkit-appearance: none; appearance: none;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘10’ height=‘6’ viewBox=‘0 0 10 6’%3E%3Cpath fill=‘rgba(255,255,255,0.35)’ d=‘M5 6L0 0h10z’/%3E%3C/svg%3E”);
+background-repeat: no-repeat; background-position: right 10px center;
 }
 select:focus { outline: none; border-color: #00d4ff; }
 select option { background-color: #150d22; color: #fff; }
 
 .btn-go {
-  background-color: #38003c; color: #00d4ff;
-  border: 1px solid #00d4ff; border-radius: 8px;
-  font-size: 13px; font-weight: 800;
-  padding: 10px 18px; cursor: pointer;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  white-space: nowrap; -webkit-appearance: none; flex-shrink: 0;
+background-color: #38003c; color: #00d4ff;
+border: 1px solid #00d4ff; border-radius: 8px;
+font-size: 13px; font-weight: 800;
+padding: 10px 18px; cursor: pointer;
+text-transform: uppercase; letter-spacing: 0.5px;
+white-space: nowrap; -webkit-appearance: none; flex-shrink: 0;
 }
 .btn-go:active { background-color: rgba(0,255,135,0.1); }
 
 .h2h-board {
-  background-color: #38003c;
-  border: 1px solid rgba(0,255,135,0.25);
-  border-radius: 10px; padding: 20px 16px;
-  text-align: center; margin-bottom: 14px;
+background-color: #38003c;
+border: 1px solid rgba(0,255,135,0.25);
+border-radius: 10px; padding: 20px 16px;
+text-align: center; margin-bottom: 14px;
 }
 .h2h-names { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 14px; }
 .h2h-mgr { flex: 1; font-weight: 800; font-size: 15px; color: #fff; }
 .h2h-vs { color: rgba(255,255,255,0.75); font-size: 12px; font-weight: 700; }
 .h2h-scores { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.h2h-score { flex: 1; font-size: 52px; font-weight: 800; color: #00d4ff; line-height: 1; }
-.h2h-score.loser { color: rgba(255,255,255,0.75); }
+.h2h-score { flex: 1; font-size: 52px; font-weight: 800; color: rgba(255,255,255,0.4); line-height: 1; }
+.h2h-score.winner { color: #00d4ff; }
+.h2h-score.loser { color: rgba(255,255,255,0.25); }
 .h2h-dash { color: rgba(255,255,255,0.15); font-size: 24px; font-weight: 800; }
 .h2h-sub { color: rgba(255,255,255,0.35); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
 
 /* ── Trades ── */
-.trade-block {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-}
-.trade-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.trade-mgr { font-size: 13px; font-weight: 700; flex: 1; }
-.trade-mgr.offered { color: #00d4ff; }
-.trade-mgr.received { color: #7ec8e3; text-align: right; }
-.trade-vs { color: rgba(255,255,255,0.55); font-size: 16px; flex-shrink: 0; }
-.trade-players { display: flex; gap: 12px; }
-.trade-side { flex: 1; }
-.trade-side-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.55); margin-bottom: 5px; }
-.trade-side .player-pill { display: block; margin-bottom: 4px; }
+
+.trade-side
 
 .trades-summary {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; margin-bottom: 20px;
+display: grid; grid-template-columns: repeat(3, 1fr);
+gap: 10px; margin-bottom: 20px;
 }
 .trades-stat {
-  background-color: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px; padding: 12px 8px; text-align: center;
+background-color: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 10px; padding: 12px 8px; text-align: center;
 }
 .trades-stat .stat-val { font-size: 26px; font-weight: 900; color: #00d4ff; line-height: 1; }
 .trades-stat .stat-lbl { font-size: 9px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; }
 
-.player-pill {
-  display: inline-block;
-  background-color: rgba(0,255,135,0.1);
-  border: 1px solid rgba(0,255,135,0.2);
-  border-radius: 20px; color: #00d4ff;
-  font-size: 12px; font-weight: 700; padding: 3px 10px;
-}
-.player-pill.out {
-  background-color: rgba(255,40,130,0.1);
-  border-color: rgba(255,40,130,0.2); color: #ff6eb0;
-}
-
 /* GW accordion for trades */
 .gw-block { margin-bottom: 12px; }
 .gw-block-header {
-  background-color: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; padding: 10px 14px;
-  display: flex; justify-content: space-between; align-items: center;
-  cursor: pointer; user-select: none;
+background-color: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 8px; padding: 10px 14px;
+display: flex; justify-content: space-between; align-items: center;
+cursor: pointer; user-select: none;
 }
 .gw-block-header:hover { background-color: rgba(255,255,255,0.08); }
 .gw-block-header .gw-title { font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -449,78 +407,28 @@ select option { background-color: #150d22; color: #fff; }
 .gw-block-body { display: none; padding-top: 6px; }
 .gw-block-body.open { display: block; }
 
-.waiver-row {
-  background-color: #150d22;
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px; padding: 10px 14px;
-  margin-bottom: 6px;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  flex-wrap: wrap;
-}
-.waiver-mgr { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); min-width: 100px; }
-.waiver-players { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .waiver-arrow { color: rgba(255,255,255,0.2); font-size: 14px; }
 
-.trades-filter {
-  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
-}
-.filter-btn {
-  background-color: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px; color: rgba(255,255,255,0.75);
-  font-size: 12px; font-weight: 700; padding: 5px 12px;
-  cursor: pointer; -webkit-appearance: none;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.filter-btn.active { background-color: rgba(0,255,135,0.15); border-color: rgba(0,255,135,0.4); color: #00d4ff; }
-
 @media (max-width: 500px) {
-  .hide-sm { display: none; }
-  .dot { width: 18px; height: 18px; font-size: 9px; }
-  .dots { gap: 3px; }
-  .h2h-score { font-size: 40px; }
-  .h2h-mgr { font-size: 13px; }
-  .trades-summary { grid-template-columns: 1fr 1fr; }
+.hide-sm { display: none; }
+.dot { width: 18px; height: 18px; font-size: 9px; }
+.dots { gap: 3px; }
+.h2h-score { font-size: 40px; }
+.h2h-mgr { font-size: 13px; }
+.trades-summary { grid-template-columns: 1fr 1fr; }
 }
 
 /* ── Trade role badges ── */
-.role-badge {
-  font-size: 9px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.6px; padding: 2px 7px; border-radius: 10px;
-  flex-shrink: 0;
-}
-.role-badge.offered  { background: rgba(0,230,118,0.1);  color: #00d4ff; border: 1px solid rgba(0,230,118,0.25); }
-.role-badge.received { background: rgba(126,200,255,0.1); color: #7ec8ff; border: 1px solid rgba(126,200,255,0.25); }
-.role-badge.rejected { background: rgba(255,107,107,0.1); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.25); }
-.role-badge.withdrawn{ background: rgba(255,201,64,0.1);  color: #ffc940; border: 1px solid rgba(255,201,64,0.25); }
 
 /* ── Trade row header ── */
-.mgr-trade-header-row {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 8px; flex-wrap: wrap;
-}
-.mgr-trade-partner {
-  font-size: 13px; font-weight: 700; color: #fff;
-  flex: 1; min-width: 0;
-}
-.mgr-trade-row {
-  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.mgr-trade-row:last-child { border-bottom: none; }
 
 /* ── Waiver item row ── */
-.mgr-waiver-item {
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-  flex-wrap: wrap;
-}
-.mgr-waiver-item:last-child { border-bottom: none; }
 
 /* ── Most traded insight table ── */
 .insight-table { margin-bottom: 8px; }
 .insight-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 0 2px;
+display: flex; align-items: center; gap: 8px;
+padding: 5px 0 2px;
 }
 .insight-rank { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.25); min-width: 18px; text-align: right; }
 .insight-name { font-size: 13px; font-weight: 700; color: #fff; min-width: 90px; }
@@ -528,22 +436,22 @@ select option { background-color: #150d22; color: #fff; }
 .insight-bar { display: block; height: 100%; background: rgba(0,230,118,0.5); border-radius: 2px; }
 .insight-count { font-size: 12px; font-weight: 800; color: #00d4ff; min-width: 28px; text-align: right; }
 .insight-detail {
-  font-size: 10px; color: rgba(255,255,255,0.35); padding: 0 0 7px 26px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  line-height: 1.5;
+font-size: 10px; color: rgba(255,255,255,0.35); padding: 0 0 7px 26px;
+border-bottom: 1px solid rgba(255,255,255,0.04);
+line-height: 1.5;
 }
 .insight-row + .insight-detail:last-child, .insight-detail:last-child { border-bottom: none; }
 
 /* ── Trade partnerships ── */
 .partnerships { display: flex; flex-direction: column; gap: 8px; }
 .partnership-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px; overflow: hidden;
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 10px; overflow: hidden;
 }
 .partnership-header {
-  display: flex; align-items: center; gap: 8px;
-  padding: 11px 14px; cursor: pointer;
+display: flex; align-items: center; gap: 8px;
+padding: 11px 14px; cursor: pointer;
 }
 .partnership-header:active { background: rgba(255,255,255,0.04); }
 .partnership-names { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
@@ -553,25 +461,25 @@ select option { background-color: #150d22; color: #fff; }
 .partner-chevron { font-size: 10px; color: rgba(255,255,255,0.35); flex-shrink: 0; }
 .partnership-body { border-top: 1px solid rgba(255,255,255,0.06); padding: 8px 14px; }
 .partnership-trade {
-  display: flex; align-items: flex-start; gap: 8px;
-  padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+display: flex; align-items: flex-start; gap: 8px;
+padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 .partnership-trade:last-child { border-bottom: none; padding-bottom: 0; }
 .partnership-players { display: flex; flex-direction: column; gap: 2px; }
 .partnership-pair { font-size: 11px; color: rgba(255,255,255,0.6); }
-.partnership-pair::before { content: ''; }
+.partnership-pair::before { content: ‘’; }
 
 /* ── Draft board ── */
 .draft-board-wrap { overflow-x: auto; margin-bottom: 8px; -webkit-overflow-scrolling: touch; }
 .draft-board { border-collapse: collapse; font-size: 11px; min-width: 900px; width: 100%; }
 .draft-board thead th {
-  padding: 6px 6px 8px; text-align: left; font-size: 10px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.45); border-bottom: 1px solid rgba(255,255,255,0.1);
-  white-space: nowrap;
+padding: 6px 6px 8px; text-align: left; font-size: 10px; font-weight: 800;
+text-transform: uppercase; letter-spacing: 0.5px;
+color: rgba(255,255,255,0.45); border-bottom: 1px solid rgba(255,255,255,0.1);
+white-space: nowrap;
 }
 .draft-board th:first-child, .draft-board td:first-child {
-  width: 28px; text-align: center; color: rgba(255,255,255,0.3);
+width: 28px; text-align: center; color: rgba(255,255,255,0.3);
 }
 .draft-round { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); }
 .draft-board tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
@@ -591,8 +499,8 @@ select option { background-color: #150d22; color: #fff; }
 .draft-pos-group { margin-bottom: 10px; }
 .draft-pos-group:last-child { margin-bottom: 0; }
 .draft-pos-label {
-  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
-  margin-bottom: 5px;
+font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+margin-bottom: 5px;
 }
 .draft-pos-label.fwd { color: #ff6b6b; }
 .draft-pos-label.mid { color: #7ec8ff; }
@@ -600,8 +508,8 @@ select option { background-color: #150d22; color: #fff; }
 .draft-pos-label.gkp { color: #ffc940; }
 .draft-pos-players { display: flex; flex-direction: column; gap: 3px; }
 .draft-squad-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+display: flex; align-items: center; gap: 8px;
+padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 .draft-squad-row:last-child { border-bottom: none; }
 .draft-pick-tag { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); min-width: 28px; }
@@ -611,16 +519,16 @@ select option { background-color: #150d22; color: #fff; }
 /* ── All picks list ── */
 .draft-all-list { font-size: 12px; }
 .draft-all-header, .draft-all-row {
-  display: grid;
-  grid-template-columns: 38px 24px 1fr 36px 60px 36px;
-  align-items: center; gap: 4px;
-  padding: 5px 4px;
+display: grid;
+grid-template-columns: 38px 24px 1fr 36px 60px 36px;
+align-items: center; gap: 4px;
+padding: 5px 4px;
 }
 .draft-all-header {
-  font-size: 9px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.5px; color: rgba(255,255,255,0.35);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 6px; margin-bottom: 2px;
+font-size: 9px; font-weight: 800; text-transform: uppercase;
+letter-spacing: 0.5px; color: rgba(255,255,255,0.35);
+border-bottom: 1px solid rgba(255,255,255,0.1);
+padding-bottom: 6px; margin-bottom: 2px;
 }
 .draft-all-row { border-bottom: 1px solid rgba(255,255,255,0.04); }
 .draft-all-row:last-child { border-bottom: none; }
@@ -632,142 +540,137 @@ select option { background-color: #150d22; color: #fff; }
 .da-mgr  { font-size: 11px; color: rgba(255,255,255,0.55); }
 .da-team { font-size: 11px; color: rgba(255,255,255,0.45); }
 .da-team.changed { color: #ffc940; font-weight: 700; }
-.team-changed { color: #ffc940; font-size: 10px; }
 
 /* ── Current owner column ── */
 .draft-all-header, .draft-all-row {
-  grid-template-columns: 38px 24px 1fr 36px 68px 56px;
+grid-template-columns: 38px 24px 1fr 36px 68px 56px;
 }
-.da-now { font-size: 11px; font-weight: 700; text-align: right; }
-.owner-changed { color: #ffc940; font-weight: 800; }
-.owner-same { color: rgba(0,230,118,0.4); font-size: 12px; }
-.draft-all-row.player-moved { background: rgba(255,201,64,0.04); }
+
+.draft-all-row
 
 /* ── Ownership chain ── */
 .chain-detail {
-  display: flex; flex-wrap: wrap; align-items: center;
-  gap: 2px; padding: 4px 0 8px 28px;
+display: flex; flex-wrap: wrap; align-items: center;
+gap: 2px; padding: 4px 0 8px 28px;
 }
 .chain-name {
-  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.07); border-radius: 4px;
-  padding: 2px 6px; white-space: nowrap;
+font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7);
+background: rgba(255,255,255,0.07); border-radius: 4px;
+padding: 2px 6px; white-space: nowrap;
 }
 .chain-arrow {
-  font-size: 11px; color: rgba(0,212,255,0.5); padding: 0 1px;
+font-size: 11px; color: rgba(0,212,255,0.5); padding: 0 1px;
 }
 
 /* ── GW Chart manager toggles ── */
 .mgr-toggle-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 12px 5px 8px; border-radius: 20px; cursor: pointer;
-  font-size: 12px; font-weight: 700; border: 1px solid transparent;
-  transition: opacity 0.15s; user-select: none; -webkit-user-select: none;
+display: inline-flex; align-items: center; gap: 6px;
+padding: 5px 12px 5px 8px; border-radius: 20px; cursor: pointer;
+font-size: 12px; font-weight: 700; border: 1px solid transparent;
+transition: opacity 0.15s; user-select: none; -webkit-user-select: none;
 }
 .mgr-toggle-btn.dimmed { opacity: 0.25; }
 
 /* streak current badge */
 .streak-badge {
-  display: inline-block; padding: 3px 8px; border-radius: 6px;
-  font-size: 11px; font-weight: 800; letter-spacing: 0.3px;
+display: inline-block; padding: 3px 8px; border-radius: 6px;
+font-size: 11px; font-weight: 800; letter-spacing: 0.3px;
 }
 .streak-badge.W { background: rgba(0,168,120,0.15); color: #00d4ff; border: 1px solid rgba(0,168,120,0.3); }
 .streak-badge.D { background: rgba(245,166,35,0.12); color: #f5a623; border: 1px solid rgba(245,166,35,0.25); }
 .streak-badge.L { background: rgba(232,25,60,0.12); color: #ff6b6b; border: 1px solid rgba(232,25,60,0.25); }
-.streak-num { font-size: 16px; font-weight: 900; color: #00d4ff; }
+
 .streak-best { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); }
 
 /* ── Robbed / Jammiest callout cards ── */
 .verdict-cards {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
 }
 .verdict-card {
-  border-radius: 12px; padding: 16px; text-align: center;
-  border: 1px solid; position: relative; overflow: hidden;
+border-radius: 12px; padding: 16px; text-align: center;
+border: 1px solid; position: relative; overflow: hidden;
 }
 .verdict-card.robbed {
-  background: rgba(255,107,107,0.07);
-  border-color: rgba(255,107,107,0.25);
+background: rgba(255,107,107,0.07);
+border-color: rgba(255,107,107,0.25);
 }
 .verdict-card.jammy {
-  background: rgba(0,212,255,0.06);
-  border-color: rgba(0,212,255,0.2);
+background: rgba(0,212,255,0.06);
+border-color: rgba(0,212,255,0.2);
 }
 .verdict-label {
-  font-size: 10px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 1px; margin-bottom: 8px;
+font-size: 10px; font-weight: 800; text-transform: uppercase;
+letter-spacing: 1px; margin-bottom: 8px;
 }
 .verdict-card.robbed .verdict-label { color: rgba(255,107,107,0.8); }
 .verdict-card.jammy  .verdict-label { color: rgba(0,212,255,0.8); }
 .verdict-emoji { font-size: 22px; margin-bottom: 6px; line-height: 1; }
 .verdict-name {
-  font-size: 16px; font-weight: 900; color: #fff;
-  margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+font-size: 16px; font-weight: 900; color: #fff;
+margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .verdict-delta {
-  font-size: 13px; font-weight: 700;
+font-size: 13px; font-weight: 700;
 }
 .verdict-card.robbed .verdict-delta { color: #ff6b6b; }
 .verdict-card.jammy  .verdict-delta { color: #00d4ff; }
 
 /* ── Rolling Win Tracker chart container ── */
 .chart-container {
-  background: #150d22;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 16px 16px 12px;
-  margin-bottom: 20px;
+background: #150d22;
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 12px;
+padding: 16px 16px 12px;
+margin-bottom: 20px;
 }
 .chart-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
+display: flex; align-items: center; justify-content: space-between;
+margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
 }
 .chart-title {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.8px; color: rgba(255,255,255,0.65);
+font-size: 11px; font-weight: 700; text-transform: uppercase;
+letter-spacing: 0.8px; color: rgba(255,255,255,0.65);
 }
 .chart-mgr-select {
-  display: flex; align-items: center; gap: 8px;
+display: flex; align-items: center; gap: 8px;
 }
 .chart-mgr-select label {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.4px; color: rgba(255,255,255,0.4);
-  white-space: nowrap;
+font-size: 11px; font-weight: 700; text-transform: uppercase;
+letter-spacing: 0.4px; color: rgba(255,255,255,0.4);
+white-space: nowrap;
 }
 .chart-mgr-select select {
-  width: auto; min-width: 140px;
-  padding: 7px 28px 7px 10px; font-size: 13px; font-weight: 700;
+width: auto; min-width: 140px;
+padding: 7px 28px 7px 10px; font-size: 13px; font-weight: 700;
 }
 .chart-legend {
-  display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap;
+display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap;
 }
 .legend-item {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.55);
+display: flex; align-items: center; gap: 6px;
+font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.55);
 }
 .legend-line {
-  width: 18px; height: 3px; border-radius: 2px; flex-shrink: 0;
+width: 18px; height: 3px; border-radius: 2px; flex-shrink: 0;
 }
-.legend-dot-marker {
-  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-}
+
 #luckChart { width: 100%; display: block; }
 .chart-empty {
-  text-align: center; color: rgba(255,255,255,0.3);
-  font-size: 13px; padding: 40px 0;
+text-align: center; color: rgba(255,255,255,0.3);
+font-size: 13px; padding: 40px 0;
 }
 .chart-tooltip {
-  position: fixed;
-  background: #1a0f2e;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 12px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.1s;
-  z-index: 100;
-  white-space: nowrap;
+position: fixed;
+background: #1a0f2e;
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 8px;
+padding: 8px 12px;
+font-size: 12px;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.1s;
+z-index: 100;
+white-space: nowrap;
 }
 .chart-tooltip.visible { opacity: 1; }
 .ct-gw { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
@@ -776,6 +679,155 @@ select option { background-color: #150d22; color: #fff; }
 .ct-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .ct-label { color: rgba(255,255,255,0.55); }
 .ct-val { font-weight: 800; color: #fff; margin-left: auto; padding-left: 12px; }
+
+/* ── Player Search ── */
+.player-search-wrap {
+position: relative; margin-bottom: 16px;
+}
+.search-clear-btn {
+position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
+color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 700;
+width: 22px; height: 22px; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+-webkit-appearance: none; line-height: 1;
+}
+.search-clear-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.player-search-input {
+background-color: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 10px; color: #fff;
+font-size: 15px; font-weight: 600;
+padding: 13px 40px 13px 16px; width: 100%;
+-webkit-appearance: none;
+}
+.player-search-input:focus { outline: none; border-color: #00d4ff; }
+.player-search-input::placeholder { color: rgba(255,255,255,0.25); }
+.player-search-results {
+background: #1a0f2e;
+border: 1px solid rgba(255,255,255,0.12);
+border-radius: 10px; overflow: hidden;
+margin-top: 4px; display: none;
+}
+.player-search-results.visible { display: block; }
+.player-search-result-item {
+padding: 11px 14px; cursor: pointer;
+border-bottom: 1px solid rgba(255,255,255,0.06);
+display: flex; align-items: center; gap: 10px;
+transition: background 0.1s;
+}
+.player-search-result-item:last-child { border-bottom: none; }
+.player-search-result-item:hover { background: rgba(255,255,255,0.05); }
+.psri-name { font-size: 14px; font-weight: 700; color: #fff; flex: 1; }
+.psri-meta { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+.player-search-card {
+background: #150d22;
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 12px; overflow: hidden;
+margin-top: 4px;
+}
+.psc-header {
+background: #1a0f2e; padding: 16px;
+border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.psc-name { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+.psc-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.psc-body { padding: 16px; }
+.psc-section-title {
+font-size: 10px; font-weight: 800; text-transform: uppercase;
+letter-spacing: 0.8px; color: rgba(255,255,255,0.55);
+margin-bottom: 12px; margin-top: 16px;
+}
+.psc-section-title:first-child { margin-top: 0; }
+.psc-draft-row {
+display: flex; align-items: center; gap: 12px;
+padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.psc-draft-row:last-child { border-bottom: none; }
+.psc-pick-num {
+font-size: 24px; font-weight: 900; color: #00d4ff;
+min-width: 44px; text-align: center; line-height: 1;
+}
+.psc-pick-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
+.psc-pick-info { flex: 1; }
+.psc-pick-manager { font-size: 15px; font-weight: 800; color: #fff; }
+.psc-pick-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.psc-tx-row {
+padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+display: flex; align-items: flex-start; gap: 12px;
+}
+.psc-tx-row:last-child { border-bottom: none; }
+.psc-tx-gw {
+font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5);
+min-width: 32px; padding-top: 1px;
+}
+.psc-tx-body { flex: 1; }
+.psc-tx-kind {
+font-size: 10px; font-weight: 800; text-transform: uppercase;
+letter-spacing: 0.6px; padding: 2px 7px; border-radius: 8px;
+display: inline-block; margin-bottom: 5px;
+}
+.psc-tx-kind.trade  { background: rgba(0,212,255,0.1); color: #00d4ff; border: 1px solid rgba(0,212,255,0.2); }
+.psc-tx-kind.waiver { background: rgba(160,144,255,0.1); color: #a090ff; border: 1px solid rgba(160,144,255,0.2); }
+.psc-tx-kind.free   { background: rgba(255,201,64,0.1); color: #ffc940; border: 1px solid rgba(255,201,64,0.2); }
+.psc-tx-detail { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.5; }
+.psc-tx-detail span { color: rgba(255,255,255,0.5); font-weight: 400; }
+.psc-empty {
+text-align: center; padding: 20px 0;
+font-size: 13px; color: rgba(255,255,255,0.35);
+}
+.psc-stats {
+display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;
+}
+.psc-stat {
+background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+border-radius: 8px; padding: 8px 12px; text-align: center; min-width: 56px;
+}
+.psc-stat-val { font-size: 20px; font-weight: 900; line-height: 1; }
+.psc-stat-val.trade   { color: #00d4ff; }
+.psc-stat-val.waiver  { color: #a090ff; }
+.psc-stat-val.free    { color: #ffc940; }
+.psc-stat-val.signed  { color: #00d4ff; }
+.psc-stat-val.released{ color: #ff6b6b; }
+.psc-stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+
+.psc-tx-trade-cols {
+display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;
+}
+.psc-tx-trade-col { min-width: 0; }
+.psc-tx-trade-mgr {
+font-size: 10px; font-weight: 800; text-transform: uppercase;
+letter-spacing: 0.6px; margin-bottom: 5px; color: #00d4ff;
+}
+.psc-tx-trade-player {
+font-size: 13px; font-weight: 700; color: #fff;
+padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.psc-tx-trade-player:last-child { border-bottom: none; }
+
+.chip[onclick], .insight-name[onclick] { cursor: pointer; }
+.chip[onclick]:hover { opacity: 0.75; }
+.insight-name[onclick]:hover { color: #00d4ff; }
+
+.da-player.player-link:hover { color: #00d4ff; }
+.draft-player.player-link:hover { color: #00d4ff; }
+.draft-squad-name.player-link:hover { color: #00d4ff; }
+
+.search-back-btn {
+display: flex; align-items: center; gap: 8px;
+background: rgba(255,255,255,0.06);
+border: 1px solid rgba(255,255,255,0.12);
+border-radius: 8px; color: rgba(255,255,255,0.7);
+font-size: 13px; font-weight: 700;
+padding: 10px 14px; margin-bottom: 16px;
+cursor: pointer; width: 100%; text-align: left;
+-webkit-appearance: none; transition: background 0.15s;
+}
+.search-back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.back-arrow { font-size: 16px; color: #00d4ff; line-height: 1; }
+.back-label { flex: 1; }
 
   </style>
 </head>
@@ -798,12 +850,14 @@ select option { background-color: #150d22; color: #fff; }
     </div>
 
 <!-- Spinner: visible while auto-fetch is in flight -->
+
 <div class="auto-load-hint" id="autoLoadHint">
   <div class="spinner"></div>
   <div>Loading league data…</div>
 </div>
 
 <!-- Paste fallback: hidden by default, shown only if auto-load fails -->
+
 <div id="pasteSection" style="display:none">
   <div class="card">
     <p class="hint">The shortcut fetches all the data you need and copies it to your clipboard automatically. Then long-press below and tap <strong>Paste</strong>.</p>
@@ -826,12 +880,16 @@ select option { background-color: #150d22; color: #fff; }
 </div>
 
 <!-- In-app error banner (shown when data is already loaded) -->
+
 <div class="error" id="resultsErrorBox" style="margin-bottom:12px"></div>
 
 <!-- RESULTS TAB: Standings + Form -->
+
 <div id="tab-results" class="tab-content active">
 
   <!-- Inner nav -->
+
+  <div class="inner-tabs-wrap">
   <div class="inner-tabs">
     <button class="inner-tab active" onclick="showInner('results','standings',this)">Standings</button>
     <button class="inner-tab" onclick="showInner('results','form',this)">Form</button>
@@ -839,8 +897,10 @@ select option { background-color: #150d22; color: #fff; }
     <button class="inner-tab" onclick="showInner('results','h2h',this)">Head to Head</button>
     <button class="inner-tab" onclick="showInner('results','records',this)">Records</button>
   </div>
+  </div>
 
   <!-- Standings panel -->
+
   <div id="inner-results-standings" class="inner-panel active">
     <div class="section-label">Overall Standings <span class="badge-dim" id="standingsBadge">Full Season</span></div>
     <div class="table-wrap">
@@ -854,20 +914,24 @@ select option { background-color: #150d22; color: #fff; }
       </table>
     </div>
 
-    <div class="section-sep"></div>
+```
+<div class="section-sep"></div>
 
-    <div class="section-label">League Position <span class="badge-dim">Week by Week</span></div>
-    <div class="chart-container" id="gwChartContainer">
-      <div id="gwChartToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
-      <div style="margin-bottom:8px">
-        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Tap name to highlight · dot to show/hide</span>
-      </div>
-      <canvas id="gwChart"></canvas>
-    </div>
-    <div id="gwChartTooltip" class="chart-tooltip"></div>
+<div class="section-label">League Position <span class="badge-dim">Week by Week</span></div>
+<div class="chart-container" id="gwChartContainer">
+  <div id="gwChartToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+  <div style="margin-bottom:8px">
+    <span style="font-size:11px;color:rgba(255,255,255,0.35)">Tap name to highlight · dot to show/hide</span>
+  </div>
+  <canvas id="gwChart"></canvas>
+</div>
+<div id="gwChartTooltip" class="chart-tooltip"></div>
+```
+
   </div>
 
   <!-- Form panel -->
+
   <div id="inner-results-form" class="inner-panel">
     <div class="gw-picker">
       <div class="gw-presets">
@@ -900,84 +964,89 @@ select option { background-color: #150d22; color: #fff; }
   </div>
 
   <!-- Records panel -->
+
   <div id="inner-results-records" class="inner-panel">
 
-    <div class="section-label">Streaks <span class="badge-dim">Full Season</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Manager</th>
-          <th title="Current streak">Now</th>
-          <th title="Longest winning streak">W🔥</th>
-          <th title="Longest unbeaten streak">Unb.</th>
-          <th title="Longest losing streak">L💀</th>
-        </tr></thead>
-        <tbody id="streaksBody"></tbody>
-      </table>
-    </div>
+```
+<div class="section-label">Streaks <span class="badge-dim">Full Season</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Manager</th>
+      <th title="Current streak">Now</th>
+      <th title="Longest winning streak">W🔥</th>
+      <th title="Longest unbeaten streak">Unb.</th>
+      <th title="Longest losing streak">L💀</th>
+    </tr></thead>
+    <tbody id="streaksBody"></tbody>
+  </table>
+</div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">Biggest GW Scores <span class="badge-dim">All Time</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
-        </tr></thead>
-        <tbody id="bigGWBody"></tbody>
-      </table>
-    </div>
+<div class="section-label">Biggest GW Scores <span class="badge-dim">All Time</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
+    </tr></thead>
+    <tbody id="bigGWBody"></tbody>
+  </table>
+</div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">Lowest GW Scores <span class="badge-dim">All Time</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
-        </tr></thead>
-        <tbody id="lowGWBody"></tbody>
-      </table>
-    </div>
+<div class="section-label">Lowest GW Scores <span class="badge-dim">All Time</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Result</th>
+    </tr></thead>
+    <tbody id="lowGWBody"></tbody>
+  </table>
+</div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">Biggest Winning Margins <span class="badge-dim">All Time</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Winner</th><th>Score</th><th class="al">Loser</th><th>Margin</th>
-        </tr></thead>
-        <tbody id="bigMarginBody"></tbody>
-      </table>
-    </div>
+<div class="section-label">Biggest Winning Margins <span class="badge-dim">All Time</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Winner</th><th>Score</th><th class="al">Loser</th><th>Margin</th>
+    </tr></thead>
+    <tbody id="bigMarginBody"></tbody>
+  </table>
+</div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">Lowest Scoring Winners <span class="badge-dim">Scrappy Ws</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Beaten</th>
-        </tr></thead>
-        <tbody id="lowWinBody"></tbody>
-      </table>
-    </div>
+<div class="section-label">Lowest Scoring Winners <span class="badge-dim">Scrappy Ws</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Beaten</th>
+    </tr></thead>
+    <tbody id="lowWinBody"></tbody>
+  </table>
+</div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">Biggest Scoring Losers <span class="badge-dim">Gut Punches</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Lost To</th>
-        </tr></thead>
-        <tbody id="bigLossBody"></tbody>
-      </table>
-    </div>
+<div class="section-label">Biggest Scoring Losers <span class="badge-dim">Gut Punches</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Manager</th><th>Score</th><th>Lost To</th>
+    </tr></thead>
+    <tbody id="bigLossBody"></tbody>
+  </table>
+</div>
+```
+
   </div>
 
   <!-- Fixture Luck panel -->
+
   <div id="inner-results-luck" class="inner-panel">
     <div class="gw-picker">
       <div class="gw-presets">
@@ -995,106 +1064,110 @@ select option { background-color: #150d22; color: #fff; }
       </div>
     </div>
 
-    <!-- Robbed / Jammiest callout cards -->
-    <div class="verdict-cards" id="verdictCards" style="display:none">
-      <div class="verdict-card robbed">
-        <div class="verdict-label">Who Got Robbed?</div>
-        <div class="verdict-emoji">😭</div>
-        <div class="verdict-name" id="robbedName">—</div>
-        <div class="verdict-delta" id="robbedDelta"></div>
-      </div>
-      <div class="verdict-card jammy">
-        <div class="verdict-label">Who's Been Jammy?</div>
-        <div class="verdict-emoji">🍀</div>
-        <div class="verdict-name" id="jammyName">—</div>
-        <div class="verdict-delta" id="jammyDelta"></div>
-      </div>
+```
+<!-- Robbed / Jammiest callout cards -->
+<div class="verdict-cards" id="verdictCards" style="display:none">
+  <div class="verdict-card robbed">
+    <div class="verdict-label">Who Got Robbed?</div>
+    <div class="verdict-emoji">😭</div>
+    <div class="verdict-name" id="robbedName">—</div>
+    <div class="verdict-delta" id="robbedDelta"></div>
+  </div>
+  <div class="verdict-card jammy">
+    <div class="verdict-label">Who's Been Jammy?</div>
+    <div class="verdict-emoji">🍀</div>
+    <div class="verdict-name" id="jammyName">—</div>
+    <div class="verdict-delta" id="jammyDelta"></div>
+  </div>
+</div>
+
+<div class="section-label">Fixture Luck <span class="badge" id="liBadge"></span></div>
+<p style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:14px;line-height:1.5;">
+  Ranked by <strong style="color:#fff">Expected Wins</strong> — gameweeks where you scored above the median. <strong style="color:#fff">Fixture Luck</strong> = actual minus expected wins. Negative = the schedule robbed you. 😭
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Manager</th>
+      <th title="Gameweeks scored above median">Exp W</th>
+      <th title="Actual wins">Act W</th>
+      <th title="Fixture luck delta — positive means jammy, negative means robbed">Luck</th>
+      <th class="hide-sm" title="Draws">D</th>
+      <th class="hide-sm" title="Losses">L</th>
+      <th title="Total points scored">PF</th>
+    </tr></thead>
+    <tbody id="luckBody"></tbody>
+  </table>
+</div>
+
+<div class="section-sep"></div>
+
+<div class="section-label">Rolling Win Tracker <span class="badge-dim">Cumulative by GW</span></div>
+<div class="chart-container">
+  <div class="chart-header">
+    <div class="chart-mgr-select">
+      <label for="chartMgrSelect">Manager</label>
+      <select id="chartMgrSelect" onchange="renderLuckChart()"></select>
     </div>
-
-    <div class="section-label">Fixture Luck <span class="badge" id="liBadge"></span></div>
-    <p style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:14px;line-height:1.5;">
-      Ranked by <strong style="color:#fff">Expected Wins</strong> — gameweeks where you scored above the median. <strong style="color:#fff">Fixture Luck</strong> = actual minus expected wins. Negative = the schedule robbed you. 😭
-    </p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th>
-          <th title="Gameweeks scored above median">Exp W</th>
-          <th title="Actual wins">Act W</th>
-          <th title="Fixture luck delta — positive means jammy, negative means robbed">Luck</th>
-          <th class="hide-sm" title="Draws">D</th>
-          <th class="hide-sm" title="Losses">L</th>
-          <th title="Total points scored">PF</th>
-        </tr></thead>
-        <tbody id="luckBody"></tbody>
-      </table>
+  </div>
+  <div class="chart-legend">
+    <div class="legend-item">
+      <div class="legend-line" style="background:#00d4ff"></div>
+      Actual Wins
     </div>
-
-    <div class="section-sep"></div>
-
-    <div class="section-label">Rolling Win Tracker <span class="badge-dim">Cumulative by GW</span></div>
-    <div class="chart-container">
-      <div class="chart-header">
-        <div class="chart-mgr-select">
-          <label for="chartMgrSelect">Manager</label>
-          <select id="chartMgrSelect" onchange="renderLuckChart()"></select>
-        </div>
-      </div>
-      <div class="chart-legend">
-        <div class="legend-item">
-          <div class="legend-line" style="background:#00d4ff"></div>
-          Actual Wins
-        </div>
-        <div class="legend-item">
-          <div class="legend-line" style="background:rgba(255,255,255,0.0);border-top:2px dashed #a090ff;height:0;margin-top:1px;width:18px"></div>
-          Expected Wins
-        </div>
-        <div class="legend-item">
-          <div class="legend-line" id="legendGapSwatch" style="background:rgba(255,107,107,0.7)"></div>
-          <span id="legendGapLabel">Gap (unlucky)</span>
-        </div>
-      </div>
-      <canvas id="luckChart" height="220"></canvas>
-      <div id="chartEmpty" class="chart-empty" style="display:none">Load league data to see chart.</div>
+    <div class="legend-item">
+      <div class="legend-line" style="background:rgba(255,255,255,0.0);border-top:2px dashed #a090ff;height:0;margin-top:1px;width:18px"></div>
+      Expected Wins
     </div>
-    <div id="chartTooltip" class="chart-tooltip"></div>
-
-    <div class="section-sep"></div>
-
-    <div class="section-label">Points Against <span class="badge-dim">Average per GW</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th class="al">Pos</th><th class="al">Manager</th>
-          <th title="Average points scored against them per gameweek">Avg PA</th>
-          <th class="hide-sm" title="Total points scored against them">Total PA</th>
-          <th class="hide-sm">P</th>
-        </tr></thead>
-        <tbody id="paBody"></tbody>
-      </table>
+    <div class="legend-item">
+      <div class="legend-line" id="legendGapSwatch" style="background:rgba(255,107,107,0.7)"></div>
+      <span id="legendGapLabel">Gap (unlucky)</span>
     </div>
+  </div>
+  <canvas id="luckChart" height="220"></canvas>
+  <div id="chartEmpty" class="chart-empty" style="display:none">Load league data to see chart.</div>
+</div>
+<div id="chartTooltip" class="chart-tooltip"></div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">League Average Score <span class="badge-dim">Per Gameweek</span></div>
-    <div class="chart-container">
-      <canvas id="paBarChart"></canvas>
-    </div>
+<div class="section-label">Points Against <span class="badge-dim">Average per GW</span></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th class="al">Pos</th><th class="al">Manager</th>
+      <th title="Average points scored against them per gameweek">Avg PA</th>
+      <th class="hide-sm" title="Total points scored against them">Total PA</th>
+      <th class="hide-sm">P</th>
+    </tr></thead>
+    <tbody id="paBody"></tbody>
+  </table>
+</div>
 
-    <div class="section-sep"></div>
+<div class="section-sep"></div>
 
-    <div class="section-label">Points Against <span class="badge-dim">Week by Week</span></div>
-    <div class="chart-container" id="paLineChartContainer">
-      <div id="paLineToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
-      <div style="margin-bottom:8px">
-        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Tap name to highlight · dot to show/hide</span>
-      </div>
-      <canvas id="paLineChart"></canvas>
-    </div>
-    <div id="paLineTooltip" class="chart-tooltip"></div>
+<div class="section-label">League Average Score <span class="badge-dim">Per Gameweek</span></div>
+<div class="chart-container">
+  <canvas id="paBarChart"></canvas>
+</div>
+
+<div class="section-sep"></div>
+
+<div class="section-label">Points Against <span class="badge-dim">Week by Week</span></div>
+<div class="chart-container" id="paLineChartContainer">
+  <div id="paLineToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+  <div style="margin-bottom:8px">
+    <span style="font-size:11px;color:rgba(255,255,255,0.35)">Tap name to highlight · dot to show/hide</span>
+  </div>
+  <canvas id="paLineChart"></canvas>
+</div>
+<div id="paLineTooltip" class="chart-tooltip"></div>
+```
+
   </div>
 
   <!-- H2H panel -->
+
   <div id="inner-results-h2h" class="inner-panel">
     <div class="section-label">Head to Head <span class="badge-dim">Full Season</span></div>
     <div class="card" style="margin-bottom:16px">
@@ -1144,22 +1217,21 @@ select option { background-color: #150d22; color: #fff; }
 
 </div>
 
-
 <!-- TRADES -->
+
 <div id="tab-trades" class="tab-content">
   <div class="sub-tabs">
-    <button class="sub-tab active" onclick="switchSubTab(this,'tradesActivity')">Activity</button>
-    <button class="sub-tab" onclick="switchSubTab(this,'tradesByManager')">By Manager</button>
-    <button class="sub-tab" onclick="switchSubTab(this,'tradesPlayers')">Players</button>
-    <button class="sub-tab" onclick="switchSubTab(this,'tradesInsights')">Insights</button>
+    <button class="sub-tab active" onclick="switchSubTab(this,'tradesOverview')">Overview</button>
+    <button class="sub-tab" onclick="switchSubTab(this,'tradesTimeline')">Timeline</button>
+    <button class="sub-tab" onclick="switchSubTab(this,'tradesSearch')">Search</button>
   </div>
-  <div id="tradesActivity"></div>
-  <div id="tradesByManager" style="display:none"></div>
-  <div id="tradesPlayers" style="display:none"></div>
-  <div id="tradesInsights" style="display:none"></div>
+  <div id="tradesOverview"></div>
+  <div id="tradesTimeline" style="display:none"></div>
+  <div id="tradesSearch" style="display:none"></div>
 </div>
 
 <!-- DRAFT -->
+
 <div id="tab-draft" class="tab-content">
   <div id="draftContent"></div>
 </div>
@@ -1244,7 +1316,7 @@ var DRAFT_PICKS = [
   {pick:73,round:7,manager:"Mark",player:"Alisson",pos:"GKP",team:"LIV",id:119},
   {pick:74,round:7,manager:"Conor",player:"White",pos:"DEF",team:"ARS",id:50},
   {pick:75,round:7,manager:"Jack",player:"Tarkowski",pos:"DEF",team:"EVE",id:125},
-  {pick:76,round:7,manager:"Ben",player:"Wilson",pos:"MID",team:"FUL",id:172},
+  {pick:76,round:7,manager:"Ben",player:"H.Wilson",pos:"MID",team:"FUL",id:172},
   {pick:77,round:7,manager:"Darragh",player:"Robertson",pos:"DEF",team:"LIV",id:87},
   {pick:78,round:7,manager:"Joe",player:"Chalobah",pos:"DEF",team:"CHE",id:247},
   {pick:79,round:7,manager:"Daire",player:"Rodrigo",pos:"MID",team:"MCI",id:58},
@@ -1336,7 +1408,7 @@ var DRAFT_PICKS = [
   {pick:165,round:14,manager:"Ben",player:"Andersen",pos:"DEF",team:"FUL",id:405},
   {pick:166,round:14,manager:"Jack",player:"Barnes",pos:"MID",team:"NEW",id:368},
   {pick:167,round:14,manager:"Conor",player:"Hato",pos:"DEF",team:"CHE",id:353},
-  {pick:168,round:14,manager:"Mark",player:"Wilson",pos:"FWD",team:"WHU",id:115},
+  {pick:168,round:14,manager:"Mark",player:"C.Wilson",pos:"FWD",team:"WHU",id:115},
   {pick:169,round:15,manager:"Mark",player:"Bamford",pos:"FWD",team:"LEE",id:223},
   {pick:170,round:15,manager:"Conor",player:"Martinez",pos:"GKP",team:"AVL",id:259},
   {pick:171,round:15,manager:"Jack",player:"Dúbravka",pos:"GKP",team:"BUR",id:557},
@@ -1351,7 +1423,99 @@ var DRAFT_PICKS = [
   {pick:180,round:15,manager:"John",player:"Meslier",pos:"GKP",team:"LEE",id:380}
 ];
 
-  var G = { data: null, managers: {}, managerById: {}, allFinished: [], playerNames: {},
+// Full player name lookup
+var PLAYER_FULL_NAMES = {
+  "Haaland":"Erling Haaland","Salah":"Mohamed Salah","Palmer":"Cole Palmer",
+  "Saka":"Bukayo Saka","Fernandes":"Bruno Fernandes","Isak":"Alexander Isak",
+  "Gyökeres":"Viktor Gyökeres","Watkins":"Ollie Watkins","Wirtz":"Florian Wirtz",
+  "Marmoush":"Omar Marmoush","João Pedro":"João Pedro","Bowen":"Jarrod Bowen",
+  "Ekitiké":"Hugo Ekitiké","Mbeumo":"Bryan Mbeumo","Wood":"Chris Wood",
+  "Solanke":"Dominic Solanke","Mateta":"Jean-Philippe Mateta","Evanilson":"Evanilson",
+  "Eze":"Eberechi Eze","Cherki":"Rayan Cherki","Gakpo":"Cody Gakpo",
+  "Gordon":"Anthony Gordon","Larsen":"Jørgen Strand Larsen","Elanga":"Anthony Elanga",
+  "Cunha":"Matheus Cunha","Rogers":"Morgan Rogers","Semenyo":"Antoine Semenyo",
+  "Kudus":"Mohammed Kudus","Ødegaard":"Martin Ødegaard","Wissa":"Yoane Wissa",
+  "Foden":"Phil Foden","Minteh":"Yankuba Minteh","Kluivert":"Justin Kluivert",
+  "Raúl":"Raúl Jiménez","Welbeck":"Danny Welbeck","Havertz":"Kai Havertz",
+  "Rice":"Declan Rice","Neto":"Pedro Neto","Gibbs-White":"Morgan Gibbs-White",
+  "Thiago":"Igor Thiago","Johnson":"Brennan Johnson","Amad":"Amad Diallo",
+  "Trossard":"Leandro Trossard","Cucurella":"Marc Cucurella","Mitoma":"Kaoru Mitoma",
+  "Ndiaye":"Iliman Ndiaye","Virgil":"Virgil van Dijk","Schade":"Kevin Schade",
+  "Tielemans":"Youri Tielemans","Delap":"Liam Delap","Beto":"Beto",
+  "Muñoz":"Daniel Muñoz","Martinelli":"Gabriel Martinelli","Sarr":"Ismaila Sarr",
+  "Füllkrug":"Niclas Füllkrug","Gabriel":"Gabriel Magalhães","Gvardiol":"Joško Gvardiol",
+  "Andreas":"Andreas Pereira","Frimpong":"Jeremie Frimpong","Saliba":"William Saliba",
+  "Raya":"David Raya","Pedro Porro":"Pedro Porro","Milenković":"Nikola Milenković",
+  "Iwobi":"Alex Iwobi","Aït-Nouri":"Rayan Aït-Nouri","Murillo":"Murillo",
+  "Schär":"Fabian Schär","Richarlison":"Richarlison","McNeil":"Dwight McNeil",
+  "Pickford":"Jordan Pickford","Kerkez":"Milos Kerkez","Madueke":"Noni Madueke",
+  "Alisson":"Alisson Becker","White":"Ben White","Tarkowski":"James Tarkowski",
+  "Wilson":"Harry Wilson","H.Wilson":"Harry Wilson","C.Wilson":"Callum Wilson","Robertson":"Andrew Robertson","Chalobah":"Trevoh Chalobah",
+  "Rodrigo":"Rodrigo","Damsgaard":"Mikkel Damsgaard","Timber":"Jurriën Timber",
+  "Wan-Bissaka":"Aaron Wan-Bissaka","Savinho":"Savinho","Murphy":"Jacob Murphy",
+  "Igor Jesus":"Igor Jesus","Enzo":"Enzo Fernández","Sánchez":"Robert Sánchez",
+  "Paquetá":"Lucas Paquetá","Lewis-Skelly":"Myles Lewis-Skelly","Sels":"Matz Sels",
+  "Barry":"Thierno Barry","Ederson":"Ederson","Lacroix":"Maxence Lacroix",
+  "Georginio":"Georginio Rutter","Collins":"Nathan Collins",
+  "Branthwaite":"Jarrad Branthwaite","Pope":"Nick Pope","Malen":"Donyell Malen",
+  "Marc Guiu":"Marc Guiu","James":"Reece James","Guimarães":"Bruno Guimarães",
+  "Szoboszlai":"Dominik Szoboszlai","Konaté":"Ibrahima Konaté","Aina":"Ola Aina",
+  "Kelleher":"Caoimhín Kelleher","Vicario":"Guglielmo Vicario","Hall":"Lewis Hall",
+  "Caicedo":"Moisés Caicedo","Robinson":"Antonee Robinson","Nketiah":"Eddie Nketiah",
+  "Hudson-Odoi":"Callum Hudson-Odoi","Leno":"Bernd Leno","Van de Ven":"Micky van de Ven",
+  "Dias":"Rúben Dias","Awoniyi":"Taiwo Awoniyi","N.Williams":"Neco Williams",
+  "Nunes":"Matheus Nunes","Piroe":"Joel Piroe","Guéhi":"Marc Guéhi",
+  "Smith Rowe":"Emile Smith Rowe","Mykolenko":"Vitaliy Mykolenko","Mitchell":"Tyrick Mitchell",
+  "Konsa":"Ezri Konsa","Calafiori":"Riccardo Calafiori","Mac Allister":"Alexis Mac Allister",
+  "Henderson":"Dean Henderson","De Cuyper":"Maxim De Cuyper","Livramento":"Tino Livramento",
+  "Trippier":"Kieran Trippier","Dorgu":"Patrick Dorgu","Burn":"Dan Burn",
+  "Ward-Prowse":"James Ward-Prowse","Reijnders":"Tijjani Reijnders","Mazraoui":"Noussair Mazraoui",
+  "Digne":"Lucas Digne","Tel":"Mathys Tel","Diouf":"El Hadj Diouf",
+  "Gusto":"Malo Gusto","Akanji":"Manuel Akanji","Jackson":"Nicolas Jackson",
+  "Truffert":"Adrien Truffert","Dango":"Dango Ouattara","Udogie":"Destiny Udogie",
+  "Verbruggen":"Bart Verbruggen","Cash":"Matty Cash","Muniz":"Rodrigo Muniz",
+  "Zirkzee":"Joshua Zirkzee","Romero":"Cristian Romero","Højlund":"Rasmus Højlund",
+  "Palhinha":"João Palhinha","Botman":"Sven Botman","Tonali":"Sandro Tonali",
+  "Tavernier":"Marcus Tavernier","Anderson":"Elliot Anderson","Bradley":"Conor Bradley",
+  "Aké":"Nathan Aké","Stones":"John Stones","Khusanov":"Abdukodir Khusanov",
+  "Kroupi":"El Kroupi Junior","Nmecha":"Felix Nmecha","Lewis-Potter":"Keane Lewis-Potter",
+  "O'Brien":"Jack O'Brien","Ramsdale":"Aaron Ramsdale","Andersen":"Joachim Andersen",
+  "Barnes":"Harvey Barnes","Hato":"Jorrel Hato","Bamford":"Patrick Bamford",
+  "Martinez":"Emiliano Martínez","Dúbravka":"Martin Dúbravka","José Sá":"José Sá",
+  "Areola":"Alphonse Areola","Trafford":"James Trafford","Onana":"André Onana",
+  "Ortega":"Stefan Ortega","Bayindir":"Altay Bayındır","Meslier":"Illan Meslier",
+  "Jörgensen":"Altay Bayındır","Petrovic":"Nikola Petrović",
+  "Arias":"Jhon Arias","Dewsbury-Hall":"Kiernan Dewsbury-Hall",
+  "B.Fernandes":"Bruno Fernandes","Anthony":"Jaidon Anthony","Bergvall":"Lucas Bergvall",
+  "Garnacho":"Alejandro Garnacho","Ayari":"Yasin Ayari","Ndoye":"Dan Ndoye",
+  "J.Palhinha":"João Palhinha","Bruno G.":"Bruno Guimarães","Rúben":"Rúben Dias",
+  "Scott":"Jack Scott","Pedro Porro":"Pedro Porro","Schade":"Kevin Schade"
+};
+
+function smartDisplayName(elementId, webName) {
+  // If web_name already contains a dot/initial (e.g. "E.Martínez", "B.Fernandes"), use as-is
+  if (webName && webName.indexOf('.') !== -1) return webName;
+  // If we have a full name from the API, prefix with first initial: "Martínez" -> "E.Martínez"
+  var fullName = G.playerFullNames[elementId];
+  if (fullName) {
+    var parts = fullName.split(' ');
+    if (parts.length >= 2 && parts[0].length > 0) {
+      return parts[0].charAt(0) + '.' + webName;
+    }
+  }
+  return webName;
+}
+
+function fullPlayerName(apiName) {
+  // Prefer live API full name looked up by web_name, fall back to manual table
+  if (G && G.playerNames && G.playerFullNames) {
+    var id = Object.keys(G.playerNames).find(function(k){ return G.playerNames[k] === apiName; });
+    if (id && G.playerFullNames[id]) return G.playerFullNames[id];
+  }
+  return PLAYER_FULL_NAMES[apiName] || apiName;
+}
+
+  var G = { data: null, managers: {}, managerById: {}, allFinished: [], playerNames: {}, playerFullNames: {},
             luckChartData: null, paChartData: null };
 
   /* ── Utilities ── */
@@ -1375,6 +1539,7 @@ var DRAFT_PICKS = [
   function gdStr(gd) { return gd>=0?"+"+gd:""+gd; }
 
   function showTab(name, btn) {
+    G_NAV = []; // clear nav stack on manual tab switch
     document.querySelectorAll(".tab-content").forEach(function(el){ el.classList.remove("active"); });
     document.querySelectorAll(".tab").forEach(function(el){ el.classList.remove("active"); });
     document.getElementById("tab-"+name).classList.add("active");
@@ -1460,6 +1625,14 @@ var DRAFT_PICKS = [
     var luckCanvas = document.getElementById('luckChart');
     if (luckCanvas) { luckCanvas._tooltipBound = false; }
     G.draftRendered = false;
+    G.luckChartData = null;
+    G.paChartData = null;
+    G.playerNames = {};
+    G.playerFullNames = {};
+    G.managers = {};
+    G.managerById = {};
+    G.allFinished = [];
+    G_NAV = [];
     document.getElementById('draftContent').innerHTML = '';
     clearError();
     window.scrollTo(0,0);
@@ -2926,8 +3099,8 @@ var DRAFT_PICKS = [
     document.getElementById("h2hC2").textContent=mgr2.name.split(" ")[0];
     var s1el=document.getElementById("h2hS1"), s2el=document.getElementById("h2hS2");
     s1el.textContent=w1; s2el.textContent=w2;
-    s1el.className="h2h-score"+(w1<w2?" loser":"");
-    s2el.className="h2h-score"+(w2<w1?" loser":"");
+    s1el.className="h2h-score"+(w1>w2?" winner":w1<w2?" loser":"");
+    s2el.className="h2h-score"+(w2>w1?" winner":w2<w1?" loser":"");
     document.getElementById("h2hSub").textContent=
       games.length+" meeting"+(games.length!==1?"s":"")+" · "+draws+" draw"+(draws!==1?"s":"");
     document.getElementById("h2hResult").style.display="block";
@@ -2940,6 +3113,7 @@ var DRAFT_PICKS = [
     return G.playerNames[id] || "Player #"+id;
   }
 
+
   function mName(id) {
     var m = G.managerById[id] || G.managerById[id ? id.toString() : '']
          || G.managers[id]    || G.managers[id ? id.toString() : ''];
@@ -2951,55 +3125,6 @@ var DRAFT_PICKS = [
     return m ? m.team : "";
   }
 
-  function buildMgrStats(approvedWaivers, acceptedTrades, deniedWaivers) {
-    var statsById = {};
-    G.data.league_entries.forEach(function(e) {
-      var obj = {
-        name: e.player_first_name + ' ' + e.player_last_name,
-        team: e.entry_name,
-        waivers: 0, freeAgents: 0, deniedWaivers: 0,
-        tradesAcceptedOffered: 0, tradesAcceptedReceived: 0,
-        tradeHistory: [], waiverHistory: []
-      };
-      Object.keys(e).forEach(function(k){
-        var v = e[k];
-        if (typeof v === 'number' && v > 0) statsById[String(v)] = obj;
-        if (typeof v === 'string' && /^\d+$/.test(v)) statsById[v] = obj;
-      });
-    });
-    approvedWaivers.forEach(function(t) {
-      var s = statsById[String(t.entry)];
-      if (!s) return;
-      if (t.kind === 'w') s.waivers++; else s.freeAgents++;
-      s.waiverHistory.push({ gw: t.event, kind: t.kind, inId: t.element_in, outId: t.element_out, priority: t.priority||9999 });
-    });
-    deniedWaivers.forEach(function(t) {
-      var s = statsById[String(t.entry)];
-      if (s) s.deniedWaivers++;
-    });
-    acceptedTrades.forEach(function(t) {
-      var off = statsById[String(t.offered_entry)];
-      var rec = statsById[String(t.received_entry)];
-      if (off) {
-        off.tradesAcceptedOffered++;
-        off.tradeHistory.push({ gw: t.event, role: 'offered', withName: mName(t.received_entry),
-          got:  t.tradeitem_set.map(function(i){ return i.element_in; }),
-          gave: t.tradeitem_set.map(function(i){ return i.element_out; }) });
-      }
-      if (rec) {
-        rec.tradesAcceptedReceived++;
-        rec.tradeHistory.push({ gw: t.event, role: 'received', withName: mName(t.offered_entry),
-          got:  t.tradeitem_set.map(function(i){ return i.element_out; }),
-          gave: t.tradeitem_set.map(function(i){ return i.element_in; }) });
-      }
-    });
-    var seen = {}, unique = [];
-    Object.keys(statsById).forEach(function(k){
-      var o = statsById[k];
-      if (!seen[o.name]) { seen[o.name] = true; unique.push(o); }
-    });
-    return unique.sort(function(a,b){ return a.name.localeCompare(b.name); });
-  }
 
   function renderTrades(transactionData, tradeData) {
     var rawList = [];
@@ -3016,157 +3141,66 @@ var DRAFT_PICKS = [
       else { try { var td=typeof tradeData==='string'?JSON.parse(tradeData):tradeData; rawTrades=td.trades||(Array.isArray(td)?td:[]); } catch(e){} }
     }
     var acceptedTrades = rawTrades.filter(function(t){ return t.state==='p'; });
-    var mgrStats = buildMgrStats(approvedWaivers, acceptedTrades, deniedWaivers);
     renderTradesOverview(approvedWaivers, acceptedTrades, deniedWaivers);
-    renderTradesByManager(mgrStats);
+    renderPlayerSearch(approvedWaivers, acceptedTrades);
   }
 
   function renderTradesOverview(approvedWaivers, acceptedTrades, deniedWaivers) {
 
-    // ── ACTIVITY tab ──
+    // ── OVERVIEW tab ──
     (function() {
-      var el = document.getElementById("tradesActivity");
+      var el = document.getElementById("tradesOverview");
       var html = '';
+
+      // Summary stats
       html += '<div class="trades-summary">';
       html += '<div class="trades-stat"><div class="stat-val">'+acceptedTrades.length+'</div><div class="stat-lbl">Trades</div></div>';
       html += '<div class="trades-stat"><div class="stat-val" style="color:#7ec8ff">'+approvedWaivers.length+'</div><div class="stat-lbl">Transfers</div></div>';
-      html += '<div class="trades-stat"><div class="stat-val" style="color:#ff6b6b">'+deniedWaivers.length+'</div><div class="stat-lbl">Waivers Denied</div></div>';
+      html += '<div class="trades-stat"><div class="stat-val" style="color:#ff6b6b">'+deniedWaivers.length+'</div><div class="stat-lbl">Denied</div></div>';
       html += '</div>';
 
-    var allTrades = [];
-    acceptedTrades.forEach(function(t){ allTrades.push({t:t, state:'accepted'}); });
-
-    if (allTrades.length) {
-      html += '<div class="section-label" style="margin-bottom:14px">Manager Trades</div>';
-      var byGW = {};
-      allTrades.forEach(function(x){ var g=x.t.event||0; if(!byGW[g])byGW[g]=[]; byGW[g].push(x); });
-      Object.keys(byGW).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
-        var rows = byGW[gw];
-        var acc = rows.length;
-        var summary = ['<span style="color:#00d4ff">'+acc+' trade'+(acc!==1?'s':'')+'</span>'];
-        html += '<div class="gw-block">';
-        html += '<div class="gw-block-header" onclick="toggleGW(this)">';
-        html += '<span class="gw-title">Gameweek '+gw+'</span>';
-        html += '<span style="display:flex;align-items:center;gap:8px"><span class="gw-count">'+summary.join(' · ')+'</span><span class="gw-chevron">▼</span></span>';
-        html += '</div><div class="gw-block-body">';
-        rows.forEach(function(x){
-          var t = x.t;
-          var offName = mName(t.offered_entry);
-          var recName = mName(t.received_entry);
-          var items = t.tradeitem_set || [];
-          var isAcc = x.state==='accepted';
-          var isRej = x.state==='rejected';
-          var accent = isAcc ? '#00d4ff' : isRej ? '#ff6b6b' : '#ffc940';
-          var badgeStyle = isAcc
-            ? 'background:rgba(0,230,118,0.12);color:#00d4ff;border:1px solid rgba(0,230,118,0.25)'
-            : isRej
-            ? 'background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.25)'
-            : 'background:rgba(255,201,64,0.1);color:#ffc940;border:1px solid rgba(255,201,64,0.25)';
-          var badgeText = isAcc ? '✓ Accepted' : isRej ? '✕ Rejected' : '↩ Withdrawn';
-          html += '<div class="trade-card" style="border-left:3px solid '+accent+';border-color:rgba(255,255,255,0.08);border-left-color:'+accent+'">';
-          html += '<div class="trade-card-header">';
-          html += '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">';
-          html += '<span style="font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+offName+'</span>';
-          html += '<span style="color:rgba(255,255,255,0.3);font-size:12px;flex-shrink:0">→</span>';
-          html += '<span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+recName+'</span>';
-          html += '</div>';
-          html += '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;border-radius:20px;padding:3px 10px;margin-left:8px;'+badgeStyle+'">'+badgeText+'</span>';
-          html += '</div>';
-          html += '<div class="trade-card-body"><div class="trade-columns">';
-          html += '<div class="trade-col">';
-          html += '<div class="trade-col-header"><span class="trade-col-manager">'+offName.split(' ')[0]+'</span><span class="trade-col-direction gets" style="margin-left:6px">'+(isAcc?'gets':'would get')+'</span></div>';
-          items.forEach(function(i){ html += '<div class="chip in">'+pName(i.element_in)+'</div>'; });
-          html += '</div>';
-          html += '<div class="trade-col">';
-          html += '<div class="trade-col-header"><span class="trade-col-manager">'+recName.split(' ')[0]+'</span><span class="trade-col-direction '+(isAcc?'gets':'gives')+' " style="margin-left:6px">'+(isAcc?'gets':'would give')+'</span></div>';
-          items.forEach(function(i){ html += '<div class="chip '+(isAcc?'in':'out')+'">'+pName(i.element_out)+'</div>'; });
-          html += '</div>';
-          html += '</div></div></div>';
-        });
-        html += '</div></div>';
-      });
-    } else {
-      html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No trades yet.</p>';
-    }
-
-    if (approvedWaivers.length) {
-      html += '<div class="section-label" style="margin-top:8px;margin-bottom:14px">Transfers <span class="badge-dim">'+approvedWaivers.length+'</span></div>';
-      var byGW2 = {};
-      approvedWaivers.forEach(function(t){ var g=t.event||0; if(!byGW2[g])byGW2[g]=[]; byGW2[g].push(t); });
-      Object.keys(byGW2).map(Number).sort(function(a,b){return b-a;}).forEach(function(gw){
-        var gwList = byGW2[gw].slice().sort(function(a,b){
-          if (a.kind !== b.kind) return a.kind==='w' ? -1 : 1;
-          return (a.priority||9999) - (b.priority||9999);
-        });
-        var wCount = gwList.filter(function(t){return t.kind==='w';}).length;
-        var fCount = gwList.filter(function(t){return t.kind==='f';}).length;
-        var summary = [];
-        if (wCount) summary.push(wCount+' waiver'+(wCount!==1?'s':''));
-        if (fCount) summary.push(fCount+' free agent'+(fCount!==1?'s':''));
-        html += '<div class="gw-block"><div class="gw-block-header" onclick="toggleGW(this)">';
-        html += '<span class="gw-title">Gameweek '+gw+'</span>';
-        html += '<span style="display:flex;align-items:center;gap:10px"><span class="gw-count">'+summary.join(' · ')+'</span><span class="gw-chevron">▼</span></span>';
-        html += '</div><div class="gw-block-body">';
-        gwList.forEach(function(t){
-          var mgr = G.managerById[String(t.entry)]||G.managers[String(t.entry)]||{name:'Unknown',team:''};
-          html += '<div class="waiver-card">';
-          html += '<div class="waiver-card-top">';
-          var priorityTag = t.kind==='w' && t.priority ? '<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);margin-right:4px">#'+t.priority+'</span>' : '';
-          html += '<span class="waiver-manager">'+priorityTag+mgr.name+'</span>';
-          html += '<span class="waiver-type-badge '+(t.kind==='w'?'w':'f')+'">'+(t.kind==='w'?'Waiver':'Free Agent')+'</span>';
-          html += '</div>';
-          html += '<div class="waiver-row-players">';
-          html += '<div class="chip in" style="margin:0">'+pName(t.element_in)+'</div>';
-          html += '<span class="waiver-arrow">←</span>';
-          html += '<div class="chip out" style="margin:0">'+pName(t.element_out)+'</div>';
-          html += '</div></div>';
-        });
-        html += '</div></div>';
-      });
-    }
-
-    if (!acceptedTrades.length && !approvedWaivers.length) {
-      html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No activity yet.</p>';
-    }
-    el.innerHTML = html;
-    })(); // end Activity
-
-    // ── PLAYERS tab ──
-    (function() {
-      var el = document.getElementById("tradesPlayers");
-      var html = '';
-
+      // Most Transferred In / Out
       if (approvedWaivers.length) {
         var pIn={}, pOut={};
         approvedWaivers.forEach(function(t){ pIn[t.element_in]=(pIn[t.element_in]||0)+1; pOut[t.element_out]=(pOut[t.element_out]||0)+1; });
+        // Each element ID is a unique player — never merge across IDs.
+        // data-player uses the element ID directly so Search always finds the exact player.
         var topIn  = Object.keys(pIn).map(function(id){return{id:id,c:pIn[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
         var topOut = Object.keys(pOut).map(function(id){return{id:id,c:pOut[id]};}).sort(function(a,b){return b.c-a.c;}).slice(0,10);
+        // Build a set of web_names that appear more than once in each list, so we can show full name for those
+        function ambiguousNames(list) {
+          var seen = {}; list.forEach(function(p){ var n=pName(p.id); seen[n]=(seen[n]||0)+1; });
+          var amb = {}; Object.keys(seen).forEach(function(n){ if(seen[n]>1) amb[n]=true; });
+          return amb;
+        }
+        var ambIn  = ambiguousNames(topIn);
+        var ambOut = ambiguousNames(topOut);
         html += '<div class="section-label" style="margin-bottom:8px">Most Transferred In</div>';
         html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times</th></tr></thead><tbody>';
-        topIn.forEach(function(p){ html+='<tr><td class="al"><span class="chip in" style="display:inline-block">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
+        topIn.forEach(function(p){ var n=pName(p.id); var label=smartDisplayName(p.id,n); html+='<tr><td class="al"><span class="chip in player-link" style="display:inline-block;cursor:pointer" data-playerid="'+p.id+'">'+label+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
         html += '</tbody></table></div>';
         html += '<div class="section-sep"></div>';
         html += '<div class="section-label" style="margin-bottom:8px">Most Transferred Out</div>';
         html += '<div class="table-wrap"><table><thead><tr><th class="al">Player</th><th>Times</th></tr></thead><tbody>';
-        topOut.forEach(function(p){ html+='<tr><td class="al"><span class="chip out" style="display:inline-block">'+pName(p.id)+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
+        topOut.forEach(function(p){ var n=pName(p.id); var label=smartDisplayName(p.id,n); html+='<tr><td class="al"><span class="chip out player-link" style="display:inline-block;cursor:pointer" data-playerid="'+p.id+'">'+label+'</span></td><td class="pts-muted">'+p.c+'</td></tr>'; });
         html += '</tbody></table></div>';
       }
 
+      // Most Traded Players
       if (acceptedTrades.length) {
         var sortedTrades = acceptedTrades.slice().sort(function(a,b){ return (a.event||0)-(b.event||0); });
-        var tradeCount  = {};
-        var ownerChains = {};
+        var tradeCount={}, ownerChains={};
         sortedTrades.forEach(function(t) {
           var offFirst = mName(t.offered_entry).split(' ')[0];
           var recFirst = mName(t.received_entry).split(' ')[0];
-          var gw = t.event || 0;
+          var gw = t.event||0;
           (t.tradeitem_set||[]).forEach(function(item) {
             var pairs = [
               { pid: String(item.element_in),  newOwner: offFirst, gw: gw },
               { pid: String(item.element_out), newOwner: recFirst, gw: gw }
             ];
             pairs.forEach(function(pair) {
-              tradeCount[pair.pid] = (tradeCount[pair.pid]||0) + 1;
+              tradeCount[pair.pid] = (tradeCount[pair.pid]||0)+1;
               if (!ownerChains[pair.pid]) ownerChains[pair.pid] = [];
               var chain = ownerChains[pair.pid];
               var last = chain.length ? chain[chain.length-1].name : null;
@@ -3176,41 +3210,30 @@ var DRAFT_PICKS = [
         });
         var topTraded = Object.keys(tradeCount)
           .map(function(id){ return { id:id, c:tradeCount[id], chain:ownerChains[id]||[] }; })
-          .sort(function(a,b){ return b.c-a.c; })
-          .slice(0,12);
-        if (approvedWaivers.length) html += '<div class="section-sep"></div>';
+          .sort(function(a,b){ return b.c-a.c; }).slice(0,10);
+        html += '<div class="section-sep"></div>';
         html += '<div class="section-label" style="margin-bottom:14px">Most Traded Players</div>';
         html += '<div class="insight-table">';
         topTraded.forEach(function(p, i) {
+          var tn=pName(p.id); var tdn=fullPlayerName(tn);
           html += '<div class="insight-row">';
           html += '<span class="insight-rank">'+(i+1)+'</span>';
-          html += '<span class="insight-name">'+pName(p.id)+'</span>';
+          html += '<span class="insight-name player-link" style="cursor:pointer" data-player="'+tdn.replace(/"/g,"&quot;")+'">'+tn+'</span>';
           html += '<span class="insight-bar-wrap"><span class="insight-bar" style="width:'+Math.round(p.c/topTraded[0].c*100)+'%"></span></span>';
           html += '<span class="insight-count">'+p.c+'×</span>';
           html += '</div>';
           if (p.chain.length) {
             var chainHtml = p.chain.map(function(step, ci) {
-              var arrow = ci === 0 ? '' : '<span class="chain-arrow">→</span>';
-              return arrow + '<span class="chain-name" title="GW'+step.gw+'">'+step.name+'</span>';
+              var arrow = ci===0 ? '' : '<span class="chain-arrow">→</span>';
+              return arrow+'<span class="chain-name" title="GW'+step.gw+'">'+step.name+'</span>';
             }).join('');
             html += '<div class="insight-detail chain-detail">'+chainHtml+'</div>';
           }
         });
         html += '</div>';
-      }
 
-      if (!acceptedTrades.length && !approvedWaivers.length) {
-        html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No player data yet.</p>';
-      }
-      el.innerHTML = html;
-    })(); // end Players
-
-    // ── INSIGHTS tab ──
-    (function() {
-      var el = document.getElementById("tradesInsights");
-      var html = '';
-
-      if (acceptedTrades.length) {
+        // Trade Partnerships
+        html += '<div class="section-sep"></div>';
         var partners = {};
         acceptedTrades.forEach(function(t) {
           var a = mName(t.offered_entry);
@@ -3218,9 +3241,7 @@ var DRAFT_PICKS = [
           var key = [a,b].sort().join('|||');
           if (!partners[key]) partners[key] = { a:a, b:b, count:0, trades:[] };
           partners[key].count++;
-          var players = (t.tradeitem_set||[]).map(function(i){
-            return pName(i.element_in)+' / '+pName(i.element_out);
-          });
+          var players = (t.tradeitem_set||[]).map(function(i){ return fullPlayerName(pName(i.element_in))+' / '+fullPlayerName(pName(i.element_out)); });
           partners[key].trades.push({ gw:t.event, players:players });
         });
         var sortedPartners = Object.values(partners).sort(function(a,b){ return b.count-a.count; });
@@ -3248,84 +3269,576 @@ var DRAFT_PICKS = [
           html += '</div></div>';
         });
         html += '</div>';
+      }
+
+      if (!acceptedTrades.length && !approvedWaivers.length) {
+        html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No activity yet.</p>';
+      }
+
+      el.innerHTML = html;
+      el.addEventListener('click', function(e) {
+        var link = e.target.closest('.player-link');
+        if (!link) return;
+        if (link.dataset.playerid) searchPlayerById(link.dataset.playerid);
+        else if (link.dataset.player) searchPlayer(link.dataset.player);
+      });
+    })(); // end Overview
+
+    // ── TIMELINE tab ──
+    (function() {
+      var el = document.getElementById("tradesTimeline");
+      var html = '';
+
+      // Trades by GW
+      if (acceptedTrades.length) {
+        html += '<div class="section-label" style="margin-bottom:14px">Trades</div>';
+        var byGW = {};
+        acceptedTrades.forEach(function(t){ var g=t.event||0; if(!byGW[g])byGW[g]=[]; byGW[g].push(t); });
+        var _tradeGWs = Object.keys(byGW).map(Number).sort(function(a,b){return b-a;});
+        _tradeGWs.forEach(function(gw, _gwIdx){
+          var rows = byGW[gw];
+          var isFirst = _gwIdx === 0;
+          html += '<div class="gw-block">';
+          html += '<div class="gw-block-header'+(isFirst?' open':'')+'" onclick="toggleGW(this)">';
+          html += '<span class="gw-title">Gameweek '+gw+'</span>';
+          html += '<span style="display:flex;align-items:center;gap:8px"><span class="gw-count"><span style="color:#00d4ff">'+rows.length+' trade'+(rows.length!==1?'s':'')+'</span></span><span class="gw-chevron" style="'+(isFirst?'transform:rotate(180deg)':'')+'">▼</span></span>';
+          html += '</div><div class="gw-block-body'+(isFirst?' open':'')+'">';
+          rows.forEach(function(t){
+            var offName = mName(t.offered_entry);
+            var recName = mName(t.received_entry);
+            var items = t.tradeitem_set || [];
+            html += '<div class="trade-card" style="border-left:3px solid #00d4ff;border-color:rgba(255,255,255,0.08);border-left-color:#00d4ff">';
+            html += '<div class="trade-card-header">';
+            html += '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">';
+            html += '<span style="font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+offName+'</span>';
+            html += '<span style="color:rgba(255,255,255,0.3);font-size:12px;flex-shrink:0">↔</span>';
+            html += '<span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+recName+'</span>';
+            html += '</div>';
+            html += '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;border-radius:20px;padding:3px 10px;margin-left:8px;background:rgba(0,230,118,0.12);color:#00d4ff;border:1px solid rgba(0,230,118,0.25)">✓ Accepted</span>';
+            html += '</div>';
+            html += '<div class="trade-card-body"><div class="trade-columns">';
+            html += '<div class="trade-col">';
+            html += '<div class="trade-col-header"><span class="trade-col-manager">'+offName.split(' ')[0]+'</span><span class="trade-col-direction gets" style="margin-left:6px">gets</span></div>';
+            items.forEach(function(i){ var n=pName(i.element_in); var dn=fullPlayerName(n); html += '<div class="chip in player-link" style="cursor:pointer" data-player="'+dn.replace(/"/g,"&quot;")+'">'+n+'</div>'; });
+            html += '</div>';
+            html += '<div class="trade-col">';
+            html += '<div class="trade-col-header"><span class="trade-col-manager">'+recName.split(' ')[0]+'</span><span class="trade-col-direction gets" style="margin-left:6px">gets</span></div>';
+            items.forEach(function(i){ var n=pName(i.element_out); var dn=fullPlayerName(n); html += '<div class="chip in player-link" style="cursor:pointer" data-player="'+dn.replace(/"/g,"&quot;")+'">'+n+'</div>'; });
+            html += '</div>';
+            html += '</div></div></div>';
+          });
+          html += '</div></div>';
+        });
       } else {
         html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No trades yet.</p>';
       }
+
+      // Transfers/waivers by GW
+      if (approvedWaivers.length) {
+        html += '<div class="section-sep"></div>';
+        html += '<div class="section-label" style="margin-bottom:14px">Transfers <span class="badge-dim">'+approvedWaivers.length+'</span></div>';
+        var byGW2 = {};
+        approvedWaivers.forEach(function(t){ var g=t.event||0; if(!byGW2[g])byGW2[g]=[]; byGW2[g].push(t); });
+        var _waiverGWs = Object.keys(byGW2).map(Number).sort(function(a,b){return b-a;});
+        _waiverGWs.forEach(function(gw, _gwIdx){
+          var gwList = byGW2[gw].slice().sort(function(a,b){
+            if (a.kind !== b.kind) return a.kind==='w' ? -1 : 1;
+            return (a.priority||9999)-(b.priority||9999);
+          });
+          var wCount = gwList.filter(function(t){return t.kind==='w';}).length;
+          var fCount = gwList.filter(function(t){return t.kind==='f';}).length;
+          var summary = [];
+          if (wCount) summary.push(wCount+' waiver'+(wCount!==1?'s':''));
+          if (fCount) summary.push(fCount+' free agent'+(fCount!==1?'s':''));
+          var isFirst = _gwIdx === 0;
+          html += '<div class="gw-block"><div class="gw-block-header'+(isFirst?' open':'')+'" onclick="toggleGW(this)">';
+          html += '<span class="gw-title">Gameweek '+gw+'</span>';
+          html += '<span style="display:flex;align-items:center;gap:10px"><span class="gw-count">'+summary.join(' · ')+'</span><span class="gw-chevron" style="'+(isFirst?'transform:rotate(180deg)':'')+'">▼</span></span>';
+          html += '</div><div class="gw-block-body'+(isFirst?' open':'')+'">';
+          gwList.forEach(function(t){
+            var mgr = G.managerById[String(t.entry)]||G.managers[String(t.entry)]||{name:'Unknown',team:''};
+            html += '<div class="waiver-card">';
+            html += '<div class="waiver-card-top">';
+            var priorityTag = t.kind==='w' && t.priority ? '<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);margin-right:4px">#'+t.priority+'</span>' : '';
+            html += '<span class="waiver-manager">'+priorityTag+mgr.name+'</span>';
+            html += '<span class="waiver-type-badge '+(t.kind==='w'?'w':'f')+'">'+(t.kind==='w'?'Waiver':'Free Agent')+'</span>';
+            html += '</div>';
+            html += '<div class="waiver-row-players">';
+            var wIn=pName(t.element_in), wOut=pName(t.element_out);
+            var wInD=fullPlayerName(wIn), wOutD=fullPlayerName(wOut);
+            html += '<div class="chip in player-link" style="margin:0;cursor:pointer" data-player="'+wInD.replace(/"/g,"&quot;")+'">'+wIn+'</div>';
+            html += '<span class="waiver-arrow">←</span>';
+            html += '<div class="chip out player-link" style="margin:0;cursor:pointer" data-player="'+wOutD.replace(/"/g,"&quot;")+'">'+wOut+'</div>';
+            html += '</div></div>';
+          });
+          html += '</div></div>';
+        });
+      }
+
+      if (!acceptedTrades.length && !approvedWaivers.length) {
+        html += '<p style="color:rgba(255,255,255,0.35);font-size:14px;text-align:center;padding:20px 0">No activity yet.</p>';
+      }
       el.innerHTML = html;
-    })(); // end Insights
+      el.addEventListener('click', function(e) {
+        var link = e.target.closest('.player-link');
+        if (link) searchPlayer(link.dataset.player);
+      });
+    })(); // end Timeline
   }
 
-  function renderTradesByManager(mgrStats) {
-    var el = document.getElementById("tradesByManager");
-    var sorted = mgrStats.slice().sort(function(a,b){
-      var ta = (a.tradesAcceptedOffered+a.tradesAcceptedReceived) + (a.waivers+a.freeAgents);
-      var tb = (b.tradesAcceptedOffered+b.tradesAcceptedReceived) + (b.waivers+b.freeAgents);
-      return tb-ta;
-    });
+
+  function renderPlayerSearch(approvedWaivers, acceptedTrades) {
+    var el = document.getElementById('tradesSearch');
+    if (!el) return;
+
     var html = '';
-    sorted.forEach(function(m, idx) {
-      var totalAccepted = m.tradesAcceptedOffered + m.tradesAcceptedReceived;
-      var totalXfers    = m.waivers + m.freeAgents;
-      var uid = 'mc'+(m.leagueId||idx);
-      html += '<div class="mgr-card">';
-      html += '<div class="mgr-card-header" onclick="toggleMgrCard(this,\'' + uid + '\')">';
-      html += '<div class="mgr-card-info">';
-      html += '<div class="mgr-card-name">'+m.name+'</div>';
-      html += '<div class="mgr-card-team">'+m.team+'</div>';
-      html += '</div>';
-      html += '<div class="mgr-card-stats">';
-      html += '<div class="mgr-mini-stat"><div class="v trades">'+totalAccepted+'</div><div class="l">Trades</div></div>';
-      html += '<div class="mgr-mini-stat"><div class="v xfers">'+totalXfers+'</div><div class="l">Transfers</div></div>';
-      html += '<div class="mgr-mini-stat"><div class="v denied">'+m.deniedWaivers+'</div><div class="l">W.Denied</div></div>';
-      html += '</div>';
-      html += '<span class="mgr-chevron" id="chv-'+uid+'">▼</span>';
-      html += '</div>';
-      html += '<div class="mgr-card-body" id="'+uid+'">';
-      if (m.tradeHistory.length) {
-        html += '<div class="mgr-section">';
-        html += '<div class="mgr-section-title">'+totalAccepted+' Trade'+(totalAccepted!==1?'s':'')+' · <span style="color:rgba(255,255,255,0.5)">'+m.tradesAcceptedOffered+' offered · '+m.tradesAcceptedReceived+' received</span></div>';
-        m.tradeHistory.slice().sort(function(a,b){return b.gw-a.gw;}).forEach(function(t){
-          html += '<div class="mgr-trade-row">';
-          var roleBadge = t.role === 'offered'
-            ? '<span class="role-badge offered">Offered</span>'
-            : '<span class="role-badge received">Received</span>';
-          html += '<div class="mgr-trade-header-row">';
-          html += '<span class="mgr-gw-tag">GW'+t.gw+'</span>';
-          html += '<span class="mgr-trade-partner">'+t.withName+'</span>';
-          html += roleBadge;
-          html += '</div>';
-          html += '<div class="mgr-trade-chips">';
-          html += '<div class="mgr-trade-group"><div class="mgr-trade-group-label got">Got</div>';
-          t.got.forEach(function(id){ html += '<div class="chip in">'+pName(id)+'</div>'; });
-          html += '</div>';
-          html += '<div class="mgr-trade-group"><div class="mgr-trade-group-label gave">Gave</div>';
-          t.gave.forEach(function(id){ html += '<div class="chip out">'+pName(id)+'</div>'; });
-          html += '</div></div></div>';
+    html += '<button id="searchBackBtn" class="search-back-btn" style="display:none" onclick="navGoBack()"><span class="back-arrow">←</span><span class="back-label"></span></button>';
+    html += '<div id="searchIntro"><div class="section-label" style="margin-bottom:12px">Player Search</div>';
+    html += '<p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:14px;line-height:1.5;">Find any player\'s draft position and full transaction history.</p></div>';
+    html += '<div class="player-search-wrap">';
+    html += '<input class="player-search-input" id="playerSearchInput" type="text" placeholder="Search players…" autocomplete="off" autocorrect="off" spellcheck="false">';
+    html += '<button id="searchClearBtn" class="search-clear-btn" style="display:none" onclick="clearPlayerSearch()">✕</button>';
+    html += '<div class="player-search-results" id="playerSearchResults"></div>';
+    html += '</div>';
+    html += '<div id="playerSearchCard"></div>';
+    el.innerHTML = html;
+    renderBackButton();
+
+    var input  = document.getElementById('playerSearchInput');
+    var resList = document.getElementById('playerSearchResults');
+    var card   = document.getElementById('playerSearchCard');
+
+    // G.playerNames (runtime API id->name map) is the ONLY reliable source for
+    // which element ID corresponds to which player in transaction data.
+    // DRAFT_PICKS id fields are manually entered and unreliable — ignore them.
+    var playerIndex = {};
+
+    // Step 1: build lookup maps from G.playerNames keyed by element ID (not web_name)
+    // This is critical — two players can share a web_name (e.g. E.Martínez / L.Martínez)
+    // and must never be grouped together.
+    // idToWebName: element id -> web_name
+    // idToFull:    element id -> "First Last"
+    // webNameToIds: web_name -> [ids]  (may contain multiple for shared surnames)
+    var idToWebName = {};
+    var idToFull = {};
+    var webNameToIds = {};
+    Object.keys(G.playerNames).forEach(function(id) {
+      var webName = G.playerNames[id];
+      idToWebName[id] = webName;
+      if (G.playerFullNames[id]) idToFull[id] = G.playerFullNames[id];
+      if (!webNameToIds[webName]) webNameToIds[webName] = [];
+      webNameToIds[webName].push(id);
+    });
+
+    // Step 2: add all drafted players.
+    // For each pick, resolve to a SINGLE element ID using API_NAME_MAP + full name matching.
+    // Never use a web_name that maps to multiple IDs without disambiguating by full name.
+    DRAFT_PICKS.forEach(function(p) {
+      var apiName = API_NAME_MAP[p.player] || p.player;
+      var expectedFull = PLAYER_FULL_NAMES[p.player] || null;
+      var candidateIds = webNameToIds[apiName] || webNameToIds[p.player] || [];
+
+      // Disambiguate: if multiple candidates share this web_name,
+      // pick the one whose full name matches our expected full name.
+      var resolvedId = null;
+      if (candidateIds.length === 1) {
+        resolvedId = candidateIds[0];
+      } else if (candidateIds.length > 1 && expectedFull) {
+        var matched = candidateIds.filter(function(id) {
+          return idToFull[id] && idToFull[id].toLowerCase() === expectedFull.toLowerCase();
         });
-        html += '</div>';
+        if (matched.length === 1) resolvedId = matched[0];
+        // If still ambiguous, leave resolvedId null — no transactions will match (safe)
       }
-      if (m.waiverHistory.length) {
-        html += '<div class="mgr-section">';
-        html += '<div class="mgr-section-title">Transfers · <span style="color:rgba(255,255,255,0.5)">'+m.waivers+' waiver · '+m.freeAgents+' free agent · '+m.deniedWaivers+' waiver denied</span></div>';
-        m.waiverHistory.slice().sort(function(a,b){ return b.gw!==a.gw ? b.gw-a.gw : a.priority-b.priority; }).forEach(function(w){
-          html += '<div class="mgr-waiver-item">';
-          html += '<span class="mgr-gw-tag">GW'+w.gw+'</span>';
-          html += '<span class="waiver-type-badge '+(w.kind==='w'?'w':'f')+'" style="margin-right:6px">'+(w.kind==='w'?'W':'FA')+'</span>';
-          html += '<span style="font-size:13px;font-weight:700;color:#fff;flex:1">'+pName(w.inId)+'</span>';
-          html += '<span style="font-size:11px;color:rgba(255,255,255,0.35);margin:0 6px">for</span>';
-          html += '<span style="font-size:12px;color:rgba(255,255,255,0.5)">'+pName(w.outId)+'</span>';
-          html += '</div>';
-        });
+
+      var full = (resolvedId && idToFull[resolvedId]) || expectedFull || p.player;
+      // Use only the single resolved ID — never a mix of multiple players
+      var resolvedIds = resolvedId ? [resolvedId] : [];
+
+      if (!playerIndex[p.player]) {
+        playerIndex[p.player] = { name: p.player, displayName: full, ids: resolvedIds, draftPick: p };
+      }
+      if (full !== p.player && !playerIndex[full]) playerIndex[full] = playerIndex[p.player];
+      if (apiName !== p.player && !playerIndex[apiName]) playerIndex[apiName] = playerIndex[p.player];
+    });
+
+    // Step 3: add undrafted players seen in transactions.
+    // Each unique element ID gets its own entry — never share entries between IDs.
+    Object.keys(idToWebName).forEach(function(id) {
+      var webName = idToWebName[id];
+      var full = idToFull[id] || PLAYER_FULL_NAMES[webName] || webName;
+      // Only add if not already covered by a drafted player entry
+      var alreadyCovered = false;
+      Object.keys(playerIndex).forEach(function(key) {
+        if (playerIndex[key].ids.indexOf(id) !== -1) alreadyCovered = true;
+      });
+      if (alreadyCovered) return;
+      // Use full name as the key so search works by full name
+      var key = full;
+      if (!playerIndex[key]) {
+        var entry = { name: webName, displayName: full, ids: [id], draftPick: null };
+        playerIndex[key] = entry;
+        // Also index by web_name if not already taken
+        if (webName !== full && !playerIndex[webName]) playerIndex[webName] = entry;
+      }
+    });
+
+    // Deduplicate entries (same object may be keyed under both API name and display name)
+    var _seen = new Set();
+    var allPlayers = Object.values(playerIndex).filter(function(p){
+      if (_seen.has(p)) return false; _seen.add(p); return true;
+    }).sort(function(a,b){ return (a.displayName||a.name).localeCompare(b.displayName||b.name); });
+
+    // Helper: get full manager name from DRAFT_PICKS first name (e.g. "Ben" -> full name via league_entries)
+    function fullMgrName(firstName) {
+      if (!G.data || !G.data.league_entries) return firstName;
+      var entry = G.data.league_entries.find(function(e) {
+        return e.player_first_name.toLowerCase() === firstName.toLowerCase();
+      });
+      if (!entry) return firstName;
+      return entry.player_first_name.charAt(0).toUpperCase() + entry.player_first_name.slice(1) + ' ' + entry.player_last_name;
+    }
+
+    function showCard(player) {
+      var dp = player.draftPick;
+      var ids = player.ids;
+      var html = '<div class="player-search-card">';
+
+      // Header
+      html += '<div class="psc-header">';
+      html += '<div class="psc-name">'+(player.displayName||fullPlayerName(player.name))+'</div>';
+      html += '<div class="psc-meta">';
+      if (dp) {
+        html += '<span class="pos-badge '+dp.pos.toLowerCase()+'">'+dp.pos+'</span>';
+        html += '<span style="font-size:13px;color:rgba(255,255,255,0.5)">'+dp.team+'</span>';
+      }
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div class="psc-body">';
+
+      // Draft info
+      html += '<div class="psc-section-title">Draft</div>';
+      if (dp) {
+        var draftMgrFull = fullMgrName(dp.manager);
+        html += '<div class="psc-draft-row">';
+        html += '<div><div class="psc-pick-num">#'+dp.pick+'</div><div class="psc-pick-label">Pick</div></div>';
+        html += '<div class="psc-pick-info">';
+        html += '<div class="psc-pick-manager">'+draftMgrFull+'</div>';
+        html += '<div class="psc-pick-sub">Round '+dp.round+'</div>';
+        html += '</div>';
         html += '</div>';
       } else {
-        html += '<div class="mgr-section"><p style="font-size:13px;color:rgba(255,255,255,0.35);margin:0">No transfers this season.</p></div>';
+        html += '<div class="psc-draft-row">';
+        html += '<div><div class="psc-pick-num" style="font-size:14px;color:rgba(255,255,255,0.3)">—</div><div class="psc-pick-label">Pick</div></div>';
+        html += '<div class="psc-pick-info">';
+        html += '<div class="psc-pick-manager" style="color:rgba(255,255,255,0.4)">Undrafted</div>';
+        html += '<div class="psc-pick-sub">Not selected in the draft</div>';
+        html += '</div>';
+        html += '</div>';
       }
-      if (!m.tradeHistory.length && !m.waiverHistory.length) {
-        html += '<div class="mgr-section"><p style="font-size:13px;color:rgba(255,255,255,0.35);margin:0">No activity this season.</p></div>';
+
+      // Build transaction history
+      var txList = [];
+
+      // Waivers / free agents — track both signed-in and dropped-out
+      approvedWaivers.forEach(function(t) {
+        var inId  = String(t.element_in);
+        var outId = String(t.element_out);
+        var mgr   = G.managerById[String(t.entry)] || G.managers[String(t.entry)] || { name: 'Unknown' };
+        var kindLabel = t.kind==='w'?'waiver':'free';
+        if (ids.indexOf(inId) !== -1) {
+          // This player was signed IN
+          txList.push({ gw: t.event||0, kind: kindLabel, dir: 'in',
+            manager: mgr.name, other: fullPlayerName(pName(outId)) });
+        }
+        if (ids.indexOf(outId) !== -1) {
+          // This player was dropped OUT
+          txList.push({ gw: t.event||0, kind: kindLabel, dir: 'out',
+            manager: mgr.name, other: fullPlayerName(pName(inId)) });
+        }
+      });
+
+      // Trades — store the full picture: both sides, both managers
+      // FPL Draft API: element_in goes TO offerer FROM receiver
+      //                element_out goes TO receiver FROM offerer
+      acceptedTrades.forEach(function(t) {
+        var offName = mName(t.offered_entry);
+        var recName = mName(t.received_entry);
+        var gw = t.event || 0;
+        var items = t.tradeitem_set || [];
+        var toOff = items.map(function(i){ return fullPlayerName(pName(String(i.element_in))); });
+        var toRec = items.map(function(i){ return fullPlayerName(pName(String(i.element_out))); });
+        var involved = false;
+        items.forEach(function(item) {
+          if (ids.indexOf(String(item.element_in)) !== -1) involved = true;
+          if (ids.indexOf(String(item.element_out)) !== -1) involved = true;
+        });
+        if (involved) {
+          // Deduplicate: only add once per trade (not once per item)
+          var alreadyAdded = txList.some(function(x){ return x.kind==='trade' && x.gw===gw && x.offName===offName && x.recName===recName; });
+          if (!alreadyAdded) {
+            txList.push({ gw: gw, kind: 'trade', offName: offName, recName: recName, toOff: toOff, toRec: toRec });
+          }
+        }
+      });
+
+      txList.sort(function(a,b){ return a.gw - b.gw; });
+
+      // ── Summary stats ──
+      if (txList.length) {
+        var nTrades   = txList.filter(function(t){ return t.kind==='trade'; }).length;
+        var nSignedIn = txList.filter(function(t){ return t.kind!=='trade' && t.dir==='in'; }).length;
+        var nReleased = txList.filter(function(t){ return t.kind!=='trade' && t.dir==='out'; }).length;
+        html += '<div class="psc-stats" style="margin-top:16px">';
+        if (nTrades)  html += '<div class="psc-stat"><div class="psc-stat-val trade">'+nTrades+'</div><div class="psc-stat-lbl">Trade'+(nTrades!==1?'s':'')+'</div></div>';
+        if (nSignedIn)html += '<div class="psc-stat"><div class="psc-stat-val signed">'+nSignedIn+'</div><div class="psc-stat-lbl">Signed</div></div>';
+        if (nReleased)html += '<div class="psc-stat"><div class="psc-stat-val released">'+nReleased+'</div><div class="psc-stat-lbl">Released</div></div>';
+        html += '</div>';
       }
+
+      html += '<div class="psc-section-title" style="margin-top:16px">Transactions <span style="font-weight:600;color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0">('+txList.length+')</span></div>';
+      if (txList.length) {
+        txList.forEach(function(tx) {
+          var kindLabel = tx.kind === 'trade' ? 'Trade' : tx.kind === 'waiver' ? 'Waiver' : 'Free Agent';
+          html += '<div class="psc-tx-row">';
+          html += '<div class="psc-tx-gw">GW'+tx.gw+'</div>';
+          html += '<div class="psc-tx-body">';
+          html += '<span class="psc-tx-kind '+tx.kind+'">'+kindLabel+'</span>';
+          if (tx.kind === 'trade') {
+            html += '<div class="psc-tx-trade-cols">';
+            html += '<div class="psc-tx-trade-col">';
+            html += '<div class="psc-tx-trade-mgr gets">'+tx.offName+' gets</div>';
+            tx.toOff.forEach(function(p){ html += '<div class="psc-tx-trade-player player-link" style="cursor:pointer" data-player="'+p.replace(/"/g,"&quot;")+'">'+p+'</div>'; });
+            html += '</div>';
+            html += '<div class="psc-tx-trade-col">';
+            html += '<div class="psc-tx-trade-mgr gets">'+tx.recName+' gets</div>';
+            tx.toRec.forEach(function(p){ html += '<div class="psc-tx-trade-player player-link" style="cursor:pointer" data-player="'+p.replace(/"/g,"&quot;")+'">'+p+'</div>'; });
+            html += '</div>';
+            html += '</div>';
+          } else {
+            if (tx.dir === 'in') {
+              html += '<div class="psc-tx-detail"><strong>'+tx.manager+'</strong> <span>signed</span> · <span>dropped</span> '+tx.other+'</div>';
+            } else {
+              html += '<div class="psc-tx-detail"><strong>'+tx.manager+'</strong> <span>released</span> · <span>signed</span> '+tx.other+'</div>';
+            }
+          }
+          html += '</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="psc-empty">No transactions found for this player.</div>';
+      }
+
       html += '</div></div>';
+      card.innerHTML = html;
+      var intro = document.getElementById('searchIntro');
+      if (intro) intro.style.display = 'none';
+      if (!card._listenerBound) {
+        card._listenerBound = true;
+        card.addEventListener('click', function(e) {
+          var link = e.target.closest('.player-link');
+          if (link) searchPlayer(link.dataset.player);
+        });
+      }
+    }
+
+    function clearPlayerSearch() {
+      input.value = '';
+      resList.classList.remove('visible');
+      resList.innerHTML = '';
+      card.innerHTML = '';
+      var intro = document.getElementById('searchIntro');
+      if (intro) intro.style.display = '';
+      var clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) clearBtn.style.display = 'none';
+      input.focus();
+    }
+
+    function doSearch(q) {
+      q = q.trim().toLowerCase();
+      resList.innerHTML = '';
+      card.innerHTML = '';
+      var intro = document.getElementById('searchIntro');
+      if (q.length < 2) {
+        resList.classList.remove('visible');
+        if (intro) intro.style.display = '';
+        return;
+      }
+      if (intro) intro.style.display = 'none';
+      var matches = allPlayers.filter(function(p){ var dn=(p.displayName||p.name).toLowerCase(); return p.name.toLowerCase().indexOf(q) !== -1 || dn.indexOf(q) !== -1; }).slice(0, 8);
+      if (!matches.length) {
+        resList.innerHTML = '<div style="padding:12px 14px;font-size:13px;color:rgba(255,255,255,0.35)">No players found</div>';
+        resList.classList.add('visible');
+        return;
+      }
+      matches.forEach(function(p) {
+        var dp = p.draftPick;
+        var div = document.createElement('div');
+        div.className = 'player-search-result-item';
+        if (p.ids && p.ids.length) div.dataset.eid = p.ids[0];
+        div.innerHTML = '<span class="psri-name">'+(p.displayName||fullPlayerName(p.name))+'</span>'
+          + (dp ? '<span class="pos-badge '+dp.pos.toLowerCase()+'">'+dp.pos+'</span><span class="psri-meta">'+dp.team+' · #'+dp.pick+'</span>' : '<span class="psri-meta">Undrafted</span>');
+        div.addEventListener('click', function() {
+          input.value = p.displayName || p.name;
+          resList.classList.remove('visible');
+          resList.innerHTML = '';
+          showCard(p);
+        });
+        resList.appendChild(div);
+      });
+      resList.classList.add('visible');
+    }
+
+    input.addEventListener('input', function() {
+      var clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) clearBtn.style.display = this.value.length ? 'flex' : 'none';
+      doSearch(this.value);
     });
-    el.innerHTML = html;
+    input.addEventListener('keydown', function(e) { if (e.key === 'Escape') { clearPlayerSearch(); } });
+    document.addEventListener('click', function(e) {
+      if (!el.contains(e.target)) { resList.classList.remove('visible'); resList.innerHTML = ''; }
+    }, true);
+  }
+
+
+
+  // ── Nav stack ──
+  var G_NAV = [];
+
+  function navCurrentState() {
+    var topTabId = null;
+    document.querySelectorAll('.tab-content').forEach(function(el){
+      if (el.classList.contains('active')) topTabId = el.id;
+    });
+    var topTabLabel = null;
+    document.querySelectorAll('.tab').forEach(function(btn){
+      if (btn.classList.contains('active')) topTabLabel = btn.textContent.trim();
+    });
+    var subPanelId = null;
+    if (topTabId) {
+      var container = document.getElementById(topTabId);
+      if (container) {
+        container.querySelectorAll('.sub-tab').forEach(function(btn){
+          if (btn.classList.contains('active')) {
+            var m = btn.getAttribute('onclick') && btn.getAttribute('onclick').match(/switchSubTab\(this,'([^']+)'\)/);
+            if (m) subPanelId = m[1];
+          }
+        });
+      }
+    }
+    return { topTabId: topTabId, topTabLabel: topTabLabel, subPanelId: subPanelId };
+  }
+
+  function navGoBack() {
+    if (!G_NAV.length) return;
+    var prev = G_NAV.pop();
+    document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('active'); });
+    if (prev.topTabId) document.getElementById(prev.topTabId).classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(btn){
+      if (btn.textContent.trim() === prev.topTabLabel) btn.classList.add('active');
+    });
+    if (prev.subPanelId && prev.topTabId) {
+      var container = document.getElementById(prev.topTabId);
+      if (container) {
+        var btn = container.querySelector('.sub-tab[onclick*="' + prev.subPanelId + '"]');
+        if (btn) switchSubTab(btn, prev.subPanelId);
+      }
+    }
+    renderBackButton();
+    window.scrollTo(0, 0);
+  }
+
+  function renderBackButton() {
+    var el = document.getElementById('searchBackBtn');
+    if (!el) return;
+    if (G_NAV.length > 0) {
+      var prev = G_NAV[G_NAV.length - 1];
+      var label = prev.topTabLabel || '';
+      if (prev.subPanelId && prev.topTabId) {
+        var container = document.getElementById(prev.topTabId);
+        if (container) {
+          var btn = container.querySelector('.sub-tab[onclick*="' + prev.subPanelId + '"]');
+          if (btn) label = btn.textContent.trim();
+        }
+      }
+      el.style.display = 'flex';
+      el.querySelector('.back-label').textContent = label;
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  function searchPlayerById(elementId) {
+    // Navigate to Search tab
+    var tradesTab = document.getElementById('tab-trades');
+    if (!tradesTab) return;
+    G_NAV.push(navCurrentState());
+    if (G_NAV.length > 20) G_NAV.shift();
+    document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('active'); });
+    tradesTab.classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(btn){
+      if (btn.textContent.trim() === 'Transfers') btn.classList.add('active');
+    });
+    var searchBtn = tradesTab.querySelector('.sub-tab[onclick*="tradesSearch"]');
+    if (searchBtn) switchSubTab(searchBtn, 'tradesSearch');
+    renderBackButton();
+    // Find the exact player entry in the index by element ID
+    // and set the input + trigger showCard directly via a synthetic click on the right result
+    var webName = G.playerNames[elementId];
+    if (!webName) { window.scrollTo(0,0); return; }
+    var input = document.getElementById('playerSearchInput');
+    if (!input) { setTimeout(function(){ searchPlayerById(elementId); }, 100); return; }
+    input.value = webName;
+    input.dispatchEvent(new Event('input'));
+    setTimeout(function() {
+      var results = document.getElementById('playerSearchResults');
+      if (!results) return;
+      var items = results.querySelectorAll('.player-search-result-item');
+      // Find the item whose player entry contains this exact element ID
+      var target = Array.from(items).find(function(item) {
+        return item._playerId === elementId || item.dataset.eid === elementId;
+      });
+      // Fallback: if only one result, use it
+      if (!target && items.length === 1) target = items[0];
+      if (target) target.click();
+      window.scrollTo(0, 0);
+    }, 50);
+  }
+
+  function searchPlayer(apiName) {
+    G_NAV.push(navCurrentState());
+    if (G_NAV.length > 20) G_NAV.shift(); // cap stack
+    var tradesTab = document.getElementById('tab-trades');
+    if (!tradesTab) return;
+    document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(el){ el.classList.remove('active'); });
+    tradesTab.classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(btn){
+      if (btn.textContent.trim() === 'Transfers') btn.classList.add('active');
+    });
+    var searchBtn = tradesTab.querySelector('.sub-tab[onclick*="tradesSearch"]');
+    if (searchBtn) switchSubTab(searchBtn, 'tradesSearch');
+    renderBackButton();
+    var input = document.getElementById('playerSearchInput');
+    if (!input) { setTimeout(function(){ searchPlayer(apiName); }, 100); return; }
+    input.value = apiName;
+    input.dispatchEvent(new Event('input'));
+    setTimeout(function() {
+      var results = document.getElementById('playerSearchResults');
+      if (!results) return;
+      var items = results.querySelectorAll('.player-search-result-item');
+      if (items.length === 1) items[0].click();
+      else if (items.length > 1) {
+        var exact = Array.from(items).find(function(el){
+          return el.querySelector('.psri-name') && el.querySelector('.psri-name').textContent.toLowerCase() === apiName.toLowerCase();
+        });
+        if (exact) exact.click();
+      }
+      window.scrollTo(0, 0);
+    }, 50);
   }
 
   function togglePartner(header) {
@@ -3356,13 +3869,11 @@ var DRAFT_PICKS = [
     subTabsEl.querySelectorAll('.sub-tab').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
     var parent = subTabsEl.parentElement;
-    // Collect panel IDs from the sibling buttons' onclick attributes
     var panelIds = [];
     subTabsEl.querySelectorAll('.sub-tab').forEach(function(b){
       var m = b.getAttribute('onclick') && b.getAttribute('onclick').match(/switchSubTab\(this,'([^']+)'\)/);
       if (m) panelIds.push(m[1]);
     });
-    // Show/hide each panel
     panelIds.forEach(function(id){
       var el = parent.querySelector('#'+id) || document.getElementById(id);
       if (el) el.style.display = id === targetId ? 'block' : 'none';
@@ -3401,8 +3912,6 @@ var DRAFT_PICKS = [
     }
 
     G.data = leagueData;
-    G.transactionData = transactionData || null;
-    G.tradeData = tradeData || null;
     G.luckChartData = null;
     G.paChartData = null;
 
@@ -3428,9 +3937,13 @@ var DRAFT_PICKS = [
       } catch(e) {}
     }
     if (!elemSrc && leagueData.elements) elemSrc = leagueData.elements;
+    G.playerFullNames = {}; // id -> "First Last"
     if (elemSrc) {
       elemSrc.forEach(function(el){
         G.playerNames[el.id] = el.web_name || (el.first_name+" "+el.second_name);
+        if (el.first_name && el.second_name) {
+          G.playerFullNames[el.id] = el.first_name+" "+el.second_name;
+        }
       });
     }
 
@@ -3473,7 +3986,6 @@ var DRAFT_PICKS = [
     document.getElementById("tab-results").classList.add("active");
     document.querySelectorAll(".tab")[0].classList.add("active");
 
-    // Sync GW preset pills — both default to All
     document.querySelectorAll('#inner-results-form .gw-preset').forEach(function(b){
       b.classList.toggle('active', b.textContent === 'All');
     });
@@ -3482,11 +3994,6 @@ var DRAFT_PICKS = [
     });
 
     window.scrollTo(0,0);
-  }
-
-  function pTeam(id) {
-    // G.playerTeam / G.teamNames not populated — placeholder for future API data
-    return '—';
   }
 
   function renderDraft() {
@@ -3522,7 +4029,7 @@ var DRAFT_PICKS = [
       html += '<div class="draft-all-row">';
       html += '<span class="da-pick">#' + p.pick + '</span>';
       html += '<span class="da-rd">' + p.round + '</span>';
-      html += '<span class="da-player">' + p.player + '</span>';
+      var dpn=fullPlayerName(p.player); html += '<span class="da-player player-link" data-player="' + dpn + '" style="cursor:pointer">' + p.player + '</span>';
       html += '<span class="da-pos"><span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span></span>';
       html += '<span class="da-mgr">' + p.manager + '</span>';
       html += '<span class="da-team" style="color:#aaa;font-size:12px">' + p.team + '</span>';
@@ -3531,7 +4038,8 @@ var DRAFT_PICKS = [
     html += '</div></div>';
 
     html += '<div id="draftBoard" class="sub-tab-content" style="display:none">';
-    html += '<div class="section-label" style="margin-bottom:14px">Draft Board</div>';
+    html += '<div class="section-label" style="margin-bottom:8px">Draft Board</div>';
+    html += '<p style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px">← Scroll horizontally to see all managers</p>';
     html += '<div class="draft-board-wrap"><table class="draft-board"><thead><tr><th>Rd</th>';
     managers.forEach(function(m) { html += '<th>' + m + '</th>'; });
     html += '</tr></thead><tbody>';
@@ -3542,7 +4050,7 @@ var DRAFT_PICKS = [
         if (p) {
           html += '<td><div class="draft-cell">';
           html += '<span class="draft-pick-num">#' + p.pick + '</span>';
-          html += '<span class="draft-player">' + p.player + '</span>';
+          var bpn=fullPlayerName(p.player); html += '<span class="draft-player player-link" data-player="' + bpn + '" style="cursor:pointer">' + p.player + '</span>';
           html += '<span class="draft-meta"><span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span> ' + p.team + '</span>';
           html += '</div></td>';
         } else { html += '<td></td>'; }
@@ -3571,7 +4079,8 @@ var DRAFT_PICKS = [
       html += '<div class="mgr-mini-stat"><div class="v" style="color:#00d4ff">' + def + '</div><div class="l">DEF</div></div>';
       html += '<div class="mgr-mini-stat"><div class="v" style="color:#ffc940">' + gkp + '</div><div class="l">GKP</div></div>';
       html += '</div>';
-      html += '<span class="mgr-chevron" id="chv-' + uid + '">&#9660;</span>';      html += '</div>';
+      html += '<span class="mgr-chevron" id="chv-' + uid + '">&#9660;</span>';
+      html += '</div>';
       html += '<div class="mgr-card-body" id="' + uid + '">';
       html += '<div class="mgr-section">';
       ['FWD','MID','DEF','GKP'].forEach(function(pos) {
@@ -3583,7 +4092,7 @@ var DRAFT_PICKS = [
         group.forEach(function(p) {
           html += '<div class="draft-squad-row">';
           html += '<span class="draft-pick-tag">#' + p.pick + '</span>';
-          html += '<span class="draft-squad-name">' + p.player + '</span>';
+          var spn=fullPlayerName(p.player); html += '<span class="draft-squad-name player-link" data-player="' + spn + '" style="cursor:pointer">' + p.player + '</span>';
           html += '<span class="draft-squad-team" style="color:#666;font-size:11px">' + p.team + '</span>';
           html += '</div>';
         });
@@ -3596,6 +4105,8 @@ var DRAFT_PICKS = [
     el.innerHTML = html;
 
     el.addEventListener('click', function(e) {
+      var link = e.target.closest('.player-link');
+      if (link) { searchPlayer(link.dataset.player); return; }
       var hdr = e.target.closest('.draft-mgr-toggle');
       if (!hdr) return;
       var uid = hdr.dataset.uid;
@@ -3627,7 +4138,23 @@ var DRAFT_PICKS = [
     }, 120);
   });
 
-  /* ── Kick off auto-load on page start ── */
+  // ── API name override map ──
+  // Maps DRAFT_PICKS player name → exact G.playerNames web_name
+  // Populated after reviewing the debug panel
+  var API_NAME_MAP = {
+    "Fernandes": "B.Fernandes",
+    "Larsen": "Strand Larsen",
+    "Murphy": "J.Murphy",
+    "Guimarães": "Bruno G.",
+    "Petrovic": "Petrović",
+    "White": "B.White",
+    "James": "R.James",
+    "Dias": "R.Dias",
+    "Anderson": "E.Anderson",
+    "O'Brien": "J.O'Brien"
+  };
+
+  // ── Debug: player mapping panel ──
   autoLoad();
 </script>
 
