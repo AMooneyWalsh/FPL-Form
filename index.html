@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!-- v54 -->
+<!-- v57 -->
 
 <html lang="en">
 <head>
@@ -495,7 +495,61 @@ width: 28px; text-align: center; color: rgba(255,255,255,0.3);
 .pos-badge.def { background: rgba(0,230,118,0.15); color: #00d4ff; }
 .pos-badge.gkp { background: rgba(255,201,64,0.12); color: #ffc940; }
 
-/* ── Draft squad cards ── */
+/* ── Draft Value table ── */
+.dv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dv-table thead tr { border-bottom: 2px solid rgba(255,255,255,0.1); }
+.dv-table th { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(255,255,255,0.35); padding: 6px 8px; text-align: center; }
+.dv-table th.al { text-align: left; }
+.dv-row { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.12s; }
+.dv-row:hover { background: rgba(255,255,255,0.04); }
+.dv-row.dv-row-open { background: rgba(0,212,255,0.05); }
+.dv-rank { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.25); padding: 10px 4px 10px 8px; }
+.dv-name { font-size: 13px; font-weight: 700; color: #fff; }
+.dv-team { font-size: 11px; color: rgba(255,255,255,0.35); }
+.dv-num { text-align: center; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #e8e8f0; }
+.dv-draft { color: rgba(255,255,255,0.65); }
+.dv-pos { color: rgba(255,255,255,0.7); font-size: 12px; }
+.dv-pos.dv-pos { }
+.dv-pos-val { color: #fff; font-size: 14px; font-weight: 800; }
+.dv-pos-lbl { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
+.dv-pos { text-align: center; padding: 10px 4px; }
+.dv-num.dv-pos { text-align: center; }
+.dv-pos.dv-num { }
+.dv-num.al { text-align: left; padding-left: 0; }
+.dv-pos { font-weight: 800; }
+.dv-neg { color: #f0407a !important; }
+.dv-pos { color: #00d4ff !important; }
+.dv-breakdown-row td { padding: 0; }
+.dv-breakdown {
+  background: rgba(0,0,0,0.2);
+  border-bottom: 2px solid rgba(0,212,255,0.15);
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.dv-player-row {
+  display: grid;
+  grid-template-columns: 32px 30px 1fr 32px 52px;
+  align-items: center; gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 12px;
+}
+.dv-player-row:last-child { border-bottom: none; }
+.dv-pick-tag { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); }
+.dv-pname { font-weight: 700; color: #fff; }
+.dv-pteam { font-size: 11px; color: rgba(255,255,255,0.35); }
+.dv-ppts { text-align: right; font-weight: 700; color: #00d4ff; font-size: 12px; }
+.dv-breakdown-label {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.35); padding: 6px 0 3px;
+}
+.dv-bench-label { margin-top: 4px; }
+.dv-benched .dv-pname { color: rgba(255,255,255,0.4); }
+.dv-benched .dv-pick-tag { color: rgba(255,255,255,0.15); }
+.dv-bench-pts { color: rgba(255,255,255,0.3) !important; }
+.dv-starter .dv-ppts { color: #00d4ff; }
+
+
 .draft-pos-group { margin-bottom: 10px; }
 .draft-pos-group:last-child { margin-bottom: 0; }
 .draft-pos-label {
@@ -1449,7 +1503,7 @@ var PLAYER_FULL_NAMES = {
   "Iwobi":"Alex Iwobi","Aït-Nouri":"Rayan Aït-Nouri","Murillo":"Murillo",
   "Schär":"Fabian Schär","Richarlison":"Richarlison","McNeil":"Dwight McNeil",
   "Pickford":"Jordan Pickford","Kerkez":"Milos Kerkez","Madueke":"Noni Madueke",
-  "Alisson":"Alisson Becker","White":"Ben White","Tarkowski":"James Tarkowski",
+  "Alisson":"Alisson Becker","White":"Benjamin White","Tarkowski":"James Tarkowski",
   "Wilson":"Harry Wilson","H.Wilson":"Harry Wilson","C.Wilson":"Callum Wilson","Robertson":"Andrew Robertson","Chalobah":"Trevoh Chalobah",
   "Rodrigo":"Rodrigo","Damsgaard":"Mikkel Damsgaard","Timber":"Jurriën Timber",
   "Wan-Bissaka":"Aaron Wan-Bissaka","Savinho":"Savinho","Murphy":"Jacob Murphy",
@@ -1472,16 +1526,16 @@ var PLAYER_FULL_NAMES = {
   "Ward-Prowse":"James Ward-Prowse","Reijnders":"Tijjani Reijnders","Mazraoui":"Noussair Mazraoui",
   "Digne":"Lucas Digne","Tel":"Mathys Tel","Diouf":"El Hadj Diouf",
   "Gusto":"Malo Gusto","Akanji":"Manuel Akanji","Jackson":"Nicolas Jackson",
-  "Truffert":"Adrien Truffert","Dango":"Dango Ouattara","Udogie":"Destiny Udogie",
+  "Truffert":"Adrien Truffert","Neto":"Pedro Lomba Neto","Dango":"Dango Ouattara","Udogie":"Destiny Udogie",
   "Verbruggen":"Bart Verbruggen","Cash":"Matty Cash","Muniz":"Rodrigo Muniz",
   "Zirkzee":"Joshua Zirkzee","Romero":"Cristian Romero","Højlund":"Rasmus Højlund",
   "Palhinha":"João Palhinha","Botman":"Sven Botman","Tonali":"Sandro Tonali",
   "Tavernier":"Marcus Tavernier","Anderson":"Elliot Anderson","Bradley":"Conor Bradley",
   "Aké":"Nathan Aké","Stones":"John Stones","Khusanov":"Abdukodir Khusanov",
   "Kroupi":"El Kroupi Junior","Nmecha":"Felix Nmecha","Lewis-Potter":"Keane Lewis-Potter",
-  "O'Brien":"Jack O'Brien","Ramsdale":"Aaron Ramsdale","Andersen":"Joachim Andersen",
+  "O'Brien":"Jake O'Brien","Ramsdale":"Aaron Ramsdale","Andersen":"Joachim Andersen",
   "Barnes":"Harvey Barnes","Hato":"Jorrel Hato","Bamford":"Patrick Bamford",
-  "Martinez":"Emiliano Martínez","Dúbravka":"Martin Dúbravka","José Sá":"José Sá",
+  "Martinez":"Emiliano Martínez Romero","Dúbravka":"Martin Dúbravka","José Sá":"José Sá",
   "Areola":"Alphonse Areola","Trafford":"James Trafford","Onana":"André Onana",
   "Ortega":"Stefan Ortega","Bayindir":"Altay Bayındır","Meslier":"Illan Meslier",
   "Jörgensen":"Altay Bayındır","Petrovic":"Nikola Petrović",
@@ -1629,6 +1683,8 @@ function fullPlayerName(apiName) {
     G.paChartData = null;
     G.playerNames = {};
     G.playerFullNames = {};
+    G.playerPoints = {};
+    G.playerIndex = {};
     G.managers = {};
     G.managerById = {};
     G.allFinished = [];
@@ -3126,6 +3182,62 @@ function fullPlayerName(apiName) {
   }
 
 
+  // Build the canonical player index: name -> { name, displayName, ids, draftPick }
+  // This is the single source of truth for resolving DRAFT_PICKS and undrafted players
+  // to element IDs. Used by renderPlayerSearch and renderDraftValueHTML.
+  // Must be called after G.playerNames, G.playerFullNames are populated in goInner.
+  function buildPlayerIndex() {
+    var idToFull = {};
+    var webNameToIds = {};
+    Object.keys(G.playerNames).forEach(function(id) {
+      var wn = G.playerNames[id];
+      if (!webNameToIds[wn]) webNameToIds[wn] = [];
+      webNameToIds[wn].push(id);
+      if (G.playerFullNames[id]) idToFull[id] = G.playerFullNames[id];
+    });
+
+    var playerIndex = {};
+
+    DRAFT_PICKS.forEach(function(p) {
+      var apiName = API_NAME_MAP[p.player] || p.player;
+      var expectedFull = PLAYER_FULL_NAMES[p.player] || null;
+      var candidateIds = webNameToIds[apiName] || webNameToIds[p.player] || [];
+      var resolvedId = null;
+      if (candidateIds.length === 1) {
+        resolvedId = candidateIds[0];
+      } else if (candidateIds.length > 1 && expectedFull) {
+        var matched = candidateIds.filter(function(id) {
+          return idToFull[id] && idToFull[id].toLowerCase() === expectedFull.toLowerCase();
+        });
+        if (matched.length === 1) resolvedId = matched[0];
+      }
+      var full = (resolvedId && idToFull[resolvedId]) || expectedFull || p.player;
+      var resolvedIds = resolvedId ? [resolvedId] : [];
+      if (!playerIndex[p.player]) {
+        playerIndex[p.player] = { name: p.player, displayName: full, ids: resolvedIds, draftPick: p };
+      }
+      if (full !== p.player && !playerIndex[full]) playerIndex[full] = playerIndex[p.player];
+      if (apiName !== p.player && !playerIndex[apiName]) playerIndex[apiName] = playerIndex[p.player];
+    });
+
+    Object.keys(G.playerNames).forEach(function(id) {
+      var webName = G.playerNames[id];
+      var full = idToFull[id] || PLAYER_FULL_NAMES[webName] || webName;
+      var alreadyCovered = Object.keys(playerIndex).some(function(key) {
+        return playerIndex[key].ids.indexOf(id) !== -1;
+      });
+      if (alreadyCovered) return;
+      var key = full;
+      if (!playerIndex[key]) {
+        var entry = { name: webName, displayName: full, ids: [id], draftPick: null };
+        playerIndex[key] = entry;
+        if (webName !== full && !playerIndex[webName]) playerIndex[webName] = entry;
+      }
+    });
+
+    return playerIndex;
+  }
+
   function renderTrades(transactionData, tradeData) {
     var rawList = [];
     if (transactionData) {
@@ -3408,80 +3520,9 @@ function fullPlayerName(apiName) {
     var resList = document.getElementById('playerSearchResults');
     var card   = document.getElementById('playerSearchCard');
 
-    // G.playerNames (runtime API id->name map) is the ONLY reliable source for
-    // which element ID corresponds to which player in transaction data.
-    // DRAFT_PICKS id fields are manually entered and unreliable — ignore them.
-    var playerIndex = {};
-
-    // Step 1: build lookup maps from G.playerNames keyed by element ID (not web_name)
-    // This is critical — two players can share a web_name (e.g. E.Martínez / L.Martínez)
-    // and must never be grouped together.
-    // idToWebName: element id -> web_name
-    // idToFull:    element id -> "First Last"
-    // webNameToIds: web_name -> [ids]  (may contain multiple for shared surnames)
-    var idToWebName = {};
-    var idToFull = {};
-    var webNameToIds = {};
-    Object.keys(G.playerNames).forEach(function(id) {
-      var webName = G.playerNames[id];
-      idToWebName[id] = webName;
-      if (G.playerFullNames[id]) idToFull[id] = G.playerFullNames[id];
-      if (!webNameToIds[webName]) webNameToIds[webName] = [];
-      webNameToIds[webName].push(id);
-    });
-
-    // Step 2: add all drafted players.
-    // For each pick, resolve to a SINGLE element ID using API_NAME_MAP + full name matching.
-    // Never use a web_name that maps to multiple IDs without disambiguating by full name.
-    DRAFT_PICKS.forEach(function(p) {
-      var apiName = API_NAME_MAP[p.player] || p.player;
-      var expectedFull = PLAYER_FULL_NAMES[p.player] || null;
-      var candidateIds = webNameToIds[apiName] || webNameToIds[p.player] || [];
-
-      // Disambiguate: if multiple candidates share this web_name,
-      // pick the one whose full name matches our expected full name.
-      var resolvedId = null;
-      if (candidateIds.length === 1) {
-        resolvedId = candidateIds[0];
-      } else if (candidateIds.length > 1 && expectedFull) {
-        var matched = candidateIds.filter(function(id) {
-          return idToFull[id] && idToFull[id].toLowerCase() === expectedFull.toLowerCase();
-        });
-        if (matched.length === 1) resolvedId = matched[0];
-        // If still ambiguous, leave resolvedId null — no transactions will match (safe)
-      }
-
-      var full = (resolvedId && idToFull[resolvedId]) || expectedFull || p.player;
-      // Use only the single resolved ID — never a mix of multiple players
-      var resolvedIds = resolvedId ? [resolvedId] : [];
-
-      if (!playerIndex[p.player]) {
-        playerIndex[p.player] = { name: p.player, displayName: full, ids: resolvedIds, draftPick: p };
-      }
-      if (full !== p.player && !playerIndex[full]) playerIndex[full] = playerIndex[p.player];
-      if (apiName !== p.player && !playerIndex[apiName]) playerIndex[apiName] = playerIndex[p.player];
-    });
-
-    // Step 3: add undrafted players seen in transactions.
-    // Each unique element ID gets its own entry — never share entries between IDs.
-    Object.keys(idToWebName).forEach(function(id) {
-      var webName = idToWebName[id];
-      var full = idToFull[id] || PLAYER_FULL_NAMES[webName] || webName;
-      // Only add if not already covered by a drafted player entry
-      var alreadyCovered = false;
-      Object.keys(playerIndex).forEach(function(key) {
-        if (playerIndex[key].ids.indexOf(id) !== -1) alreadyCovered = true;
-      });
-      if (alreadyCovered) return;
-      // Use full name as the key so search works by full name
-      var key = full;
-      if (!playerIndex[key]) {
-        var entry = { name: webName, displayName: full, ids: [id], draftPick: null };
-        playerIndex[key] = entry;
-        // Also index by web_name if not already taken
-        if (webName !== full && !playerIndex[webName]) playerIndex[webName] = entry;
-      }
-    });
+    // Use the shared player index built at load time in goInner.
+    // This is the single source of truth for player name → element ID resolution.
+    var playerIndex = G.playerIndex;
 
     // Deduplicate entries (same object may be keyed under both API name and display name)
     var _seen = new Set();
@@ -3550,12 +3591,12 @@ function fullPlayerName(apiName) {
         if (ids.indexOf(inId) !== -1) {
           // This player was signed IN
           txList.push({ gw: t.event||0, kind: kindLabel, dir: 'in',
-            manager: mgr.name, other: fullPlayerName(pName(outId)) });
+            manager: mgr.name, other: fullPlayerName(pName(outId)), otherId: outId });
         }
         if (ids.indexOf(outId) !== -1) {
           // This player was dropped OUT
           txList.push({ gw: t.event||0, kind: kindLabel, dir: 'out',
-            manager: mgr.name, other: fullPlayerName(pName(inId)) });
+            manager: mgr.name, other: fullPlayerName(pName(inId)), otherId: inId });
         }
       });
 
@@ -3617,10 +3658,13 @@ function fullPlayerName(apiName) {
             html += '</div>';
             html += '</div>';
           } else {
+            var otherLink = tx.otherId
+              ? '<span class="psc-tx-other player-link" style="cursor:pointer;color:#00d4ff;font-weight:700" data-playerid="'+tx.otherId+'">'+tx.other+'</span>'
+              : '<span style="color:rgba(255,255,255,0.5)">'+tx.other+'</span>';
             if (tx.dir === 'in') {
-              html += '<div class="psc-tx-detail"><strong>'+tx.manager+'</strong> <span>signed</span> · <span>dropped</span> '+tx.other+'</div>';
+              html += '<div class="psc-tx-detail"><strong>'+tx.manager+'</strong> <span>signed</span> · <span style="color:rgba(255,255,255,0.4)">dropped</span> '+otherLink+'</div>';
             } else {
-              html += '<div class="psc-tx-detail"><strong>'+tx.manager+'</strong> <span>released</span> · <span>signed</span> '+tx.other+'</div>';
+              html += '<div class="psc-tx-detail"><strong>'+tx.manager+'</strong> <span>released</span> · <span style="color:rgba(255,255,255,0.4)">signed</span> '+otherLink+'</div>';
             }
           }
           html += '</div>';
@@ -3785,23 +3829,31 @@ function fullPlayerName(apiName) {
     var searchBtn = tradesTab.querySelector('.sub-tab[onclick*="tradesSearch"]');
     if (searchBtn) switchSubTab(searchBtn, 'tradesSearch');
     renderBackButton();
-    // Find the exact player entry in the index by element ID
-    // and set the input + trigger showCard directly via a synthetic click on the right result
-    var webName = G.playerNames[elementId];
-    if (!webName) { window.scrollTo(0,0); return; }
+
+    // Find the player entry in G.playerIndex by element ID
+    // Use displayName for the search — it's always the full name (e.g. "Bruno Fernandes")
+    // which reliably matches in doSearch. Never use webName (e.g. "B.Fernandes") — dots break matching.
+    var entry = null;
+    var idStr = String(elementId);
+    Object.keys(G.playerIndex).some(function(key) {
+      var e = G.playerIndex[key];
+      if (e.ids && e.ids.indexOf(idStr) !== -1) { entry = e; return true; }
+    });
+    if (!entry) { window.scrollTo(0,0); return; }
+
+    var searchTerm = entry.displayName || entry.name;
     var input = document.getElementById('playerSearchInput');
     if (!input) { setTimeout(function(){ searchPlayerById(elementId); }, 100); return; }
-    input.value = webName;
+    input.value = searchTerm;
     input.dispatchEvent(new Event('input'));
     setTimeout(function() {
       var results = document.getElementById('playerSearchResults');
       if (!results) return;
       var items = results.querySelectorAll('.player-search-result-item');
-      // Find the item whose player entry contains this exact element ID
+      // Match by data-eid — most reliable
       var target = Array.from(items).find(function(item) {
-        return item._playerId === elementId || item.dataset.eid === elementId;
+        return item.dataset.eid === idStr;
       });
-      // Fallback: if only one result, use it
       if (!target && items.length === 1) target = items[0];
       if (target) target.click();
       window.scrollTo(0, 0);
@@ -3938,14 +3990,21 @@ function fullPlayerName(apiName) {
     }
     if (!elemSrc && leagueData.elements) elemSrc = leagueData.elements;
     G.playerFullNames = {}; // id -> "First Last"
+    G.playerPoints = {};   // id -> total_points (season)
     if (elemSrc) {
       elemSrc.forEach(function(el){
         G.playerNames[el.id] = el.web_name || (el.first_name+" "+el.second_name);
         if (el.first_name && el.second_name) {
           G.playerFullNames[el.id] = el.first_name+" "+el.second_name;
         }
+        if (typeof el.total_points === 'number') {
+          G.playerPoints[el.id] = el.total_points;
+        }
       });
     }
+
+    // Build the shared player index — used by renderPlayerSearch and renderDraftValueHTML
+    G.playerIndex = buildPlayerIndex();
 
     G.allFinished = leagueData.matches.filter(function(m){ return m.finished; });
 
@@ -3996,6 +4055,163 @@ function fullPlayerName(apiName) {
     window.scrollTo(0,0);
   }
 
+  // Given an array of players with { pts, pos, pickNum }, find the optimal legal XI.
+  // Rules: exactly 1 GKP, exactly 10 outfield (3-5 DEF, 2-5 MID, 1-3 FWD), 11 total.
+  // Returns { totalPts, xiPickNums } — set of pick numbers in the optimal XI.
+  function bestDraftXI(players) {
+    var byPos = { GKP: [], DEF: [], MID: [], FWD: [] };
+    players.forEach(function(p) {
+      if (byPos[p.pos]) byPos[p.pos].push(p);
+    });
+    // Sort each group descending by pts (null treated as 0 for sorting, but tracked separately)
+    Object.keys(byPos).forEach(function(pos) {
+      byPos[pos].sort(function(a, b) { return (b.pts || 0) - (a.pts || 0); });
+    });
+
+    // Must pick exactly 1 GKP (best available)
+    var gkp = byPos.GKP[0] || null;
+    var gkpPts = gkp ? (gkp.pts || 0) : 0;
+
+    // All valid outfield formations [nDEF, nMID, nFWD] summing to 10
+    var formations = [];
+    for (var d = 3; d <= 5; d++) {
+      for (var m = 2; m <= 5; m++) {
+        var f = 10 - d - m;
+        if (f >= 1 && f <= 3) formations.push([d, m, f]);
+      }
+    }
+
+    var bestPts = -1;
+    var bestPickNums = [];
+
+    formations.forEach(function(fm) {
+      var nD = fm[0], nM = fm[1], nF = fm[2];
+      if (byPos.DEF.length < nD || byPos.MID.length < nM || byPos.FWD.length < nF) return;
+      var pts = gkpPts;
+      var pickNums = gkp ? [gkp.pickNum] : [];
+      byPos.DEF.slice(0, nD).forEach(function(p) { pts += (p.pts || 0); pickNums.push(p.pickNum); });
+      byPos.MID.slice(0, nM).forEach(function(p) { pts += (p.pts || 0); pickNums.push(p.pickNum); });
+      byPos.FWD.slice(0, nF).forEach(function(p) { pts += (p.pts || 0); pickNums.push(p.pickNum); });
+      if (pts > bestPts) { bestPts = pts; bestPickNums = pickNums; }
+    });
+
+    return { totalPts: bestPts < 0 ? 0 : bestPts, xiPickNums: bestPickNums };
+  }
+
+  function renderDraftValueHTML(managers, mgrInfo) {
+    var noPointsData = Object.keys(G.playerPoints).length === 0;
+
+
+    var rows = managers.map(function(m) {
+      var picks = DRAFT_PICKS.filter(function(p){ return p.manager === m; });
+      var playerRows = [];
+
+      picks.forEach(function(p) {
+        var entry = G.playerIndex[p.player] || null;
+        var elementId = (entry && entry.ids.length === 1) ? entry.ids[0] : null;
+        var pts = (elementId && typeof G.playerPoints[elementId] === 'number') ? G.playerPoints[elementId] : null;
+        playerRows.push({ pick: p, pts: pts, pos: p.pos });
+      });
+
+      var xiResult = bestDraftXI(playerRows.map(function(r) {
+        return { pts: r.pts, pos: r.pos, pickNum: r.pick.pick };
+      }));
+      var draftPts = xiResult.totalPts;
+      var xiPickNums = xiResult.xiPickNums;
+
+      var h2hPts = null;
+      if (G.data && G.data.standings && G.data.league_entries) {
+        var entry = G.data.league_entries.find(function(e) {
+          return e.player_first_name.toLowerCase() === m.toLowerCase();
+        });
+        if (entry) {
+          var standing = G.data.standings.find(function(s) {
+            return s.league_entry === entry.id || s.league_entry === entry.entry_id;
+          });
+          if (standing) h2hPts = standing.points_for;
+        }
+      }
+
+      var delta = (h2hPts !== null) ? h2hPts - draftPts : null;
+      var info = mgrInfo[m] || { name: m, team: m };
+      return { manager: m, info: info, draftPts: draftPts, h2hPts: h2hPts, delta: delta, playerRows: playerRows, xiPickNums: xiPickNums };
+    });
+
+    rows.sort(function(a, b){ return b.draftPts - a.draftPts; });
+
+    var html = '';
+    html += '<div class="section-label" style="margin-bottom:6px">Draft Value</div>';
+    html += '<p style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:16px;line-height:1.5;">';
+    html += "The best legal XI from each manager's original draft squad, vs their actual H2H points scored. Positive delta means transfers helped; negative means keeping the draft squad would have been better.";
+    html += '</p>';
+
+    if (noPointsData) {
+      html += '<div style="background:rgba(255,201,64,0.08);border:1px solid rgba(255,201,64,0.25);border-radius:8px;padding:14px 16px;font-size:13px;color:rgba(255,201,64,0.9);line-height:1.5;">';
+      html += '<strong style="color:#ffc940;">No player points data available.</strong> The bootstrapData in your data.json does not include <code>total_points</code> per element. Check your iOS Shortcut is fetching the bootstrap-static endpoint correctly.';
+      html += '</div>';
+      return html;
+    }
+
+    html += '<div class="table-wrap">';
+    html += '<table class="dv-table"><thead><tr>';
+    html += '<th class="al" style="width:28px">#</th>';
+    html += '<th class="al">Manager</th>';
+    html += '<th title="Best legal XI from drafted squad using season total_points">Best XI</th>';
+    html += '<th title="Points For - total H2H match points scored this season">H2H Pts</th>';
+    html += '<th title="H2H Pts minus Best XI score - positive means transfers helped">Delta</th>';
+    html += '</tr></thead><tbody>';
+
+    rows.forEach(function(r, i) {
+      var deltaVal = r.delta;
+      var deltaStr = deltaVal === null ? '-' : (deltaVal > 0 ? '+' + deltaVal : String(deltaVal));
+      var deltaClass = deltaVal === null ? '' : (deltaVal > 0 ? 'dv-pos' : deltaVal < 0 ? 'dv-neg' : '');
+      html += '<tr class="dv-row" data-mgr="' + r.manager + '">';
+      html += '<td class="al dv-rank">' + (i+1) + '</td>';
+      html += '<td class="al"><div class="dv-name">' + r.info.name + '</div><div class="dv-team">' + r.info.team + '</div></td>';
+      html += '<td class="dv-num dv-draft">' + r.draftPts + '</td>';
+      html += '<td class="dv-num">' + (r.h2hPts !== null ? r.h2hPts : '-') + '</td>';
+      html += '<td class="dv-num ' + deltaClass + '">' + deltaStr + '</td>';
+      html += '</tr>';
+      html += '<tr class="dv-breakdown-row" id="dvb-' + r.manager + '" style="display:none"><td colspan="5">';
+      html += '<div class="dv-breakdown">';
+      var posOrder = { GKP: 0, DEF: 1, MID: 2, FWD: 3 };
+      var xi = r.playerRows.filter(function(pr) { return r.xiPickNums.indexOf(pr.pick.pick) !== -1; });
+      var bench = r.playerRows.filter(function(pr) { return r.xiPickNums.indexOf(pr.pick.pick) === -1; });
+      xi.sort(function(a,b){ return posOrder[a.pos] - posOrder[b.pos]; });
+      bench.sort(function(a,b){ return (b.pts||0) - (a.pts||0); });
+      html += '<div class="dv-breakdown-label">Starting XI</div>';
+      xi.forEach(function(pr) {
+        var p = pr.pick;
+        html += '<div class="dv-player-row dv-starter">';
+        html += '<span class="dv-pick-tag">#' + p.pick + '</span>';
+        html += '<span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span>';
+        var _xeid=G.playerIndex[p.player]&&G.playerIndex[p.player].ids[0]||'';
+        html += (_xeid ? '<span class="dv-pname player-link" data-playerid="'+_xeid+'" style="cursor:pointer">' : '<span class="dv-pname">') + p.player + '</span>';
+        html += '<span class="dv-pteam">' + p.team + '</span>';
+        html += '<span class="dv-ppts">' + (pr.pts !== null ? pr.pts + ' pts' : '-') + '</span>';
+        html += '</div>';
+      });
+      html += '<div class="dv-breakdown-label dv-bench-label">Bench</div>';
+      bench.forEach(function(pr) {
+        var p = pr.pick;
+        html += '<div class="dv-player-row dv-benched">';
+        html += '<span class="dv-pick-tag">#' + p.pick + '</span>';
+        html += '<span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span>';
+        var _bkeid=G.playerIndex[p.player]&&G.playerIndex[p.player].ids[0]||'';
+        html += (_bkeid ? '<span class="dv-pname player-link" data-playerid="'+_bkeid+'" style="cursor:pointer">' : '<span class="dv-pname">') + p.player + '</span>';
+        html += '<span class="dv-pteam">' + p.team + '</span>';
+        html += '<span class="dv-ppts dv-bench-pts">' + (pr.pts !== null ? pr.pts + ' pts' : '-') + '</span>';
+        html += '</div>';
+      });
+      html += '</div></td></tr>';
+    });
+
+    html += '</tbody></table></div>';
+    html += '<p style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:10px;line-height:1.5;">Tap a row to see starting XI and bench. Best XI = highest-scoring legal formation (1 GKP, 3-5 DEF, 2-5 MID, 1-3 FWD) from original 15 drafted players using season total points.</p>';
+
+    return html;
+  }
+
   function renderDraft() {
     var el = document.getElementById('draftContent');
     if (!el) return;
@@ -4016,6 +4232,7 @@ function fullPlayerName(apiName) {
     html += '<button class="sub-tab active" onclick="switchSubTab(this,\'draftOrder\')">All Picks</button>';
     html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftBoard\')">Draft Board</button>';
     html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftSquads\')">By Manager</button>';
+    html += '<button class="sub-tab" onclick="switchSubTab(this,\'draftValue\')">Draft Value</button>';
     html += '</div>';
 
     html += '<div id="draftOrder" class="sub-tab-content">';
@@ -4029,7 +4246,7 @@ function fullPlayerName(apiName) {
       html += '<div class="draft-all-row">';
       html += '<span class="da-pick">#' + p.pick + '</span>';
       html += '<span class="da-rd">' + p.round + '</span>';
-      var dpn=fullPlayerName(p.player); html += '<span class="da-player player-link" data-player="' + dpn + '" style="cursor:pointer">' + p.player + '</span>';
+      var _eid=G.playerIndex[p.player]&&G.playerIndex[p.player].ids[0]||''; html += '<span class="da-player player-link" data-playerid="' + _eid + '" style="cursor:pointer' + (_eid?'':';opacity:0.4;cursor:default') + '">' + p.player + '</span>';
       html += '<span class="da-pos"><span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span></span>';
       html += '<span class="da-mgr">' + p.manager + '</span>';
       html += '<span class="da-team" style="color:#aaa;font-size:12px">' + p.team + '</span>';
@@ -4050,7 +4267,7 @@ function fullPlayerName(apiName) {
         if (p) {
           html += '<td><div class="draft-cell">';
           html += '<span class="draft-pick-num">#' + p.pick + '</span>';
-          var bpn=fullPlayerName(p.player); html += '<span class="draft-player player-link" data-player="' + bpn + '" style="cursor:pointer">' + p.player + '</span>';
+          var _beid=G.playerIndex[p.player]&&G.playerIndex[p.player].ids[0]||''; html += '<span class="draft-player player-link" data-playerid="' + _beid + '" style="cursor:pointer">' + p.player + '</span>';
           html += '<span class="draft-meta"><span class="pos-badge ' + p.pos.toLowerCase() + '">' + p.pos + '</span> ' + p.team + '</span>';
           html += '</div></td>';
         } else { html += '<td></td>'; }
@@ -4092,7 +4309,7 @@ function fullPlayerName(apiName) {
         group.forEach(function(p) {
           html += '<div class="draft-squad-row">';
           html += '<span class="draft-pick-tag">#' + p.pick + '</span>';
-          var spn=fullPlayerName(p.player); html += '<span class="draft-squad-name player-link" data-player="' + spn + '" style="cursor:pointer">' + p.player + '</span>';
+          var _seid=G.playerIndex[p.player]&&G.playerIndex[p.player].ids[0]||''; html += '<span class="draft-squad-name player-link" data-playerid="' + _seid + '" style="cursor:pointer">' + p.player + '</span>';
           html += '<span class="draft-squad-team" style="color:#666;font-size:11px">' + p.team + '</span>';
           html += '</div>';
         });
@@ -4102,11 +4319,21 @@ function fullPlayerName(apiName) {
     });
     html += '</div>';
 
+    // ── Draft Value panel ──
+    html += '<div id="draftValue" class="sub-tab-content" style="display:none">';
+    html += renderDraftValueHTML(managers, mgrInfo);
+    html += '</div>';
+
+
     el.innerHTML = html;
 
     el.addEventListener('click', function(e) {
       var link = e.target.closest('.player-link');
-      if (link) { searchPlayer(link.dataset.player); return; }
+      if (link) {
+        var eid = link.dataset.playerid;
+        if (eid) searchPlayerById(eid);
+        return;
+      }
       var hdr = e.target.closest('.draft-mgr-toggle');
       if (!hdr) return;
       var uid = hdr.dataset.uid;
@@ -4117,6 +4344,17 @@ function fullPlayerName(apiName) {
       body.classList.toggle('open', !isOpen);
       body.style.display = isOpen ? 'none' : 'block';
       if (chv) chv.classList.toggle('open', !isOpen);
+    });
+
+    el.addEventListener('click', function(e) {
+      var dvRow = e.target.closest('.dv-row');
+      if (!dvRow) return;
+      var mgr = dvRow.dataset.mgr;
+      var breakdown = document.getElementById('dvb-' + mgr);
+      if (!breakdown) return;
+      var isOpen = breakdown.style.display !== 'none';
+      breakdown.style.display = isOpen ? 'none' : 'table-row';
+      dvRow.classList.toggle('dv-row-open', !isOpen);
     });
     managers.forEach(function(m) {
       var uid = 'dr-' + m.toLowerCase();
@@ -4142,16 +4380,27 @@ function fullPlayerName(apiName) {
   // Maps DRAFT_PICKS player name → exact G.playerNames web_name
   // Populated after reviewing the debug panel
   var API_NAME_MAP = {
-    "Fernandes": "B.Fernandes",
-    "Larsen": "Strand Larsen",
-    "Murphy": "J.Murphy",
-    "Guimarães": "Bruno G.",
-    "Petrovic": "Petrović",
-    "White": "B.White",
-    "James": "R.James",
-    "Dias": "R.Dias",
-    "Anderson": "E.Anderson",
-    "O'Brien": "J.O'Brien"
+    "Fernandes":  "B.Fernandes",
+    "Larsen":     "Strand Larsen",
+    "Murphy":     "J.Murphy",
+    "Guimarães":  "Bruno G.",
+    "Petrovic":   "Petrović",
+    "James":      "R.James",
+    "Dias":       "R.Dias",
+    "Anderson":   "E.Anderson",
+    "Alisson":    "A.Becker",
+    "Salah":      "M.Salah",
+    "Dango":      "O.Dango",
+    "Timber":     "J.Timber",
+    "Arias":      "J.Arias",
+    "Paquetá":    "L.Paquetá",
+    "Ederson":    "Ederson M.",
+    "Jackson":    "N.Jackson",
+    "Palhinha":   "J.Palhinha",
+    "Kroupi":     "Kroupi.Jr",
+    "Ortega":     "Ortega Moreno",
+    "H.Wilson":   "Wilson",
+    "C.Wilson":   "Wilson"
   };
 
   // ── Debug: player mapping panel ──
