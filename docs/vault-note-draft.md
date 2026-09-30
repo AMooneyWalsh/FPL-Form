@@ -59,6 +59,9 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Architecture doc agreed (`docs/architecture.md`)
 - [x] Save real API responses (network access to draft.premierleague.com allowed in the cloud environment, all endpoints verified)
 - [x] Step 1 built: league table from live FPL data, my-team highlight, fallback when FPL is down, automatic checks
-- [ ] Adam: create Cloudflare account and connect the repo (docs/setup.md)
+- [x] Adam: Cloudflare account created and repo connected. **Live at https://drafty-in-here.amooneywalsh.workers.dev** (2026-09-30)
 - [x] Step 2 built: trade verdicts, trade ledger, waiver record and battles, player journeys (Trades is the landing page)
+- [x] Step 2 live and checked against real data (2026-09-30)
+- [ ] Optional: switch off Cloudflare's non-production branch builds (they fail instantly and aren't needed)
+- [ ] Optional: set up KV storage so finished gameweeks survive restarts (needs a namespace id)
 - [ ] Step 3: draft analysis

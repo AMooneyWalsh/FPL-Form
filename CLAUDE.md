@@ -19,6 +19,8 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 - New site (steps 1 and 2 built; pages: Trades, Waivers, Players, Table): `app/` React, `worker/` Cloudflare Worker, `shared/` league maths, `fixtures/` real API data. Run `npm run check` before every merge. See `docs/setup.md`.
 - See `docs/architecture.md` (agreed plan), `docs/existing-app.md` and `docs/fpl-draft-api.md`.
 
+- **Live site:** https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main` automatically). Cloudflare's PR preview builds fail instantly for a setup reason we can't see; the GitHub `check` job is the real gate.
+
 ## Working style
 
 - **The owner is not technical and relies entirely on Claude.** Explain in plain English, never ask them to run commands or edit code, and give click-by-click steps for anything they must do (Cloudflare, GitHub). Prefer designs that run and recover by themselves.
