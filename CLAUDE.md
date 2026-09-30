@@ -16,9 +16,11 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 - Existing app: a static, read-only stats viewer. `index.html` (single file, ~4.4k lines, vanilla JS) loads `data.json` and renders results/form tables, luck, charts, streaks, records, H2H, waiver and trade analysis, and player search for one league ("Drafty In Here", league id 6573, 12 managers, 2025/26).
 - `data.json` is a snapshot of the official FPL Draft API, refreshed by manual "Update League Data" commits. There is no build step, backend, or CI.
 - Live league for 2026/27: league ID `634` ("Drafty In Here", 14 managers, H2H, waivers, trades on), owner's entry ID `1412`. The old data.json league (6573) is last season's and that ID has since been reused by another league.
-- See `docs/existing-app.md` and `docs/fpl-draft-api.md`.
+- See `docs/architecture.md` (plan, pending owner review), `docs/existing-app.md` and `docs/fpl-draft-api.md`.
 
 ## Working style
+
+- **The owner is not technical and relies entirely on Claude.** Explain in plain English, never ask them to run commands or edit code, and give click-by-click steps for anything they must do (Cloudflare, GitHub). Prefer designs that run and recover by themselves.
 
 - Present options and trade-offs (stack, hosting, database) with a recommendation before building. Don't pick silently.
 - No code until scope has been agreed with the owner.

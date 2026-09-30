@@ -31,6 +31,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: Site is **public by link**, no logins. "My team" can be remembered per browser.
 - 2026-09-30: Use the **free Cloudflare Pages address** for now. Buy a domain later if the group uses it.
 - 2026-09-30: 2026/27 league ID is **634**, Adam's entry ID is **1412** (default "my team"). Both are settings, updated each season.
+- 2026-09-30: Adam isn't technical and relies on Claude for all of the build and upkeep. Site must run and recover by itself; Adam's jobs are clicks only.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 
 ## Findings
@@ -41,6 +42,8 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Some API fields are unreliable (`matches_played`, `winning_league_entry`), so the site calculates results itself.
 
 ## Open questions
+- Is the old site live somewhere friends use (GitHub Pages)?
+- Happy with the routine: Claude opens a pull request, Adam checks the preview and presses Merge?
 
 ## Progress
 - [x] Repo set up, CLAUDE.md, docs
@@ -49,4 +52,4 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Verify FPL Draft API reads work without login
 - [x] Get the 2026/27 league ID (634)
 - [x] Confirm league 634 details: "Drafty In Here", 14 managers, H2H, waivers, trades on, 30s draft on 16 Aug
-- [ ] Architecture doc for review
+- [x] Architecture doc drafted (`docs/architecture.md`), waiting on review
