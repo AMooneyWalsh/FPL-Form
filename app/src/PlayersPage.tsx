@@ -13,7 +13,6 @@ const HOW: Record<Stint["how"], string> = {
 
 export function PlayersPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [query, setQuery] = useState("");
-  const [picked, setPicked] = useState<number | null>(null);
   const moves = useMemo(() => ({ transactions: data.transactions, trades: data.trades, draft: data.draft }), [data]);
 
   // Every player who has belonged to anyone this season, with their journeys.
@@ -37,8 +36,6 @@ export function PlayersPage({ data, myTeam }: { data: LeagueData; myTeam: number
     .sort((a, b) => b.stints.length - a.stints.length || total(b.stints) - total(a.stints))
     .slice(0, 10);
 
-  const selected = picked !== null ? everOwned.find((p) => p.id === picked) : undefined;
-
   return (
     <>
       <section>
@@ -49,33 +46,19 @@ export function PlayersPage({ data, myTeam }: { data: LeagueData; myTeam: number
           type="search"
           placeholder="Search a player, e.g. Saka"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPicked(null);
-          }}
+          onChange={(e) => setQuery(e.target.value)}
         />
         {q && results.length === 0 && <p className="notice">Nobody in the league has owned a player matching that.</p>}
-        {q && !selected && (
+        {q && (
           <ul className="plain results">
             {results.slice(0, 20).map(({ id, stints }) => (
               <li key={id}>
-                <button className="link" onClick={() => setPicked(id)}>
-                  <PlayerName id={id} data={data} /> · {stints.length} {stints.length === 1 ? "owner" : "spells"}
-                </button>
+                <PlayerName id={id} data={data} /> · {stints.length} {stints.length === 1 ? "owner" : "spells"}
               </li>
             ))}
           </ul>
         )}
       </section>
-
-      {selected && (
-        <section>
-          <Journey id={selected.id} stints={selected.stints} data={data} myTeam={myTeam} />
-          <button className="link" onClick={() => setPicked(null)}>
-            ← Back to results
-          </button>
-        </section>
-      )}
 
       {!q && (
         <section>
@@ -87,6 +70,24 @@ export function PlayersPage({ data, myTeam }: { data: LeagueData; myTeam: number
         </section>
       )}
     </>
+  );
+}
+
+/** One player's page (#/player/123): every manager he's belonged to. */
+export function PlayerPage({ id, data, myTeam }: { id: number; data: LeagueData; myTeam: number | null }) {
+  const stints = useMemo(
+    () => playerJourney(id, data.seasons, { transactions: data.transactions, trades: data.trades, draft: data.draft }),
+    [id, data],
+  );
+  if (!data.players.has(id)) return <p className="notice">Couldn't find that player.</p>;
+  return (
+    <section>
+      <Journey id={id} stints={stints} data={data} myTeam={myTeam} />
+      {stints.length === 0 && <p className="notice">Nobody in the league has owned him this season.</p>}
+      <a className="link" href="#/moves/players">
+        Search another player
+      </a>
+    </section>
   );
 }
 

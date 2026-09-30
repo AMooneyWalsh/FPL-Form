@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
-import { Manager, nobody, PlayerName, ShowFilter } from "./bits";
+import { Manager, nobody, PlayerName, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
-  const [who, setWho] = useState<number | null>(null);
+  const [who, setWho] = useShownManager();
   const record = useMemo(() => waiverRecord(data.transactions, data.seasons, [...data.entries.keys()]), [data]);
   const battles = useMemo(() => waiverBattles(data.transactions, data.seasons), [data]);
   const shown = who === null ? battles : battles.filter((b) => b.claims.some((c) => c.entryId === who));

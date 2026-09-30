@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Player } from "../../shared/types";
 import type { LeagueData } from "./data";
 
@@ -6,7 +6,7 @@ export function PlayerName({ id, data, detail = true }: { id: number; data: Leag
   const p = data.players.get(id);
   if (!p) return <span>Player {id}</span>;
   return (
-    <span className="player">
+    <a className="player" href={`#/player/${id}`}>
       {p.name}
       {detail && (
         <span className="player-meta">
@@ -14,12 +14,16 @@ export function PlayerName({ id, data, detail = true }: { id: number; data: Leag
           {p.team} {p.position}
         </span>
       )}
-    </span>
+    </a>
   );
 }
 
 export function Manager({ id, data, mine }: { id: number; data: LeagueData; mine?: number | null }) {
-  return <span className={id === mine ? "mgr mine-name" : "mgr"}>{data.labels.get(id) ?? "Someone"}</span>;
+  return (
+    <a className={id === mine ? "mgr mine-name" : "mgr"} href={`#/manager/${id}`}>
+      {data.labels.get(id) ?? "Someone"}
+    </a>
+  );
 }
 
 export function Pts({ n, signed = false }: { n: number; signed?: boolean }) {
@@ -32,6 +36,30 @@ export function playerSearchText(p: Player): string {
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
+}
+
+const SHOW_KEY = "showManager";
+
+/** The manager picked in a "Show" filter. Shared by every page and kept for this visit,
+ * so picking Ben on Trades still shows Ben on Waivers. null = everyone. */
+export function useShownManager(): [number | null, (id: number | null) => void] {
+  const [who, setWho] = useState<number | null>(() => {
+    try {
+      const v = window.sessionStorage.getItem(SHOW_KEY);
+      return v ? Number(v) : null;
+    } catch {
+      return null;
+    }
+  });
+  const set = (id: number | null) => {
+    setWho(id);
+    try {
+      window.sessionStorage.setItem(SHOW_KEY, id === null ? "" : String(id));
+    } catch {
+      // Private browsing: still works on this page.
+    }
+  };
+  return [who, set];
 }
 
 /** "Show: Everyone / Me / any manager" filter for long lists. null = everyone. */

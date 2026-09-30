@@ -23,7 +23,9 @@ export function StandingsTable({ rows, myTeam }: { rows: StandingRow[]; myTeam: 
               <tr key={r.leagueEntryId} className={r.entryId === myTeam ? "mine" : undefined}>
                 <td className="num rank">{r.rank}</td>
                 <td className="left">
-                  <div className="team">{r.teamName}</div>
+                  <a className="team" href={`#/manager/${r.entryId}`}>
+                    {r.teamName}
+                  </a>
                   <div className="manager">
                     {r.managerName} · {r.pointsFor} scored
                   </div>
