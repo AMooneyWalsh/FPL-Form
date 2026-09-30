@@ -1,6 +1,8 @@
 # Navigation and page architecture review (30 Sept 2026)
 
-Status: the owner chose option A. Both steps are built. Step 1: four tabs, landing page, sticky section menus, Draft sections. Step 2: every player name links to `#/player/{id}` and every manager name (and league-table team) to `#/manager/{id}`. The "Show" manager filter is shared across pages for the visit. Player pages are full pages with a Back link rather than pop-ups, and the Player journeys search stays under Moves.
+Status: the owner chose option A. Both steps are built. Step 1: four tabs, landing page, sticky section menus, Draft sections. Step 2: every player name links to `#/player/{id}` and every manager name (and league-table team) to `#/manager/{id}`. The "Show" manager filter is shared across pages for the visit. Player pages are full pages with a Back link rather than pop-ups, and the Player journeys search stays under Moves (chip "Journeys").
+
+Added since: manager page "Season in numbers" with coloured league ranks, and Moves > Suggestions (waiver suggestions). The "How the site is laid out today" section below describes the layout before this work.
 
 ## How the site is laid out today
 
