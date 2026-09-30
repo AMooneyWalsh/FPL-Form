@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
+import { freeAgentSignings } from "../../shared/waivers";
 import { Manager, nobody, PlayerName, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
@@ -9,6 +10,9 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
   const battles = useMemo(() => waiverBattles(data.transactions, data.seasons), [data]);
   const shown = who === null ? battles : battles.filter((b) => b.claims.some((c) => c.entryId === who));
   const byGw = groupBy(shown, (b) => b.event);
+  const signings = useMemo(() => freeAgentSignings(data.transactions, data.seasons), [data]);
+  const mySignings = who === null ? signings : signings.filter((f) => f.entryId === who);
+  const [allSignings, setAllSignings] = useState(false);
 
   return (
     <>
@@ -46,6 +50,37 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section>
+        <div className="section-head">
+          <h2>Free agent signings</h2>
+          <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
+        </div>
+        <p className="hint">Players picked up without a waiver claim, newest first, and what they've scored since.</p>
+        {mySignings.length === 0 && (
+          <p className="notice">
+            {who === null ? "No free agent signings yet." : nobody(data, who, myTeam, "signed a free agent")}
+          </p>
+        )}
+        <ul className="plain facts">
+          {(allSignings ? mySignings : mySignings.slice(0, 10)).map((f) => (
+            <li key={f.id} className={f.entryId === myTeam ? "is-mine" : undefined}>
+              <div>
+                <Manager id={f.entryId} data={data} /> signed <PlayerName id={f.elementIn} data={data} />
+              </div>
+              <div className="player-meta">
+                GW{f.event} · dropped <PlayerName id={f.elementOut} data={data} detail={false} /> ·{" "}
+                <strong>{f.points} pts</strong> since{!f.stillOwned && " (let go again)"}
+              </div>
+            </li>
+          ))}
+        </ul>
+        {mySignings.length > 10 && (
+          <button className="link" onClick={() => setAllSignings((v) => !v)}>
+            {allSignings ? "Show fewer" : `Show all ${mySignings.length}`}
+          </button>
+        )}
       </section>
 
       <section>

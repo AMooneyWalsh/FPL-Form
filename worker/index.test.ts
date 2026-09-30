@@ -181,13 +181,18 @@ describe("trimPlayers", () => {
   it("shrinks the 1 MB player list to what the site needs", () => {
     const raw = JSON.stringify(bootstrap);
     const trimmed = trimPlayers(raw);
-    expect(trimmed.length).toBeLessThan(raw.length / 5);
+    // Form, injury news and fixtures make it bigger, but still well under a quarter.
+    expect(trimmed.length).toBeLessThan(raw.length / 4);
     const { players, rules } = JSON.parse(trimmed) as {
       players: { id: number; name: string; team: string; teamCode: number; position: string }[];
       rules: unknown;
     };
     expect(players.length).toBe(bootstrap.elements.length);
     expect(players.find((p) => p.name === "Saka")).toMatchObject({ team: "ARS", teamCode: 3, position: "MID" });
+    // Injury news and form come through for waiver suggestions.
+    expect(players.find((p) => p.name === "White")).toMatchObject({ status: "d", chanceNext: 75 });
+    expect(typeof (players[0] as unknown as { form: number }).form).toBe("number");
+    expect((JSON.parse(trimmed) as { fixtures: unknown[] }).fixtures.length).toBeGreaterThan(0);
     expect(rules).toEqual({
       play: 11,
       select: { GKP: 2, DEF: 5, MID: 5, FWD: 3 },

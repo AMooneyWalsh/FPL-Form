@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
+import { draftDay } from "../../shared/waivers";
 import { Manager, PlayerName, Pts, ShowFilter, useShownManager, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 
@@ -10,6 +11,7 @@ export const DRAFT_VIEWS = [
   { id: "no-moves", label: "No moves" },
   { id: "origins", label: "Points" },
   { id: "redraft", label: "Redraft" },
+  { id: "day", label: "Draft day" },
 ] as const;
 export type DraftView = (typeof DRAFT_VIEWS)[number]["id"];
 
@@ -46,6 +48,7 @@ export function DraftPage({ data, myTeam, view }: { data: LeagueData; myTeam: nu
       {view === "no-moves" && <DraftOnlyTable rows={draftTable} real={realTable} data={data} myTeam={myTeam} />}
       {view === "origins" && <SquadOrigins origins={origins} data={data} myTeam={myTeam} />}
       {view === "redraft" && <Redraft redraft={redraft} data={data} myTeam={myTeam} />}
+      {view === "day" && <DraftDay data={data} myTeam={myTeam} />}
     </>
   );
 }
@@ -333,4 +336,76 @@ function ordinal(n: number): string {
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+// ---------------------------------------------------------------- draft day
+
+function DraftDay({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
+  const rows = useMemo(() => draftDay(data.draft, [...data.entries.keys()]), [data]);
+  const autos = rows.flatMap((r) => r.autoPicks).sort((a, b) => a.index - b.index);
+  return (
+    <>
+      <section>
+        <h2>Draft day</h2>
+        <p className="hint">
+          How long everyone took over their picks (the time since the pick before), slowest first, and who left FPL to
+          pick for them.
+        </p>
+        <div className="table-wrap">
+          <table className="data">
+            <thead>
+              <tr>
+                <th className="left">Manager</th>
+                <th className="num">Avg</th>
+                <th className="left">Slowest pick</th>
+                <th className="num">Auto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.entryId} className={r.entryId === myTeam ? "mine" : undefined}>
+                  <td className="left">
+                    <Manager id={r.entryId} data={data} />
+                  </td>
+                  <td className="num">{duration(r.averageSeconds)}</td>
+                  <td className="left">
+                    {r.slowest ? (
+                      <>
+                        <PlayerName id={r.slowest.choice.element} data={data} detail={false} />{" "}
+                        <span className="player-meta">{duration(r.slowest.seconds)}</span>
+                      </>
+                    ) : (
+                      "–"
+                    )}
+                  </td>
+                  <td className="num strong">{r.autoPicks.length}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section>
+        <h2>Auto picks</h2>
+        {autos.length === 0 ? (
+          <p className="notice">Everyone made all their own picks.</p>
+        ) : (
+          <ul className="plain facts">
+            {autos.map((c) => (
+              <li key={c.index} className={c.entry === myTeam ? "is-mine" : undefined}>
+                Pick {c.index}: <PlayerName id={c.element} data={data} /> for <Manager id={c.entry} data={data} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
+  );
+}
+
+function duration(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return m < 60 ? `${m}m ${s}s` : `${Math.floor(m / 60)}h ${m % 60}m`;
 }

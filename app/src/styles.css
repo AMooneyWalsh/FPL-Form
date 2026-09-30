@@ -1638,3 +1638,70 @@ a.link {
 .stat-row:has(> .stat:nth-child(3):last-child) {
   grid-template-columns: repeat(3, 1fr);
 }
+
+.flag {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  vertical-align: 1px;
+  text-decoration: none;
+}
+
+.flag-out {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.flag-doubt {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+/* Fixture difficulty: 1 easy (green) to 5 hard (red). */
+.fdr {
+  display: inline-block;
+  min-width: 52px;
+  margin: 2px 4px 0 0;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.fdr-1 { background: #1f9d55; color: #fff; }
+.fdr-2 { background: #8fd19e; color: #10301b; }
+.fdr-3 { background: var(--line); color: var(--text); }
+.fdr-4 { background: #f19a9d; color: #3d0b0d; }
+.fdr-5 { background: #c9302c; color: #fff; }
+
+.sugg {
+  padding: 10px 12px;
+}
+
+.sugg-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.sugg-rating {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.sugg-stats {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 2px 0 4px;
+}
+
+.sugg-drop {
+  font-size: 12px;
+  margin-top: 6px;
+}
