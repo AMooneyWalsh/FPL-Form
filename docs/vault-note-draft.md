@@ -80,3 +80,4 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Reviewed page layout and journeys (`docs/navigation-review.md`). Chose option A: four tabs (Live, League, Moves, Draft), player pop-up and manager page.
 - Step 1 done: tabs cut to four, site opens on Live during games and League otherwise, section menus stay on screen, Draft split into sections.
 - Step 2 done: tap any player or manager name for their own page. Manager page shows position, form, next opponent, trades, waivers, draft grade and squad. The manager filter now carries across pages.
+- Manager page now has 'Season in numbers': luck (lucky wins, unlucky losses, rank), best/worst/average score, bench points, biggest win and defeat, streaks, players used, top scorers and points by source. Trades list trimmed to the latest three with a 'See all' link.

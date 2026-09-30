@@ -1608,3 +1608,12 @@ a.link {
   text-decoration-color: var(--accent);
   text-underline-offset: 3px;
 }
+
+.stat-row:has(> .stat:nth-child(2):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.facts li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
