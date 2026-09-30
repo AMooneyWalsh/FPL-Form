@@ -690,3 +690,11 @@ button.more {
   color: var(--accent);
   font-weight: 600;
 }
+
+.muted {
+  color: var(--muted);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
