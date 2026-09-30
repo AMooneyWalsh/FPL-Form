@@ -35,6 +35,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: **Claude publishes changes without Adam's review** once automatic tests pass, then tells Adam what changed.
 - 2026-09-30: **Focus on the differentiators vs draftfpl.live: trade analysis and draft analysis.** New build order: skeleton, trades/waivers, draft analysis, table/stats, live gameweek, waiver suggestions.
 - 2026-09-30: Analysis features, all eight chosen: trade verdicts, manager trade ledger, waiver battles, player journeys; steals and busts, draft-only table, squad origins, hindsight redraft.
+- 2026-09-30: **Trade cards follow the chain**: a player traded on is worth his points for you plus an equal share of what you got for him (dropping ends the chain). Cards also show an "on paper" raw-points number. The overall trade table never follows chains, so it never double counts. Came from Adam's Saka/Ndiaye/Bruno example. Details in repo `docs/trade-scoring.md`.
 - 2026-09-30: Trades and waivers refresh every ~2 minutes, all week. Finished gameweeks are stored once and kept.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 
@@ -59,6 +60,9 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Architecture doc agreed (`docs/architecture.md`)
 - [x] Save real API responses (network access to draft.premierleague.com allowed in the cloud environment, all endpoints verified)
 - [x] Step 1 built: league table from live FPL data, my-team highlight, fallback when FPL is down, automatic checks
-- [ ] Adam: create Cloudflare account and connect the repo (docs/setup.md)
+- [x] Adam: Cloudflare account created and repo connected. **Live at https://drafty-in-here.amooneywalsh.workers.dev** (2026-09-30)
 - [x] Step 2 built: trade verdicts, trade ledger, waiver record and battles, player journeys (Trades is the landing page)
+- [x] Step 2 live and checked against real data (2026-09-30)
+- [ ] Optional: switch off Cloudflare's non-production branch builds (they fail instantly and aren't needed)
+- [ ] Optional: set up KV storage so finished gameweeks survive restarts (needs a namespace id)
 - [ ] Step 3: draft analysis

@@ -51,19 +51,50 @@ export class Seasons {
 }
 
 // ---------------------------------------------------------------- trades
+//
+// Trade cards follow the chain: if you trade a player on, the trade you got
+// him in also gets credit for what you got for him (shared equally if he went
+// with others), and so on. Dropping a player ends the chain. The ledger below
+// never follows chains, so it never counts a point twice.
+// Full explanation: docs/trade-scoring.md
+
+/** Where a player went when his new manager traded him on. */
+export interface Onward {
+  tradeId: number;
+  event: number;
+  /** What came back in that trade. */
+  received: number[];
+  /** Players the manager sent in that trade (this one included). */
+  sentWith: number[];
+  /** This player's share of what came back. */
+  value: number;
+}
 
 export interface TradedPlayer {
   element: number;
+  /** Points he scored for this manager, in their XI, while they had him. */
   points: number;
   benchPoints: number;
   gameweeks: number;
   stillOwned: boolean;
+  /** Set if the manager traded him on. */
+  onward: Onward | null;
+  /** Set if the manager dropped him for a waiver or free agent. */
+  droppedEvent: number | null;
+  /** points + onward value: what he was worth to this manager in the end. */
+  value: number;
+  /** "On paper": all his FPL points since the trade, whoever owned him. */
+  raw: number;
 }
 
 export interface TradeSide {
   entryId: number;
   received: TradedPlayer[];
+  /** Sum of values (follows chains). Decides the verdict. */
   total: number;
+  /** Sum of plain points (no chains). Used by the ledger. */
+  spellTotal: number;
+  raw: number;
 }
 
 export interface TradeVerdict {
@@ -72,33 +103,119 @@ export interface TradeVerdict {
   time: string;
   offerer: TradeSide;
   receiver: TradeSide;
-  /** entry_id of whoever's side has scored more, or null if level. */
+  /** entry_id of whoever's side is ahead, or null if level. */
   winner: number | null;
+  /** Whole points, rounded. */
   margin: number;
   /** No gameweek has been played since the trade yet. */
   pending: boolean;
 }
 
-export function tradeVerdicts(trades: Trade[], seasons: Seasons): TradeVerdict[] {
-  return trades
+interface Move {
+  trade: Trade;
+  time: string;
+  /** entry_id -> players they received */
+  got: Map<number, number[]>;
+  /** entry_id -> players they sent */
+  sent: Map<number, number[]>;
+}
+
+function toMove(t: Trade): Move {
+  const ins = t.tradeitem_set.map((i) => i.element_in);
+  const outs = t.tradeitem_set.map((i) => i.element_out);
+  return {
+    trade: t,
+    time: t.response_time ?? t.offer_time,
+    got: new Map([
+      [t.offered_entry, ins],
+      [t.received_entry, outs],
+    ]),
+    sent: new Map([
+      [t.offered_entry, outs],
+      [t.received_entry, ins],
+    ]),
+  };
+}
+
+export function tradeVerdicts(trades: Trade[], seasons: Seasons, transactions: Transaction[] = []): TradeVerdict[] {
+  const moves = trades
     .filter((t) => t.state === "p")
-    .map((t) => {
-      const side = (entryId: number, elements: number[]): TradeSide => {
-        const received = elements.map((element) => ({ element, ...seasons.spell(element, entryId, t.event) }));
-        return { entryId, received, total: received.reduce((s, p) => s + p.points, 0) };
+    .map(toMove)
+    .sort((a, b) => a.time.localeCompare(b.time));
+  const drops = transactions.filter((t) => t.result === "a");
+  const memo = new Map<string, TradedPlayer>();
+
+  const raw = (element: number, from: number) =>
+    seasons.gameweeks.filter((g) => g.event >= from).reduce((sum, g) => sum + (g.points[element] ?? 0), 0);
+
+  /** What `element` was worth to `entryId`, who got him in `move`. */
+  function worth(element: number, entryId: number, move: Move): TradedPlayer {
+    const key = `${element}:${entryId}:${move.trade.id}`;
+    const cached = memo.get(key);
+    if (cached) return cached;
+
+    const spell = seasons.spell(element, entryId, move.trade.event);
+    // He was continuously theirs up to this gameweek (exclusive).
+    const heldUntil = move.trade.event + spell.gameweeks;
+
+    // Did they drop him before any onward trade?
+    const drop = drops
+      .filter((t) => t.entry === entryId && t.element_out === element && t.added > move.time)
+      .sort((a, b) => a.added.localeCompare(b.added))[0];
+    const next = moves.find(
+      (m) =>
+        m.time > move.time &&
+        (m.sent.get(entryId) ?? []).includes(element) &&
+        m.trade.event <= heldUntil &&
+        (!drop || m.time < drop.added),
+    );
+
+    let onward: Onward | null = null;
+    if (next) {
+      const sentWith = next.sent.get(entryId)!;
+      const received = next.got.get(entryId)!;
+      const back = received.reduce((sum, q) => sum + worth(q, entryId, next).value, 0);
+      onward = { tradeId: next.trade.id, event: next.trade.event, received, sentWith, value: back / sentWith.length };
+    }
+    const result: TradedPlayer = {
+      element,
+      points: spell.points,
+      benchPoints: spell.benchPoints,
+      gameweeks: spell.gameweeks,
+      stillOwned: spell.stillOwned,
+      onward,
+      droppedEvent: !onward && drop && drop.event <= seasons.lastEvent ? drop.event : null,
+      value: spell.points + (onward?.value ?? 0),
+      raw: raw(element, move.trade.event),
+    };
+    memo.set(key, result);
+    return result;
+  }
+
+  return moves
+    .map((m) => {
+      const side = (entryId: number): TradeSide => {
+        const received = m.got.get(entryId)!.map((el) => worth(el, entryId, m));
+        return {
+          entryId,
+          received,
+          total: received.reduce((s, p) => s + p.value, 0),
+          spellTotal: received.reduce((s, p) => s + p.points, 0),
+          raw: received.reduce((s, p) => s + p.raw, 0),
+        };
       };
-      const offerer = side(t.offered_entry, t.tradeitem_set.map((i) => i.element_in));
-      const receiver = side(t.received_entry, t.tradeitem_set.map((i) => i.element_out));
-      const margin = Math.abs(offerer.total - receiver.total);
+      const offerer = side(m.trade.offered_entry);
+      const receiver = side(m.trade.received_entry);
+      const margin = Math.round(Math.abs(offerer.total - receiver.total));
       return {
-        id: t.id,
-        event: t.event,
-        time: t.response_time ?? t.offer_time,
+        id: m.trade.id,
+        event: m.trade.event,
+        time: m.time,
         offerer,
         receiver,
         winner: margin === 0 ? null : offerer.total > receiver.total ? offerer.entryId : receiver.entryId,
         margin,
-        pending: seasons.lastEvent < t.event,
+        pending: seasons.lastEvent < m.trade.event,
       };
     })
     .sort((a, b) => b.time.localeCompare(a.time));
@@ -136,7 +253,7 @@ export function tradeLedger(verdicts: TradeVerdict[], entryIds: number[]): Ledge
       if (!row) continue;
       const mine = tradedIn.get(me.entryId) ?? new Set<number>();
       row.trades++;
-      row.gained += me.total;
+      row.gained += me.spellTotal;
       row.given += them.received.filter((p) => !mine.has(p.element)).reduce((sum, p) => sum + p.points, 0);
       if (!v.pending && v.winner === me.entryId) row.won++;
       if (!v.pending && v.winner === them.entryId) row.lost++;
