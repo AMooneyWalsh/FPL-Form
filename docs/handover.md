@@ -25,7 +25,7 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 1. Old site (root `index.html` + `data.json`): archive it into an `old-site/` folder or replace it with a redirect? No answer yet.
 2. Optional max-3-per-club switch on the hindsight redraft (not an official Draft rule)?
-3. Step 6, waiver suggestions: built (Moves > Suggestions, `shared/waivers.ts`). Fixture difficulty is our own estimate (clubs ranked by their players' FPL points), because the Draft API has no difficulty ratings and `ep_next` is always null there.
+3. Step 6, waiver suggestions: built (Moves > Suggestions, `shared/waivers.ts`). Fixture difficulty comes from the main FPL game's API (`/api/fdr` → `fantasy.premierleague.com/api/fixtures/?future=1`, same club ids as Draft). The Draft API has none, and `ep_next` is always null there. If `/api/fdr` fails, the site falls back to ranking clubs by their players' FPL points.
 4. Gameweek 6 (from Sat 10 Oct) is the Live tab's first real in-play run, especially the "Will come on for X" projections. Ask the owner for screenshots.
 
 ## Known limits

@@ -33,8 +33,10 @@ export interface LeagueData {
   draft: DraftChoice[];
   /** Who owns each player right now (entry_id), null for free agents. */
   owners: Map<number, number | null>;
-  /** The next few gameweeks' Premier League fixtures. */
+  /** Upcoming Premier League fixtures. */
   fixtures: UpcomingFixture[];
+  /** The fixtures carry FPL's own difficulty ratings (not our fallback estimate). */
+  officialDifficulty: boolean;
   seasons: Seasons;
   entries: Map<number, LeagueEntry>;
   /** Short manager names keyed by entry_id. */
@@ -58,6 +60,8 @@ export function useLeagueData(): Loadable<LeagueData> {
   const trades = useApi<Envelope<{ trades: Trade[] }>>("/api/trades", REFRESH);
   const transactions = useApi<Envelope<{ transactions: Transaction[] }>>("/api/transactions", REFRESH);
   const draft = useApi<Envelope<{ choices: DraftChoice[] }>>("/api/draft", 3600);
+  // Optional: if FPL's main site is down we fall back to our own difficulty estimate.
+  const fdr = useApi<Envelope<{ fixtures: UpcomingFixture[] }>>("/api/fdr", 6 * 3600);
   const ownership = useApi<Envelope<{ element_status: { element: number; owner: number | null }[] }>>(
     "/api/ownership",
     REFRESH,
@@ -100,7 +104,11 @@ export function useLeagueData(): Loadable<LeagueData> {
         transactions: transactions.value.data.transactions,
         draft: draft.value.data.choices,
         owners: new Map(ownership.value.data.element_status.map((s) => [s.element, s.owner])),
-        fixtures: players.value.data.fixtures ?? [],
+        fixtures:
+          fdr.status === "ready" && fdr.value.data.fixtures.length > 0
+            ? fdr.value.data.fixtures
+            : (players.value.data.fixtures ?? []),
+        officialDifficulty: fdr.status === "ready" && fdr.value.data.fixtures.length > 0,
         seasons: new Seasons(gameweeks.value.loaded),
         entries: new Map(entries.map((e) => [e.entry_id, e])),
         labels: managerLabels(entries),
@@ -110,7 +118,7 @@ export function useLeagueData(): Loadable<LeagueData> {
         missingGameweeks: gameweeks.value.missing,
       },
     };
-  }, [config, league, game, players, trades, transactions, draft, ownership, gameweeks]);
+  }, [config, league, game, players, trades, transactions, draft, ownership, fdr, gameweeks]);
 }
 
 /**

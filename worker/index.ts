@@ -4,7 +4,7 @@
 
 import { buildGameweek, type RawLive, type RawPicks } from "../shared/gameweek";
 import { toLiveGameweek, type LivePicks, type RawLiveResponse } from "../shared/live";
-import type { GameStatus, LeagueDetails, Player, PlayersPayload, SquadRules } from "../shared/types";
+import type { GameStatus, LeagueDetails, Player, PlayersPayload, SquadRules, UpcomingFixture } from "../shared/types";
 
 export interface Env {
   LEAGUE_ID: string;
@@ -43,6 +43,8 @@ export const ROUTES: Record<string, Route> = {
   ownership: { upstream: (env) => `league/${env.LEAGUE_ID}/element-status`, ttl: 2 * MINUTE },
   draft: { upstream: (env) => `draft/${env.LEAGUE_ID}/choices`, ttl: 6 * HOUR, transform: trimDraft },
   players: { upstream: () => "bootstrap-static", ttl: HOUR, transform: trimPlayers },
+  // Fixture difficulty ratings only exist on the main FPL game's API (same club ids as Draft).
+  fdr: { upstream: () => FPL_FIXTURES, ttl: 6 * HOUR, transform: trimFixtures },
 };
 
 interface Cached {
@@ -246,7 +248,7 @@ async function serveShirt(code: string, keeper: boolean, ctx: ExecutionContext):
 }
 
 async function fetchUpstream(path: string): Promise<string> {
-  const res = await fetch(UPSTREAM + path, {
+  const res = await fetch(path.startsWith("https://") ? path : UPSTREAM + path, {
     headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
     signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
@@ -354,6 +356,32 @@ export function trimPlayers(raw: string): string {
     fixtures,
   };
   return JSON.stringify(payload);
+}
+
+const FPL_FIXTURES = "https://fantasy.premierleague.com/api/fixtures/?future=1";
+
+/** Main-game fixtures still to be played, with FPL's 1-5 difficulty for each side. */
+export function trimFixtures(raw: string): string {
+  const list = JSON.parse(raw) as {
+    event: number | null;
+    team_h: number;
+    team_a: number;
+    team_h_difficulty: number;
+    team_a_difficulty: number;
+    kickoff_time: string | null;
+  }[];
+  if (!Array.isArray(list)) throw new Error("Unexpected fixtures shape");
+  const fixtures: UpcomingFixture[] = list
+    .filter((f) => f.event !== null)
+    .map((f) => ({
+      event: f.event as number,
+      home: f.team_h,
+      away: f.team_a,
+      kickoff: f.kickoff_time,
+      homeDifficulty: f.team_h_difficulty,
+      awayDifficulty: f.team_a_difficulty,
+    }));
+  return JSON.stringify({ fixtures });
 }
 
 /** The choices endpoint also carries every player's status; keep just the picks. */

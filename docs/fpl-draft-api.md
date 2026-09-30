@@ -43,3 +43,7 @@ The API is unofficial and undocumented, so it can change without notice. Base UR
 - `game.trades_time_for_approval: true` means trades go through an approval window before processing.
 - Working out every H2H score from squads (starting XI after `subs`, summing `event/{gw}/live` `total_points`) reproduces all 70 GW1-5 scores exactly. No captains in Draft.
 - `bootstrap-static.elements[].draft_rank` is FPL's pre-season draft ranking, useful for draft analysis.
+
+## The main FPL game's API
+
+The Draft API has no fixture difficulty ratings. The main game's public API does: `https://fantasy.premierleague.com/api/fixtures/?future=1` gives every unplayed fixture with `team_h_difficulty` and `team_a_difficulty` (1 easy to 5 hard, each from that side's point of view). Club ids match the Draft API's. The Worker serves it trimmed as `/api/fdr`.

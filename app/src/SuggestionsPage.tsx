@@ -69,8 +69,9 @@ export function SuggestionsPage({ data, myTeam }: { data: LeagueData; myTeam: nu
       </section>
 
       <p className="hint">
-        Fixture colours: green is easy, red is hard. FPL Draft doesn't publish difficulty ratings, so these rank clubs
-        by the FPL points their players have scored this season.
+        Fixture colours are FPL's own difficulty ratings: green is easy, red is hard.
+        {!data.officialDifficulty &&
+          " FPL's ratings couldn't be loaded just now, so these are an estimate from each club's FPL points this season."}
       </p>
     </>
   );
