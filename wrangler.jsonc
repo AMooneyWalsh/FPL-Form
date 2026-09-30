@@ -1,0 +1,17 @@
+{
+  // Cloudflare settings. LEAGUE_ID changes every season (see CLAUDE.md).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "drafty-in-here",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "LEAGUE_ID": "634",
+    "DEFAULT_ENTRY_ID": "1412"
+  },
+  "observability": { "enabled": true }
+}

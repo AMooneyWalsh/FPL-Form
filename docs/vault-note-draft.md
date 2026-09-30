@@ -57,4 +57,6 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Confirm league 634 details: "Drafty In Here", 14 managers, H2H, waivers, trades on, 30s draft on 16 Aug
 - [x] Architecture doc agreed (`docs/architecture.md`)
 - [x] Save real API responses (network access to draft.premierleague.com allowed in the cloud environment, all endpoints verified)
-- [ ] Step 1: skeleton site live on Cloudflare
+- [x] Step 1 built: league table from live FPL data, my-team highlight, fallback when FPL is down, automatic checks
+- [ ] Adam: create Cloudflare account and connect the repo (docs/setup.md)
+- [ ] Step 2: trades and waivers

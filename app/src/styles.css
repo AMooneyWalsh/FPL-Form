@@ -1,0 +1,204 @@
+:root {
+  --bg: #f6f5f8;
+  --surface: #ffffff;
+  --text: #1c1523;
+  --muted: #6b6474;
+  --line: #e6e3ea;
+  --brand: #37003c;
+  --brand-text: #ffffff;
+  --accent: #00a86b;
+  --mine: #eefaf4;
+  --win: #00a86b;
+  --draw: #9a93a3;
+  --loss: #e0474c;
+  --warn-bg: #fff6e0;
+  --warn-text: #6b4a00;
+  --error-bg: #fdecec;
+  --error-text: #8a1c1f;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121015;
+    --surface: #1c1921;
+    --text: #efedf2;
+    --muted: #a39cab;
+    --line: #2d2934;
+    --brand: #2a0a2f;
+    --mine: #13291f;
+    --warn-bg: #3a2e10;
+    --warn-text: #f3d998;
+    --error-bg: #3b1718;
+    --error-text: #f6b4b6;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 16px 32px;
+}
+
+.masthead {
+  margin: 0 -16px 16px;
+  padding: 20px 16px 16px;
+  background: var(--brand);
+  color: var(--brand-text);
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.masthead .sub {
+  margin: 4px 0 0;
+  opacity: 0.8;
+}
+
+.notice {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.notice.warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.notice.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.table-wrap {
+  background: var(--surface);
+  border-radius: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+}
+
+table.standings {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.standings th,
+.standings td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.standings tr:last-child td {
+  border-bottom: 0;
+}
+
+.standings th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.standings .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.standings .left {
+  text-align: left;
+}
+
+.standings .rank {
+  color: var(--muted);
+}
+
+.standings .pts {
+  font-weight: 700;
+}
+
+.standings .team {
+  font-weight: 600;
+}
+
+.standings .manager {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.standings tr.mine td {
+  background: var(--mine);
+}
+
+.form {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.chip {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.chip.W {
+  background: var(--win);
+}
+
+.chip.D {
+  background: var(--draw);
+}
+
+.chip.L {
+  background: var(--loss);
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.picker select {
+  font: inherit;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  max-width: 220px;
+}
+
+@media (max-width: 480px) {
+  .hide-narrow {
+    display: none;
+  }
+}

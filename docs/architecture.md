@@ -1,6 +1,6 @@
 # Architecture (draft for review)
 
-Status: draft, 2026-09-30. Nothing here is built yet.
+Status: agreed 2026-09-30. Step 1 built.
 
 ---
 
@@ -93,7 +93,7 @@ Once step 4 is done, the new site can replace the old one. Until then the old `i
 
 ### Worker routes and caching
 
-Worker fetches from `https://draft.premierleague.com/api/`, caches with the Cache API and writes a last-good copy to KV (throttled to stay within KV free write limits).
+Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per isolate (the Cache API does nothing on `workers.dev`) and writes a last-good copy to KV (throttled to stay within KV free write limits).
 
 | Our route | Upstream | Cache (match live) | Cache (otherwise) |
 |---|---|---|---|
@@ -156,12 +156,12 @@ This is the fiddliest logic, so it gets thorough unit tests using saved real res
 ### Repo layout (planned)
 
 ```
-src/            React app
+app/            React app (Vite root, because the old site owns the root index.html)
 worker/         Cloudflare Worker (API routes, caching)
 shared/         Types and scoring logic used by both, unit tested
 fixtures/       Saved real API responses for tests
-legacy/         Old index.html + data.json, kept until the new site replaces it
 docs/
+index.html, data.json   Old site, left in place until the new site replaces it
 ```
 
 ### Testing
