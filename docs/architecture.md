@@ -129,6 +129,9 @@ Finished, finalised gameweeks never change, so each is fetched once and stored i
 
 ### How the analysis counts points (as built)
 
+Full write-up with worked examples: `docs/trade-scoring.md`.
+
+
 - A player earns for a manager only in gameweeks that manager owned him and he was in the XI that counted (after auto-subs). Verified: rebuilding every H2H score from squads matches all 70 GW1-5 scores.
 - **Trade verdict:** each side's received players, from the trade's gameweek until they leave that manager. Pending until a gameweek has been played.
 - **Trade ledger:** gained = points from everyone traded in; given = points scored for new owners by players traded away, *excluding* players the manager had themselves got by trade. Without that, passing a player straight on counts against you twice (it took Daire from -143 to -45 after GW5).

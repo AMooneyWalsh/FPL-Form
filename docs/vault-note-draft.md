@@ -47,6 +47,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Some API fields are unreliable (`matches_played`, `winning_league_entry`), so the site calculates results itself.
 
 ## Open questions
+- How should trade cards handle players passed straight on? Options in the repo's `docs/trade-scoring.md` (A: keep maths and show what they were traded on for; B: follow the chain; C: raw points). Recommended A.
 - Is the old site live somewhere friends use (GitHub Pages)? Unanswered; old files stay put until the new site replaces them, so it's safe either way.
 
 ## Progress
