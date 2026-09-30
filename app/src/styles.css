@@ -1622,9 +1622,17 @@ a.link {
   margin-top: 4px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--muted);
   text-align: center;
   line-height: 1.2;
+}
+
+.stat-rank.good {
+  color: var(--win);
+}
+
+.stat-rank.bad {
+  color: var(--loss);
 }
 
 .stat-row:has(> .stat:nth-child(3):last-child) {
