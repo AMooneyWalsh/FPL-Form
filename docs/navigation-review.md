@@ -1,6 +1,6 @@
 # Navigation and page architecture review (30 Sept 2026)
 
-Status: proposal, waiting on the owner's go-ahead. Nothing here is built yet.
+Status: the owner chose option A. Step 1 (four tabs, landing page, sticky section menus, Draft sections) is built. Step 2 (player pop-up, manager page, remembered manager filter, retiring the Player journeys chip) is next.
 
 ## How the site is laid out today
 

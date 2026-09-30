@@ -19,7 +19,7 @@ import {
 import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope } from "../../shared/types";
 import { useApi } from "./api";
-import { Manager } from "./bits";
+import { Manager, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { StandingsTable } from "./StandingsTable";
 
@@ -108,13 +108,7 @@ function LiveView({
 
   return (
     <>
-      <nav className="chips" aria-label="Live sections">
-        {LIVE_VIEWS.map((v) => (
-          <a key={v.id} href={`#/live/${v.id}`} className={v.id === view ? "chip-btn active" : "chip-btn"}>
-            {v.label}
-          </a>
-        ))}
-      </nav>
+      <SubNav page="live" views={LIVE_VIEWS} current={view} label="Live sections" />
       {view === "matches" && <MatchesView ctx={ctx} next={next} />}
       {view === "bonus" && <BonusView ctx={ctx} />}
       {view === "fixtures" && <FixturesView ctx={ctx} />}

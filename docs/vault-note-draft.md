@@ -75,3 +75,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Live tab v2 (1 Oct, from Adam's draftfpl.live screenshot): per-player stat lines, own-club match and status, shirts, sub markers, points breakdown on tap, match headers with league position, record, W/L chip and progress dots, bench points, Bonus view with league owners, Fixtures view with scorers/assists/cards, Stars and regrets
 - [x] Full review (30 Sept): UX pass, regression tests on live data, 7 bugs and 7 UX fixes (see repo docs/review-2026-09-30.md). Biggest: friends no longer see Adam's team as theirs (first-visit team picker), and the site no longer gets stuck pre-season
 - [ ] Step 6: waiver suggestions
+
+## 30 Sept 2026: navigation
+- Reviewed page layout and journeys (`docs/navigation-review.md`). Chose option A: four tabs (Live, League, Moves, Draft), player pop-up and manager page.
+- Step 1 done: tabs cut to four, site opens on Live during games and League otherwise, section menus stay on screen, Draft split into sections.

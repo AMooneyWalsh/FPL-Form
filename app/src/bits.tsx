@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { Player } from "../../shared/types";
 import type { LeagueData } from "./data";
 
@@ -71,4 +72,40 @@ export function ShowFilter({
 /** "You haven't…" or "Ben hasn't…" */
 export function nobody(data: LeagueData, who: number, myTeam: number | null, action: string): string {
   return who === myTeam ? `You haven't ${action} yet.` : `${data.labels.get(who)} hasn't ${action} yet.`;
+}
+
+/** The chip menu under the top tabs (e.g. League: Table / Form / ...). Stays on screen while scrolling. */
+export function SubNav({
+  page,
+  views,
+  current,
+  label,
+}: {
+  page: string;
+  views: readonly { id: string; label: string }[];
+  current: string;
+  label: string;
+}) {
+  const active = useRef<HTMLAnchorElement>(null);
+  // On a phone the menu can be wider than the screen, so bring the current one into view.
+  useEffect(() => {
+    const el = active.current;
+    const bar = el?.parentElement;
+    if (el && bar) bar.scrollLeft = el.offsetLeft - bar.offsetLeft - 16;
+  }, [current]);
+  return (
+    <nav className="chips subnav" aria-label={label}>
+      {views.map((v) => (
+        <a
+          key={v.id}
+          ref={v.id === current ? active : undefined}
+          href={`#/${page}/${v.id}`}
+          className={v.id === current ? "chip-btn active" : "chip-btn"}
+          aria-current={v.id === current ? "page" : undefined}
+        >
+          {v.label}
+        </a>
+      ))}
+    </nav>
+  );
 }
