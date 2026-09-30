@@ -228,10 +228,7 @@ function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: b
         <MatchSide entry={m.awayEntry} squad={m.away} ctx={ctx} right />
       </button>
       {open && m.home && m.away && (
-        <div className="lv-lineups">
-          <Lineup squad={m.home} ctx={ctx} />
-          <Lineup squad={m.away} ctx={ctx} />
-        </div>
+<Lineups home={m.home} away={m.away} ctx={ctx} />
       )}
       {open && !(m.home && m.away) && <p className="hint lv-pad">Lineups appear once the deadline passes.</p>}
       {!open && <span className="sr-only">Tap for lineups</span>}
@@ -282,28 +279,41 @@ function Dots({ squad }: { squad: LiveSquad }) {
 
 const POSITION_ORDER = { GKP: 0, DEF: 1, MID: 2, FWD: 3 } as const;
 
-function Lineup({ squad, ctx }: { squad: LiveSquad; ctx: Ctx }) {
-  const xi = squad.players
-    .filter((p) => p.counts)
-    .sort((a, b) => POSITION_ORDER[a.position] - POSITION_ORDER[b.position] || a.slot - b.slot);
-  const bench = squad.players.filter((p) => !p.counts);
+const byPosition = (a: LivePlayer, b: LivePlayer) => POSITION_ORDER[a.position] - POSITION_ORDER[b.position] || a.slot - b.slot;
+
+/**
+ * Both lineups side by side as one table: row n holds each side's nth player,
+ * so the two rows always line up even when one player has more to show.
+ */
+function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: Ctx }) {
+  const split = (s: LiveSquad) => ({
+    xi: s.players.filter((p) => p.counts).sort(byPosition),
+    bench: s.players.filter((p) => !p.counts).sort((a, b) => a.slot - b.slot),
+  });
+  const h = split(home);
+  const a = split(away);
+  const rows = (left: LivePlayer[], right: LivePlayer[], bench: boolean) =>
+    Array.from({ length: Math.max(left.length, right.length) }, (_, i) => [
+      <Cell key={`h${i}`} p={left[i]} squad={home} bench={bench} ctx={ctx} />,
+      <Cell key={`a${i}`} p={right[i]} squad={away} bench={bench} ctx={ctx} />,
+    ]);
   return (
-    <div className="lv-lineup">
-      <ul className="plain">
-        {xi.map((p) => (
-          <PlayerRow key={p.element} p={p} ctx={ctx} />
-        ))}
-      </ul>
+    <div className="lv-lineups" role="table" aria-label="Lineups">
+      {rows(h.xi, a.xi, false)}
       <div className="lv-bench-label">
-        Bench <span className="lv-bench-pts">{squad.benchPoints} pts</span>
+        Bench <span className="lv-bench-pts">{home.benchPoints} pts</span>
       </div>
-      <ul className="plain lv-bench">
-        {bench.map((p) => (
-          <PlayerRow key={p.element} p={p} ctx={ctx} />
-        ))}
-      </ul>
+      <div className="lv-bench-label">
+        Bench <span className="lv-bench-pts">{away.benchPoints} pts</span>
+      </div>
+      {rows(h.bench, a.bench, true)}
     </div>
   );
+}
+
+function Cell({ p, squad, bench, ctx }: { p?: LivePlayer; squad: LiveSquad; bench: boolean; ctx: Ctx }) {
+  if (!p) return <div className="lv-row empty" />;
+  return <PlayerRow p={p} squad={squad} bench={bench} ctx={ctx} />;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -365,50 +375,38 @@ function Shirt({ teamId, gk, ctx }: { teamId: number; gk: boolean; ctx: Ctx }) {
   return (
     <img
       className="lv-shirt"
-      src={`https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${club.code}${gk ? "_1" : ""}-66.png`}
+      src={`/api/shirt/${club.code}${gk ? "_1" : ""}`}
       alt=""
       width={28}
       height={28}
-      loading="lazy"
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
     />
   );
 }
 
-function PlayerRow({ p, ctx }: { p: LivePlayer; ctx: Ctx }) {
+function PlayerRow({ p, squad, bench, ctx }: { p: LivePlayer; squad: LiveSquad; bench: boolean; ctx: Ctx }) {
   const [open, setOpen] = useState(false);
   const player = ctx.data.players.get(p.element);
   const parts = statParts(p);
-  const dim = p.status === "did-not-play" || p.status === "no-game";
-  const tag = p.subbedIn
-    ? { text: "Sub in", label: "Auto-sub in", cls: "in" }
+  const other = p.subFor ? ctx.data.players.get(p.subFor)?.name : undefined;
+  const projected = ctx.phase !== "done" && !squad.officialSubs;
+  // A starter whose games are over without playing, and nobody could come on for him.
+  const blank = !bench && (p.status === "did-not-play" || p.status === "no-game");
+  const note = p.subbedIn
+    ? { cls: "in", text: `${projected ? "Coming on" : "On"} for ${other ?? "a starter"}` }
     : p.subbedOut
-      ? { text: "Sub out", label: "Auto-sub out", cls: "out" }
-      : null;
+      ? { cls: "out", text: `${projected ? "Coming off" : "Off"}, didn't play` }
+      : blank
+        ? { cls: "out", text: "Didn't play, no sub could come on" }
+        : null;
   return (
-    <li className={`lv-row ${dim ? "dim" : ""} ${p.status}`}>
+    <div className={`lv-row ${bench ? "benched" : ""} ${p.status}`} role="cell">
       <button className="lv-row-main" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
         <span className="lv-row-body">
-          <span className="lv-row-name">
-            {player?.name ?? `Player ${p.element}`}
-            {tag && (
-              <span className={`lv-tag ${tag.cls}`} title={tag.label} aria-label={tag.label}>
-                {tag.text}
-              </span>
-            )}
-            {p.cameOn && (
-              <span className="lv-mark on" title="Came on as a substitute">
-                ▲
-              </span>
-            )}
-            {p.cameOff && (
-              <span className="lv-mark off" title="Taken off before the end">
-                ▼
-              </span>
-            )}
-          </span>
+          <span className="lv-row-name">{player?.name ?? `Player ${p.element}`}</span>
+          {note && <span className={`lv-note ${note.cls}`}>{note.text}</span>}
           {parts.length > 0 && <span className="lv-row-stats">{parts.join(", ")}</span>}
           {fixtureLines(p.teamId, ctx).map((line) => (
             <span key={line} className="lv-row-fix">
@@ -419,7 +417,7 @@ function PlayerRow({ p, ctx }: { p: LivePlayer; ctx: Ctx }) {
         <span className="lv-row-pts">{p.points}</span>
       </button>
       {open && <Breakdown p={p} />}
-    </li>
+    </div>
   );
 }
 

@@ -83,6 +83,10 @@ export default {
     if (liveMatch) {
       return serveLive(Number(liveMatch[1]), env, ctx);
     }
+    const shirtMatch = /^shirt\/(\d{1,3})(_1)?$/.exec(name);
+    if (shirtMatch) {
+      return serveShirt(shirtMatch[1], !!shirtMatch[2], ctx);
+    }
     const route = ROUTES[name];
     if (!route) {
       return json({ error: "Not found" }, 404);
@@ -212,6 +216,32 @@ async function respond(get: () => Promise<Result>): Promise<Response> {
   } catch (err) {
     if (err instanceof NotFound) return json({ error: err.message }, 404);
     return json({ error: "FPL is not responding and there is no saved copy yet." }, 502);
+  }
+}
+
+/**
+ * Club shirt images, passed through from FPL's image server so the browser
+ * loads them from our own address (some phones block FPL's image host).
+ * Cached at Cloudflare's edge for a week.
+ */
+async function serveShirt(code: string, keeper: boolean, ctx: ExecutionContext): Promise<Response> {
+  const src = `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${code}${keeper ? "_1" : ""}-66.png`;
+  const cache = typeof caches !== "undefined" ? caches.default : null;
+  const key = new Request(src);
+  const hit = await cache?.match(key);
+  if (hit) return hit;
+  try {
+    const res = await fetch(src, { headers: { "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS) });
+    if (!res.ok || !(res.headers.get("content-type") ?? "").startsWith("image/")) {
+      return json({ error: "No shirt" }, 404, 3600);
+    }
+    const out = new Response(res.body, {
+      headers: { "Content-Type": res.headers.get("content-type")!, "Cache-Control": "public, max-age=604800" },
+    });
+    if (cache) ctx.waitUntil(cache.put(key, out.clone()));
+    return out;
+  } catch {
+    return json({ error: "No shirt" }, 502, 60);
   }
 }
 
