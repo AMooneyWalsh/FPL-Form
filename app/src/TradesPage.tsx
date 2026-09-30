@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { tradeLedger, tradeVerdicts, type TradeSide, type TradeVerdict } from "../../shared/moves";
+import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
 import { Manager, MineToggle, PlayerName, Pts } from "./bits";
 import type { LeagueData } from "./data";
 
 export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [justMine, setJustMine] = useState(false);
-  const verdicts = useMemo(() => tradeVerdicts(data.trades, data.seasons), [data]);
+  const verdicts = useMemo(() => tradeVerdicts(data.trades, data.seasons, data.transactions), [data]);
   const ledger = useMemo(() => tradeLedger(verdicts, [...data.entries.keys()]), [verdicts, data]);
   const shown = justMine
     ? verdicts.filter((v) => v.offerer.entryId === myTeam || v.receiver.entryId === myTeam)
@@ -77,6 +77,10 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
           <h2>Every trade</h2>
           <MineToggle on={justMine} set={setJustMine} />
         </div>
+        <p className="hint">
+          Big number: what each player was worth to the manager who got him. That's his points in their XI, plus, if
+          they traded him on, a share of what they got for him. Small number: all his points since, whoever had him.
+        </p>
         {shown.length === 0 && <p className="notice">No trades to show.</p>}
         {shown.map((v) => (
           <TradeCard key={v.id} v={v} data={data} myTeam={myTeam} />
@@ -89,7 +93,7 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
 function TradeCard({ v, data, myTeam }: { v: TradeVerdict; data: LeagueData; myTeam: number | null }) {
   const date = new Date(v.time).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
   return (
-    <article className="card">
+    <article className="card" id={`trade-${v.id}`}>
       <header className="card-head">
         <span>
           GW{v.event} · {date}
@@ -125,14 +129,49 @@ function Side({ side, v, data, myTeam }: { side: TradeSide; v: TradeVerdict; dat
         {side.received.map((p) => (
           <li key={p.element}>
             <PlayerName id={p.element} data={data} />
-            <span className="pts">{v.pending ? "" : p.points}</span>
-            {!v.pending && !p.stillOwned && (
-              <div className="note">{p.gameweeks === 0 ? "moved on before playing" : `gone after ${p.gameweeks} GW`}</div>
+            {!v.pending && (
+              <span className="pts">
+                {Math.round(p.value)} <span className="raw">({p.raw})</span>
+              </span>
             )}
+            {!v.pending && <Trail p={p} data={data} />}
           </li>
         ))}
       </ul>
-      {!v.pending && <div className="side-total">{side.total} pts</div>}
+      {!v.pending && (
+        <div className="side-total">
+          {Math.round(side.total)} pts <span className="raw">· on paper {side.raw}</span>
+        </div>
+      )}
     </div>
   );
+}
+
+/** Where the player went next, if he didn't stay. */
+function Trail({ p, data }: { p: TradedPlayer; data: LeagueData }) {
+  if (p.onward) {
+    const o = p.onward;
+    const names = o.received.map((id) => data.players.get(id)?.name ?? "someone").join(", ");
+    const tooEarly = o.event > data.seasons.lastEvent;
+    const worth = tooEarly
+      ? "too early to say"
+      : o.sentWith.length > 1
+        ? `1/${o.sentWith.length} share = ${Math.round(o.value)}`
+        : `${Math.round(o.value)}`;
+    return (
+      <div className="note">
+        {p.points !== 0 && `${p.points} for them, then `}
+        <button
+          className="inline-link"
+          onClick={() => document.getElementById(`trade-${o.tradeId}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}
+        >
+          ↳ traded on in GW{o.event} for {names}
+        </button>{" "}
+        · {worth}
+      </div>
+    );
+  }
+  if (p.droppedEvent !== null) return <div className="note">↳ dropped in GW{p.droppedEvent}</div>;
+  if (!p.stillOwned && p.gameweeks > 0) return <div className="note">↳ gone after {p.gameweeks} GW</div>;
+  return null;
 }

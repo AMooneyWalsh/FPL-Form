@@ -16,7 +16,7 @@ const entryIds = leagueJson.league_entries.map((e) => e.entry_id);
 const seasons = new Seasons(gameweeks);
 
 describe("with league 634's real data (GW1-5)", () => {
-  const verdicts = tradeVerdicts(trades, seasons);
+  const verdicts = tradeVerdicts(trades, seasons, transactions);
 
   it("judges every processed trade, newest first", () => {
     expect(verdicts).toHaveLength(trades.length);
@@ -27,9 +27,15 @@ describe("with league 634's real data (GW1-5)", () => {
   it("totals each side from its players and picks the right winner", () => {
     for (const v of verdicts) {
       for (const side of [v.offerer, v.receiver]) {
-        expect(side.total).toBe(side.received.reduce((s, p) => s + p.points, 0));
+        expect(side.total).toBeCloseTo(side.received.reduce((s, p) => s + p.value, 0));
+        expect(side.spellTotal).toBe(side.received.reduce((s, p) => s + p.points, 0));
+        for (const p of side.received) {
+          // A player's worth is what he did for you plus anything he was traded on for.
+          expect(p.value).toBeCloseTo(p.points + (p.onward?.value ?? 0));
+          if (p.onward) expect(p.droppedEvent).toBeNull();
+        }
       }
-      expect(v.margin).toBe(Math.abs(v.offerer.total - v.receiver.total));
+      expect(v.margin).toBe(Math.round(Math.abs(v.offerer.total - v.receiver.total)));
       if (v.winner !== null) {
         const winning = v.winner === v.offerer.entryId ? v.offerer : v.receiver;
         const losing = winning === v.offerer ? v.receiver : v.offerer;
@@ -102,6 +108,26 @@ function trade(id: number, event: number, offered: number, received: number, ite
   };
 }
 
+describe("following a player through onward trades (real data)", () => {
+  const verdicts = tradeVerdicts(trades, seasons, transactions);
+
+  it("credits Daire's Saka with Szoboszlai, who he got for him the same evening", () => {
+    const SAKA = 12;
+    const morning = verdicts.find((v) => v.time.startsWith("2026-08-26T08:03"))!;
+    const saka = morning.offerer.received.find((p) => p.element === SAKA)!;
+    expect(morning.offerer.entryId).toBe(1679);
+    expect(saka.points).toBe(0);
+    expect(saka.onward?.event).toBe(2);
+    expect(saka.value).toBeGreaterThan(0);
+  });
+
+  it("never lets following chains change the overall trade table", () => {
+    const ledger = tradeLedger(verdicts, entryIds);
+    const daire = ledger.find((r) => r.entryId === 1679)!;
+    expect(daire.net).toBe(-45);
+  });
+});
+
 describe("players passed straight through", () => {
   it("spots Daire having Saka for a moment in GW2 without him ever playing for Daire", () => {
     const SAKA = 12;
@@ -127,6 +153,81 @@ describe("points rules", () => {
   it("marks a trade pending until a gameweek has been played", () => {
     const [v] = tradeVerdicts([trade(1, 4, 1, 2, [[20, 10]], "2026-10-01T00:00:00Z")], s);
     expect(v.pending).toBe(true);
+  });
+});
+
+describe("Adam's example: Ndiaye for Saka, then Saka straight on for Bruno", () => {
+  // Daire (1) gives Ndiaye (100) to Ross (2) for Saka (200), then passes Saka
+  // to Mark (3) for Bruno (300) before he plays. Ndiaye scores 2 for Ross,
+  // Saka 10 for Mark, Bruno 30 for Daire.
+  const s = new Seasons([
+    gw(1, {}, { 1: [[100], []], 2: [[200], []], 3: [[300], []] }),
+    gw(2, { 100: 2, 200: 10, 300: 30 }, { 1: [[300], []], 2: [[100], []], 3: [[200], []] }),
+  ]);
+  const verdicts = tradeVerdicts(
+    [
+      trade(1, 2, 1, 2, [[200, 100]], "2026-08-20T10:00:00Z"),
+      trade(2, 2, 1, 3, [[300, 200]], "2026-08-20T11:00:00Z"),
+    ],
+    s,
+  );
+  const first = verdicts.find((v) => v.id === 1)!;
+  const second = verdicts.find((v) => v.id === 2)!;
+
+  it("gives Daire the first trade, because Saka became Bruno", () => {
+    expect(first.offerer.received[0]).toMatchObject({ points: 0, value: 30, raw: 10 });
+    expect(first.offerer.received[0].onward).toMatchObject({ tradeId: 2, received: [300], value: 30 });
+    expect(first.receiver.total).toBe(2);
+    expect(first.winner).toBe(1);
+    expect(first.margin).toBe(28);
+  });
+
+  it("gives Daire the second trade too", () => {
+    expect(second.offerer.total).toBe(30);
+    expect(second.receiver.total).toBe(10);
+    expect(second.winner).toBe(1);
+    expect(second.margin).toBe(20);
+  });
+
+  it("agrees with the overall table, which counts Bruno once", () => {
+    const daire = tradeLedger(verdicts, [1, 2, 3]).find((r) => r.entryId === 1)!;
+    expect(daire.net).toBe(28);
+  });
+});
+
+describe("onward trades with more than one player, and drops", () => {
+  // Trades are always even in FPL Draft. Manager 1 gets 200 for 100, then
+  // sends 200 + 201 to manager 3 for 300 + 301, who score 30 and 10 for him.
+  const s = new Seasons([
+    gw(1, {}, { 1: [[100, 201], []], 2: [[200], []], 3: [[300, 301], []] }),
+    gw(2, { 300: 30, 301: 10 }, { 1: [[300, 301], []], 2: [[100], []], 3: [[200, 201], []] }),
+  ]);
+
+  it("gives a player an equal share of what came back when he went with others", () => {
+    const verdicts = tradeVerdicts(
+      [
+        trade(1, 2, 1, 2, [[200, 100]], "2026-08-20T10:00:00Z"),
+        trade(2, 2, 1, 3, [[300, 200], [301, 201]], "2026-08-20T11:00:00Z"),
+      ],
+      s,
+    );
+    const p = verdicts.find((v) => v.id === 1)!.offerer.received[0];
+    expect(p.onward?.sentWith).toEqual([200, 201]);
+    expect(p.onward?.received).toEqual([300, 301]);
+    expect(p.value).toBe(20); // (30 + 10) / 2
+  });
+
+  it("stops following a player once he's dropped", () => {
+    const dropped = new Seasons([
+      gw(1, {}, { 1: [[100], []], 2: [[200], []] }),
+      gw(2, { 200: 4, 100: 1 }, { 1: [[200], []], 2: [[100], []] }),
+      gw(3, { 400: 9 }, { 1: [[400], []], 2: [[100], []] }),
+    ]);
+    const drop: Transaction = {
+      id: 1, entry: 1, event: 3, kind: "w", result: "a", element_in: 400, element_out: 200, priority: 1, added: "2026-08-25T00:00:00Z",
+    };
+    const [v] = tradeVerdicts([trade(1, 2, 1, 2, [[200, 100]], "2026-08-20T10:00:00Z")], dropped, [drop]);
+    expect(v.offerer.received[0]).toMatchObject({ points: 4, value: 4, onward: null, droppedEvent: 3 });
   });
 });
 
