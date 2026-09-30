@@ -105,7 +105,7 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per
 | `/api/ownership` | `league/{LEAGUE_ID}/element-status` | 2 min |
 | `/api/draft` | `draft/{LEAGUE_ID}/choices` (trimmed to picks) | 6 h |
 | `/api/players` | `bootstrap-static` trimmed to `{ players, rules }` (fields we use + squad rules) | 1 h |
-| `/api/live/{n}` | `event/{n}/live` + lineups for all 14 managers (missing before the deadline), trimmed | 1 min while games are on, else 10 min / 1 h |
+| `/api/live/{n}` | `event/{n}/live` + lineups for all 14 managers (missing before the deadline), trimmed to per-player stats and points breakdown, BPS and match events | 1 min while games are on, else 10 min / 1 h |
 | `/api/gw/{n}` | `event/{n}/live` + `entry/{id}/event/{n}` for all 14 managers, built into points + fielded XIs | finished GWs kept for good (memory + KV); current GW 2 min |
 
 Live-match-aware timings come with the live gameweek page (step 5).

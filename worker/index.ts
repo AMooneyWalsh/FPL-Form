@@ -268,7 +268,7 @@ interface RawBootstrap {
     total_points: number;
     draft_rank: number;
   }[];
-  teams: { id: number; short_name: string }[];
+  teams: { id: number; short_name: string; code: number }[];
   settings: { squad: Record<string, number> };
 }
 
@@ -277,12 +277,14 @@ interface RawBootstrap {
 export function trimPlayers(raw: string): string {
   const b = JSON.parse(raw) as RawBootstrap;
   const teams = new Map(b.teams.map((t) => [t.id, t.short_name]));
+  const codes = new Map(b.teams.map((t) => [t.id, t.code]));
   const players: Player[] = b.elements.map((e) => ({
     id: e.id,
     name: e.web_name,
     fullName: `${e.first_name} ${e.second_name}`,
     team: teams.get(e.team) ?? "",
     teamId: e.team,
+    teamCode: codes.get(e.team) ?? 0,
     position: POSITIONS[e.element_type],
     totalPoints: e.total_points,
     draftRank: e.draft_rank,

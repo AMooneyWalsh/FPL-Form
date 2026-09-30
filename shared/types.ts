@@ -118,6 +118,8 @@ export interface Player {
   fullName: string;
   team: string;
   teamId: number;
+  /** FPL's club code, used for shirt images. */
+  teamCode: number;
   position: "GKP" | "DEF" | "MID" | "FWD";
   totalPoints: number;
   /** FPL's pre-season draft ranking (lower = expected to be better). */

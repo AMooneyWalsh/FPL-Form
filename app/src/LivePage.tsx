@@ -1,24 +1,57 @@
 import { useMemo, useState } from "react";
 import {
+  bonusTable,
+  gamesOf,
+  leagueOwners,
   liveMatches,
   liveTable,
+  topPerformers,
+  type EventKey,
+  type LiveFixture,
   type LiveGameweek,
   type LiveMatch,
   type LivePlayer,
   type LiveSquad,
+  type Owner,
+  type Performer,
   type PlayerInfo,
 } from "../../shared/live";
+import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope } from "../../shared/types";
 import { useApi } from "./api";
 import { Manager } from "./bits";
 import type { LeagueData } from "./data";
 import { StandingsTable } from "./StandingsTable";
 
+export const LIVE_VIEWS = [
+  { id: "matches", label: "Matches" },
+  { id: "bonus", label: "Bonus" },
+  { id: "fixtures", label: "Fixtures" },
+] as const;
+export type LiveView = (typeof LIVE_VIEWS)[number]["id"];
+
 type Phase = "upcoming" | "live" | "done";
 
-export function LivePage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
+interface Club {
+  short: string;
+  code: number;
+}
+
+/** Everything the three views share, worked out once. */
+interface Ctx {
+  data: LeagueData;
+  gw: LiveGameweek;
+  myTeam: number | null;
+  phase: Phase;
+  clubs: Map<number, Club>;
+  matches: LiveMatch[];
+  owners: Map<number, Owner>;
+  table: StandingRow[];
+}
+
+export function LivePage({ data, myTeam, view }: { data: LeagueData; myTeam: number | null; view: LiveView }) {
   const event = data.game.current_event;
-  const live = useApi<Envelope<LiveGameweek>>(`/api/live/${event}`, 60);
+  const live = useApi<Envelope<LiveGameweek>>(event >= 1 ? `/api/live/${event}` : null, 60);
   const hasNext = data.game.current_event_finished && data.league.matches.some((m) => m.event === event + 1);
   const next = useApi<Envelope<LiveGameweek>>(hasNext ? `/api/live/${event + 1}` : null, 3600);
 
@@ -31,6 +64,7 @@ export function LivePage({ data, myTeam }: { data: LeagueData; myTeam: number | 
       next={hasNext && next.status === "ready" ? next.value.data : null}
       data={data}
       myTeam={myTeam}
+      view={view}
     />
   );
 }
@@ -46,22 +80,56 @@ function LiveView({
   next,
   data,
   myTeam,
+  view,
 }: {
   gw: LiveGameweek;
   next: LiveGameweek | null;
   data: LeagueData;
   myTeam: number | null;
+  view: LiveView;
 }) {
-  const info = useMemo(
-    () => new Map<number, PlayerInfo>(data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }])),
-    [data],
+  const ctx = useMemo((): Ctx => {
+    const info = new Map<number, PlayerInfo>(data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }]));
+    const clubs = new Map<number, Club>();
+    for (const p of data.playerList) clubs.set(p.teamId, { short: p.team, code: p.teamCode });
+    const phase = phaseOf(gw);
+    const matches = liveMatches(data.league, gw, info, data.rules);
+    return {
+      data,
+      gw,
+      myTeam,
+      phase,
+      clubs,
+      matches,
+      owners: leagueOwners(matches),
+      table: phase === "upcoming" ? computeStandings(data.league) : liveTable(data.league, gw.event, matches),
+    };
+  }, [data, gw, myTeam]);
+
+  return (
+    <>
+      <nav className="chips" aria-label="Live sections">
+        {LIVE_VIEWS.map((v) => (
+          <a key={v.id} href={`#/live/${v.id}`} className={v.id === view ? "chip-btn active" : "chip-btn"}>
+            {v.label}
+          </a>
+        ))}
+      </nav>
+      {view === "matches" && <MatchesView ctx={ctx} next={next} />}
+      {view === "bonus" && <BonusView ctx={ctx} />}
+      {view === "fixtures" && <FixturesView ctx={ctx} />}
+    </>
   );
-  const matches = useMemo(() => liveMatches(data.league, gw, info, data.rules), [data, gw, info]);
-  const table = useMemo(() => liveTable(data.league, gw.event, matches), [data, gw, matches]);
-  const phase = phaseOf(gw);
+}
+
+// ---------------------------------------------------------------- matches
+
+function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
+  const { gw, phase, data, myTeam } = ctx;
   const played = gw.fixtures.filter((f) => f.finishedProvisional).length;
   const mine = (m: LiveMatch) => m.homeEntry === myTeam || m.awayEntry === myTeam;
-  const ordered = [...matches].sort((a, b) => Number(mine(b)) - Number(mine(a)));
+  const ordered = [...ctx.matches].sort((a, b) => Number(mine(b)) - Number(mine(a)));
+  const hasLineups = Object.keys(gw.picks).length > 0;
 
   return (
     <>
@@ -74,27 +142,35 @@ function LiveView({
         </div>
         <p className="hint">
           {phase === "live" &&
-            `${played} of ${gw.fixtures.length} matches finished. Bonus is provisional until FPL confirms it, and auto-subs are FPL's likely ones. Updates every minute.`}
+            `${played} of ${gw.fixtures.length} matches finished. Updates every minute. Bonus is provisional (*) until FPL confirms it, and auto-subs are FPL's likely ones.`}
           {phase === "done" &&
             (gw.fixtures.every((f) => f.finished)
               ? "All matches finished and FPL has confirmed the points."
               : "All matches are over. FPL is still confirming bonus and subs, so scores may move a little.")}
           {phase === "upcoming" && firstKickoff(gw) && `First kick-off ${formatKickoff(firstKickoff(gw)!)}.`}
         </p>
-        {Object.keys(gw.picks).length === 0 && (
-          <p className="notice">Lineups appear here once the deadline passes.</p>
+        {hasLineups && (
+          <p className="hint">
+            Tap a match for both lineups, then a player for where his points came from.{" "}
+            <span className="lv-key">
+              <Dot status="played" /> played <Dot status="playing" /> playing <Dot status="to-play" /> still to play
+            </span>
+          </p>
         )}
-        {ordered.map((m, i) => (
-          <MatchCard key={i} m={m} data={data} myTeam={myTeam} startOpen={mine(m) && phase !== "upcoming"} />
+        {!hasLineups && <p className="notice">Lineups appear here once the deadline passes.</p>}
+        {ordered.map((m) => (
+          <MatchCard key={`${m.homeEntry}-${m.awayEntry}`} m={m} ctx={ctx} startOpen={mine(m) && phase !== "upcoming"} />
         ))}
       </section>
 
       {phase === "live" && (
         <section>
           <h2>Table if it ended now</h2>
-          <StandingsTable rows={table} myTeam={myTeam} />
+          <StandingsTable rows={ctx.table} myTeam={myTeam} />
         </section>
       )}
+
+      {phase !== "upcoming" && <Performers ctx={ctx} />}
 
       {next && (
         <section>
@@ -120,128 +196,439 @@ function LiveView({
           </div>
         </section>
       )}
-
-      <section>
-        <h2>Premier League fixtures</h2>
-        <PlFixtures gw={gw} data={data} />
-      </section>
     </>
   );
 }
 
-// ---------------------------------------------------------------- matches
-
-function MatchCard({ m, data, myTeam, startOpen }: { m: LiveMatch; data: LeagueData; myTeam: number | null; startOpen: boolean }) {
+function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: boolean }) {
   const [open, setOpen] = useState(startOpen);
+  const { phase, myTeam } = ctx;
   const h = m.home?.score ?? null;
   const a = m.away?.score ?? null;
-  const leader = h === null || a === null || h === a ? null : h > a ? m.homeEntry : m.awayEntry;
+  const result = (mine: number | null, theirs: number | null) =>
+    mine === null || theirs === null ? null : mine > theirs ? "W" : mine < theirs ? "L" : "D";
+  const isMine = m.homeEntry === myTeam || m.awayEntry === myTeam;
   return (
-    <article className={`card match ${m.homeEntry === myTeam || m.awayEntry === myTeam ? "mine-card" : ""}`}>
-      <button className="match-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <Side entry={m.homeEntry} squad={m.home} data={data} leading={leader === m.homeEntry} />
-        <span className="match-score">
-          <span className={leader === m.homeEntry ? "lead" : undefined}>{h ?? "–"}</span>
-          <span className="muted">–</span>
-          <span className={leader === m.awayEntry ? "lead" : undefined}>{a ?? "–"}</span>
+    <article className={`card match ${isMine ? "mine-card" : ""}`}>
+      <button className="lv-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <MatchSide entry={m.homeEntry} squad={m.home} ctx={ctx} />
+        <span className="lv-score">
+          <span className="lv-nums">
+            <span>{h ?? "–"}</span>
+            <span className="muted">–</span>
+            <span>{a ?? "–"}</span>
+          </span>
+          {phase !== "upcoming" && m.home && m.away && (
+            <span className="lv-chips">
+              <span className={`lv-res ${result(h, a)} ${phase}`}>{result(h, a)}</span>
+              <span className={`lv-res ${result(a, h)} ${phase}`}>{result(a, h)}</span>
+            </span>
+          )}
         </span>
-        <Side entry={m.awayEntry} squad={m.away} data={data} leading={leader === m.awayEntry} right />
+        <MatchSide entry={m.awayEntry} squad={m.away} ctx={ctx} right />
       </button>
       {open && m.home && m.away && (
-        <div className="lineups">
-          <Lineup squad={m.home} data={data} />
-          <Lineup squad={m.away} data={data} />
+        <div className="lv-lineups">
+          <Lineup squad={m.home} ctx={ctx} />
+          <Lineup squad={m.away} ctx={ctx} />
         </div>
       )}
-      {!(m.home && m.away) && open && <p className="hint">Lineups appear once the deadline passes.</p>}
+      {open && !(m.home && m.away) && <p className="hint lv-pad">Lineups appear once the deadline passes.</p>}
+      {!open && <span className="sr-only">Tap for lineups</span>}
     </article>
   );
 }
 
-function Side({
-  entry,
-  squad,
-  data,
-  leading,
-  right,
-}: {
-  entry: number;
-  squad: LiveSquad | null;
-  data: LeagueData;
-  leading: boolean;
-  right?: boolean;
-}) {
+function MatchSide({ entry, squad, ctx, right }: { entry: number; squad: LiveSquad | null; ctx: Ctx; right?: boolean }) {
+  const row = ctx.table.find((r) => r.entryId === entry);
+  const team = ctx.data.entries.get(entry)?.entry_name;
   return (
-    <span className={`match-side ${right ? "right" : ""}`}>
-      <span className={leading ? "match-name lead" : "match-name"}>{data.labels.get(entry)}</span>
-      {squad && (
-        <span className="player-meta">{squad.toPlay > 0 ? `${squad.toPlay} to play` : "all played"}</span>
+    <span className={`lv-side ${right ? "right" : ""}`}>
+      <span className="lv-name">
+        {ctx.data.labels.get(entry)}
+        {row && ctx.phase !== "upcoming" && <sup className="lv-rank">{row.rank}</sup>}
+      </span>
+      <span className="lv-team">{team}</span>
+      {row && (
+        <span className="lv-rec">
+          {row.won}-{row.drawn}-{row.lost}
+        </span>
       )}
+      {squad && <Dots squad={squad} />}
     </span>
   );
 }
 
-const STATUS: Record<LivePlayer["status"], { mark: string; label: string }> = {
-  played: { mark: "✓", label: "Played" },
-  playing: { mark: "●", label: "Playing now" },
-  "to-play": { mark: "·", label: "Still to play" },
-  "did-not-play": { mark: "✕", label: "Didn't play" },
-  "no-game": { mark: "✕", label: "No game this week" },
-};
+function Dot({ status }: { status: LivePlayer["status"] }) {
+  return <span className={`lv-dot ${status}`} aria-hidden="true" />;
+}
 
-function Lineup({ squad, data }: { squad: LiveSquad; data: LeagueData }) {
-  const xi = squad.players.filter((p) => p.counts);
-  const bench = squad.players.filter((p) => !p.counts);
-  const row = (p: LivePlayer) => (
-    <li key={p.element} className={`lineup-row status-${p.status}`}>
-      <span className="lineup-mark" title={STATUS[p.status].label} aria-label={STATUS[p.status].label}>
-        {STATUS[p.status].mark}
-      </span>
-      <span className="lineup-name">
-        {data.players.get(p.element)?.name ?? p.element}
-        {p.subbedIn && <span className="sub-in" title="Auto-sub in"> ↑</span>}
-        {p.subbedOut && <span className="sub-out" title="Auto-sub out"> ↓</span>}
-      </span>
-      <span className="lineup-pts">
-        {p.points}
-        {p.provisionalBonus > 0 && <span className="prov" title="Provisional bonus"> +{p.provisionalBonus}b</span>}
-      </span>
-    </li>
-  );
+function Dots({ squad }: { squad: LiveSquad }) {
+  const counting = squad.players.filter((p) => p.counts);
   return (
-    <div className="lineup">
-      <ul className="plain">{xi.map(row)}</ul>
-      <div className="bench-label">Bench</div>
-      <ul className="plain bench">{bench.map(row)}</ul>
-    </div>
+    <span
+      className="lv-dots"
+      role="img"
+      aria-label={`${counting.length - squad.toPlay} of ${counting.length} players have played or are playing, ${squad.toPlay} still to play`}
+    >
+      {counting.map((p) => (
+        <Dot key={p.element} status={p.status} />
+      ))}
+    </span>
   );
 }
 
-// ---------------------------------------------------------------- PL fixtures
+// ---------------------------------------------------------------- lineups
 
-function PlFixtures({ gw, data }: { gw: LiveGameweek; data: LeagueData }) {
-  const teams = useMemo(() => {
-    const m = new Map<number, string>();
-    for (const p of data.playerList) m.set(p.teamId, p.team);
-    return m;
-  }, [data]);
-  const fixtures = [...gw.fixtures].sort((a, b) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id);
+const POSITION_ORDER = { GKP: 0, DEF: 1, MID: 2, FWD: 3 } as const;
+
+function Lineup({ squad, ctx }: { squad: LiveSquad; ctx: Ctx }) {
+  const xi = squad.players
+    .filter((p) => p.counts)
+    .sort((a, b) => POSITION_ORDER[a.position] - POSITION_ORDER[b.position] || a.slot - b.slot);
+  const bench = squad.players.filter((p) => !p.counts);
   return (
-    <div className="card">
-      <ul className="plain fixture-list">
-        {fixtures.map((f) => (
-          <li key={f.id}>
-            <span className="fx-team">{teams.get(f.teamH)}</span>
-            <span className="fx-score">
-              {f.started ? `${f.scoreH ?? 0}–${f.scoreA ?? 0}` : f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"}
-            </span>
-            <span className="fx-team right">{teams.get(f.teamA)}</span>
-            <span className="fx-state muted">{f.finishedProvisional ? "FT" : f.started ? `${f.minutes}'` : ""}</span>
-          </li>
+    <div className="lv-lineup">
+      <ul className="plain">
+        {xi.map((p) => (
+          <PlayerRow key={p.element} p={p} ctx={ctx} />
+        ))}
+      </ul>
+      <div className="lv-bench-label">
+        Bench <span className="lv-bench-pts">{squad.benchPoints} pts</span>
+      </div>
+      <ul className="plain lv-bench">
+        {bench.map((p) => (
+          <PlayerRow key={p.element} p={p} ctx={ctx} />
         ))}
       </ul>
     </div>
   );
+}
+
+const STAT_LABELS: Record<string, string> = {
+  minutes: "Minutes played",
+  goals_scored: "Goals",
+  assists: "Assists",
+  clean_sheets: "Clean sheet",
+  goals_conceded: "Goals conceded",
+  own_goals: "Own goals",
+  penalties_saved: "Penalties saved",
+  penalties_missed: "Penalties missed",
+  yellow_cards: "Yellow cards",
+  red_cards: "Red cards",
+  saves: "Saves",
+  bonus: "Bonus",
+  defensive_contribution: "Defensive contribution",
+};
+
+/** Stats where "×3" means something (not minutes or the defensive-contribution total). */
+const COUNTED = new Set(["goals_scored", "assists", "own_goals", "penalties_saved", "penalties_missed", "yellow_cards", "red_cards", "saves", "goals_conceded"]);
+
+/** "90 MP, 1 GS, 13 DC": the stats that matter, only when they happened. */
+function statParts(p: LivePlayer): string[] {
+  const s = p.stats;
+  const out: string[] = [];
+  if (s.minutes) out.push(`${s.minutes}\u00a0MP`);
+  if (s.goals_scored) out.push(`${s.goals_scored}\u00a0GS`);
+  if (s.assists) out.push(`${s.assists}\u00a0A`);
+  if (s.clean_sheets) out.push(`${s.clean_sheets}\u00a0CS`);
+  if (s.goals_conceded && (p.position === "GKP" || p.position === "DEF")) out.push(`${s.goals_conceded}\u00a0GC`);
+  if (s.saves) out.push(`${s.saves}\u00a0S`);
+  if (s.penalties_saved) out.push(`${s.penalties_saved}\u00a0PS`);
+  if (s.penalties_missed) out.push(`${s.penalties_missed}\u00a0PM`);
+  if (s.own_goals) out.push(`${s.own_goals}\u00a0OG`);
+  if (p.bonus) out.push(`${p.bonus}\u00a0B`);
+  if (p.provisionalBonus) out.push(`${p.provisionalBonus}\u00a0B*`);
+  if (s.defensive_contribution) out.push(`${s.defensive_contribution}\u00a0DC`);
+  if (s.yellow_cards) out.push(`${s.yellow_cards}\u00a0YC`);
+  if (s.red_cards) out.push(`${s.red_cards}\u00a0RC`);
+  return out;
+}
+
+/** "NFO 0 - 1 COV | FT", "BHA 1 - 0 ARS | 67'", or "LEE v CRY | Sun 13:00". */
+function fixtureLines(teamId: number, ctx: Ctx): string[] {
+  const games = gamesOf(teamId, ctx.gw);
+  if (games.length === 0) return ["No game this week"];
+  return games.map((f) => {
+    const h = ctx.clubs.get(f.teamH)?.short ?? "?";
+    const a = ctx.clubs.get(f.teamA)?.short ?? "?";
+    if (!f.started) return `${h} v ${a} | ${f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"}`;
+    return `${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a} | ${f.finishedProvisional ? "FT" : `${f.minutes}'`}`;
+  });
+}
+
+function Shirt({ teamId, gk, ctx }: { teamId: number; gk: boolean; ctx: Ctx }) {
+  const [failed, setFailed] = useState(false);
+  const club = ctx.clubs.get(teamId);
+  if (!club || failed) return <span className="lv-shirt fallback">{club?.short ?? "?"}</span>;
+  return (
+    <img
+      className="lv-shirt"
+      src={`https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${club.code}${gk ? "_1" : ""}-66.png`}
+      alt=""
+      width={28}
+      height={28}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function PlayerRow({ p, ctx }: { p: LivePlayer; ctx: Ctx }) {
+  const [open, setOpen] = useState(false);
+  const player = ctx.data.players.get(p.element);
+  const parts = statParts(p);
+  const dim = p.status === "did-not-play" || p.status === "no-game";
+  const tag = p.subbedIn
+    ? { text: "Sub in", label: "Auto-sub in", cls: "in" }
+    : p.subbedOut
+      ? { text: "Sub out", label: "Auto-sub out", cls: "out" }
+      : null;
+  return (
+    <li className={`lv-row ${dim ? "dim" : ""} ${p.status}`}>
+      <button className="lv-row-main" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
+        <span className="lv-row-body">
+          <span className="lv-row-name">
+            {player?.name ?? `Player ${p.element}`}
+            {tag && (
+              <span className={`lv-tag ${tag.cls}`} title={tag.label} aria-label={tag.label}>
+                {tag.text}
+              </span>
+            )}
+            {p.cameOn && (
+              <span className="lv-mark on" title="Came on as a substitute">
+                ▲
+              </span>
+            )}
+            {p.cameOff && (
+              <span className="lv-mark off" title="Taken off before the end">
+                ▼
+              </span>
+            )}
+          </span>
+          {parts.length > 0 && <span className="lv-row-stats">{parts.join(", ")}</span>}
+          {fixtureLines(p.teamId, ctx).map((line) => (
+            <span key={line} className="lv-row-fix">
+              {line}
+            </span>
+          ))}
+        </span>
+        <span className="lv-row-pts">{p.points}</span>
+      </button>
+      {open && <Breakdown p={p} />}
+    </li>
+  );
+}
+
+function Breakdown({ p }: { p: LivePlayer }) {
+  const lines = p.breakdown.filter(([, , pts]) => pts !== 0);
+  const total = p.points;
+  if (lines.length === 0 && p.provisionalBonus === 0) return <div className="lv-breakdown muted">No points yet.</div>;
+  return (
+    <ul className="lv-breakdown plain">
+      {lines.map(([stat, value, pts]) => (
+        <li key={stat}>
+          <span>
+            {STAT_LABELS[stat] ?? stat}
+            {COUNTED.has(stat) && value > 1 && <span className="muted"> ×{value}</span>}
+          </span>
+          <span className={pts < 0 ? "pts-neg" : undefined}>{pts > 0 ? `+${pts}` : pts}</span>
+        </li>
+      ))}
+      {p.provisionalBonus > 0 && (
+        <li>
+          <span>Bonus (provisional)</span>
+          <span>+{p.provisionalBonus}</span>
+        </li>
+      )}
+      <li className="total">
+        <span>Total</span>
+        <span>{total}</span>
+      </li>
+    </ul>
+  );
+}
+
+// ---------------------------------------------------------------- performers
+
+function Performers({ ctx }: { ctx: Ctx }) {
+  const { best, benched } = useMemo(() => topPerformers(ctx.matches, 5), [ctx.matches]);
+  if (best.length === 0) return null;
+  return (
+    <section>
+      <h2>Stars and regrets</h2>
+      <div className="two-col">
+        <PerformerList title="Top scorers" rows={best} ctx={ctx} />
+        <PerformerList title="Left on the bench" rows={benched} ctx={ctx} empty="Nobody who scored is on a bench." />
+      </div>
+    </section>
+  );
+}
+
+function PerformerList({ title, rows, ctx, empty }: { title: string; rows: Performer[]; ctx: Ctx; empty?: string }) {
+  return (
+    <div className="card">
+      <h3 className="card-title">{title}</h3>
+      {rows.length === 0 && <p className="hint">{empty}</p>}
+      <ol className="plain lv-perf">
+        {rows.map((r) => {
+          const player = ctx.data.players.get(r.element);
+          return (
+            <li key={r.element} className={r.entryId === ctx.myTeam ? "is-mine" : undefined}>
+              <Shirt teamId={player?.teamId ?? 0} gk={player?.position === "GKP"} ctx={ctx} />
+              <span className="lv-perf-name">
+                {player?.name}
+                <span className="player-meta">
+                  {" "}
+                  <Manager id={r.entryId} data={ctx.data} />
+                </span>
+              </span>
+              <strong>{r.points}</strong>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- bonus
+
+function BonusView({ ctx }: { ctx: Ctx }) {
+  const table = useMemo(() => bonusTable(ctx.gw), [ctx.gw]);
+  const started = table.filter((t) => t.rows.length > 0);
+  const waiting = table.filter((t) => t.rows.length === 0);
+  return (
+    <section>
+      <h2>Bonus points</h2>
+      <p className="hint">
+        The three best BPS in each match get 3, 2 and 1 bonus points (ties share). Until FPL confirms it, this is our
+        working-out from the live BPS, so it can change while a match is on. A manager's name shows who in the league owns
+        the player.
+      </p>
+      {started.length === 0 && <p className="notice">Bonus appears once matches start.</p>}
+      {started.map(({ fixture, rows }) => (
+        <article key={fixture.id} className="card">
+          <header className="card-head lv-fx-head">
+            <span className="lv-fx-title">{fixtureTitle(fixture, ctx)}</span>
+            <span className={fixture.bonusConfirmed ? "lv-conf" : "lv-prov"}>
+              {fixture.bonusConfirmed ? "Confirmed" : "Provisional"}
+            </span>
+          </header>
+          <table className="data lv-bonus">
+            <tbody>
+              {rows.map((r) => {
+                const player = ctx.data.players.get(r.element);
+                const owner = ctx.owners.get(r.element);
+                return (
+                  <tr key={r.element} className={owner?.entryId === ctx.myTeam ? "mine" : undefined}>
+                    <td className="lv-bonus-pts">{r.bonus > 0 ? <span className={`lv-b b${r.bonus}`}>{r.bonus}</span> : null}</td>
+                    <td className="left">
+                      {player?.name ?? r.element} <span className="player-meta">{player?.team}</span>
+                    </td>
+                    <td className="left lv-bonus-owner">
+                      {owner ? (
+                        <>
+                          <Manager id={owner.entryId} data={ctx.data} />
+                          {!owner.counts && <span className="player-meta"> bench</span>}
+                        </>
+                      ) : null}
+                    </td>
+                    <td className="num">{r.bps}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="hint lv-bps-note">Last column is BPS.</p>
+        </article>
+      ))}
+      {waiting.length > 0 && (
+        <p className="hint">
+          Not started: {waiting.map((t) => fixtureTitle(t.fixture, ctx)).join(", ")}.
+        </p>
+      )}
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------- fixtures
+
+const EVENT_LABELS: [EventKey, string][] = [
+  ["goals_scored", "Goals"],
+  ["assists", "Assists"],
+  ["own_goals", "Own goals"],
+  ["penalties_missed", "Penalties missed"],
+  ["penalties_saved", "Penalties saved"],
+  ["yellow_cards", "Yellow cards"],
+  ["red_cards", "Red cards"],
+];
+
+function FixturesView({ ctx }: { ctx: Ctx }) {
+  const fixtures = [...ctx.gw.fixtures].sort((a, b) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id);
+  return (
+    <section>
+      <h2>Premier League fixtures</h2>
+      <p className="hint">Who scored, assisted and got carded, with the league owner of each player in brackets.</p>
+      {fixtures.map((f) => (
+        <FixtureCard key={f.id} f={f} ctx={ctx} />
+      ))}
+    </section>
+  );
+}
+
+function FixtureCard({ f, ctx }: { f: LiveFixture; ctx: Ctx }) {
+  const h = ctx.clubs.get(f.teamH)?.short;
+  const a = ctx.clubs.get(f.teamA)?.short;
+  const status = f.finishedProvisional ? "FT" : f.started ? `${f.minutes}'` : f.kickoff ? formatKickoff(f.kickoff, true) : "TBC";
+  return (
+    <article className="card lv-fx">
+      <div className="lv-fx-row">
+        <span className="lv-fx-team">{h}</span>
+        <span className="lv-fx-score">{f.started ? `${f.scoreH ?? 0} – ${f.scoreA ?? 0}` : "v"}</span>
+        <span className="lv-fx-team right">{a}</span>
+        <span className="lv-fx-state muted">{status}</span>
+      </div>
+      {EVENT_LABELS.map(([key, label]) => {
+        const list = f.events[key];
+        if (!list || list.length === 0) return null;
+        return (
+          <p key={key} className="lv-events">
+            <span className="lv-events-label">{label}</span>{" "}
+            {list.map((e, i) => {
+              const player = ctx.data.players.get(e.element);
+              const owner = ctx.owners.get(e.element);
+              return (
+                <span key={`${e.element}-${i}`} className="lv-event">
+                  {player?.name ?? e.element}
+                  {e.value > 1 && ` ×${e.value}`}
+                  {owner && (
+                    <span className={owner.entryId === ctx.myTeam ? "player-meta mine-name" : "player-meta"}>
+                      {" "}
+                      ({ctx.data.labels.get(owner.entryId)})
+                    </span>
+                  )}
+                  {i < list.length - 1 && ", "}
+                </span>
+              );
+            })}
+          </p>
+        );
+      })}
+    </article>
+  );
+}
+
+// ---------------------------------------------------------------- helpers
+
+function fixtureTitle(f: LiveFixture, ctx: Ctx): string {
+  const h = ctx.clubs.get(f.teamH)?.short ?? "?";
+  const a = ctx.clubs.get(f.teamA)?.short ?? "?";
+  if (!f.started) return `${h} v ${a} (${f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"})`;
+  return `${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}${f.finishedProvisional ? " · FT" : ` · ${f.minutes}'`}`;
 }
 
 function firstKickoff(gw: LiveGameweek): string | null {
@@ -250,7 +637,12 @@ function firstKickoff(gw: LiveGameweek): string | null {
 
 function formatKickoff(iso: string, short = false): string {
   const d = new Date(iso);
-  return d.toLocaleString("en-GB", short
-    ? { weekday: "short", hour: "2-digit", minute: "2-digit" }
-    : { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  return d
+    .toLocaleString(
+      "en-GB",
+      short
+        ? { weekday: "short", hour: "2-digit", minute: "2-digit" }
+        : { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" },
+    )
+    .replace(/ /g, "\u00a0");
 }
