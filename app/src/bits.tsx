@@ -33,10 +33,42 @@ export function playerSearchText(p: Player): string {
     .toLowerCase();
 }
 
-export function MineToggle({ on, set }: { on: boolean; set: (v: boolean) => void }) {
+/** "Show: Everyone / Me / any manager" filter for long lists. null = everyone. */
+export function ShowFilter({
+  data,
+  value,
+  onChange,
+  myTeam,
+}: {
+  data: LeagueData;
+  value: number | null;
+  onChange: (id: number | null) => void;
+  myTeam: number | null;
+}) {
+  const others = [...data.entries.keys()]
+    .filter((id) => id !== myTeam)
+    .sort((a, b) => (data.labels.get(a) ?? "").localeCompare(data.labels.get(b) ?? ""));
   return (
-    <label className="toggle">
-      <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} /> Just mine
+    <label className="show-filter">
+      <span className="picker-label">Show</span>
+      <select
+        className="select"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
+      >
+        <option value="">Everyone</option>
+        {myTeam !== null && <option value={myTeam}>Me ({data.labels.get(myTeam)})</option>}
+        {others.map((id) => (
+          <option key={id} value={id}>
+            {data.labels.get(id)}
+          </option>
+        ))}
+      </select>
     </label>
   );
+}
+
+/** "You haven't…" or "Ben hasn't…" */
+export function nobody(data: LeagueData, who: number, myTeam: number | null, action: string): string {
+  return who === myTeam ? `You haven't ${action} yet.` : `${data.labels.get(who)} hasn't ${action} yet.`;
 }

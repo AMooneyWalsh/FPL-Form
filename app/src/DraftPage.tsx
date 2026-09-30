@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
-import { Manager, MineToggle, PlayerName, Pts } from "./bits";
+import { Manager, PlayerName, Pts, ShowFilter } from "./bits";
 import type { LeagueData } from "./data";
 
 export function DraftPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
@@ -27,8 +27,9 @@ export function DraftPage({ data, myTeam }: { data: LeagueData; myTeam: number |
   return (
     <>
       <p className="hint">
-        Everything here uses points from the {data.seasons.lastEvent} gameweeks played so far, so early on it can swing
-        a lot from week to week.
+        {data.seasons.lastEvent === 0
+          ? "No gameweeks have been played yet, so all of this starts at zero until gameweek 1."
+          : `Everything here uses points from ${data.seasons.lastEvent === 1 ? "the first gameweek" : `the ${data.seasons.lastEvent} gameweeks`} played so far${data.inProgress ? `, including gameweek ${data.game.current_event} as it stands` : ""}, so early on it can swing a lot from week to week.`}
       </p>
       <Grades grades={grades} data={data} myTeam={myTeam} />
       <StealsAndBusts reports={reports} data={data} myTeam={myTeam} />
@@ -91,15 +92,15 @@ function Grades({ grades, data, myTeam }: { grades: ReturnType<typeof draftGrade
 // ---------------------------------------------------------------- steals & busts
 
 function StealsAndBusts({ reports, data, myTeam }: { reports: PickReport[]; data: LeagueData; myTeam: number | null }) {
-  const [justMine, setJustMine] = useState(false);
-  const pool = justMine ? reports.filter((r) => r.entryId === myTeam) : reports;
+  const [who, setWho] = useState<number | null>(null);
+  const pool = who === null ? reports : reports.filter((r) => r.entryId === who);
   const steals = [...pool].sort((a, b) => b.value - a.value).slice(0, 5);
   const busts = [...pool].sort((a, b) => a.value - b.value).slice(0, 5);
   return (
     <section>
       <div className="section-head">
         <h2>Steals and busts</h2>
-        <MineToggle on={justMine} set={setJustMine} />
+        <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
       </div>
       <p className="hint">Picks doing far better, or far worse, than where they were taken.</p>
       <div className="two-col">
@@ -268,13 +269,13 @@ function SquadOrigins({ origins, data, myTeam }: { origins: Origins[]; data: Lea
 
 function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsightRedraft>; data: LeagueData; myTeam: number | null }) {
   const [rounds, setRounds] = useState(2);
-  const [justMine, setJustMine] = useState(false);
-  const shown = justMine ? redraft.filter((r) => r.entryId === myTeam) : redraft.filter((r) => r.round <= rounds);
+  const [who, setWho] = useState<number | null>(null);
+  const shown = who !== null ? redraft.filter((r) => r.entryId === who) : redraft.filter((r) => r.round <= rounds);
   return (
     <section>
       <div className="section-head">
         <h2>Hindsight redraft</h2>
-        <MineToggle on={justMine} set={setJustMine} />
+        <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
       </div>
       <p className="hint">
         The draft run again in the same order, with everyone taking the best scorer still available who fits their squad
@@ -309,7 +310,7 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
           </tbody>
         </table>
       </div>
-      {!justMine && rounds < 15 && (
+      {who === null && rounds < 15 && (
         <button className="link more" onClick={() => setRounds((n) => Math.min(15, n + 3))}>
           Show more rounds
         </button>

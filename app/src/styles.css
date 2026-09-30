@@ -221,10 +221,11 @@ table.standings {
 }
 
 .tabs a {
-  flex: 1;
+  flex: 1 1 auto;
+  position: relative;
   text-align: center;
-  padding: 12px 6px;
-  font-size: 15px;
+  padding: 12px 2px;
+  font-size: 14px;
   color: var(--brand-text);
   opacity: 0.7;
   text-decoration: none;
@@ -1096,4 +1097,121 @@ button.more {
 
 .pairings li:first-child {
   border-top: 0;
+}
+
+/* ---- review fixes (30 Sept) ---- */
+
+/* Header and tabs run the full width of wide screens. */
+.masthead,
+.tabs {
+  box-shadow: 0 0 0 100vmax var(--brand);
+  clip-path: inset(0 -100vmax);
+}
+
+.masthead-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.masthead-row > div {
+  min-width: 0;
+}
+
+.team-picker.compact .select {
+  max-width: 140px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--brand-text);
+}
+
+.team-picker.compact .select option {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.select {
+  min-height: 36px;
+}
+
+.team-picker:not(.compact) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team-picker:not(.compact) .select {
+  font-size: 16px;
+  width: 100%;
+}
+
+.picker-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.show-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.show-filter .select {
+  max-width: 150px;
+}
+
+.section-head {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.welcome {
+  border-color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.welcome h2 {
+  margin-bottom: 4px;
+}
+
+button.small-link {
+  display: inline-block;
+  width: auto;
+  min-height: 40px;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: underline;
+  padding: 10px 0 0;
+}
+
+.notice.error p {
+  margin: 0 0 10px;
+}
+
+.live-dot {
+  position: absolute;
+  top: 9px;
+  right: 2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--loss);
+  box-shadow: 0 0 0 2px var(--brand);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .tabs a {
+    font-size: 13px;
+  }
 }

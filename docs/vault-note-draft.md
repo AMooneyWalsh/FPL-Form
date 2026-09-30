@@ -19,6 +19,7 @@ repo: https://github.com/amooneywalsh/fpl-form
 A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 
 ## Decisions
+- 2026-09-30: Nobody gets a "my team" until they pick one on their device (was defaulting to Adam's team for everyone).
 - 2026-09-30: Repo is `fpl-form`. Planning lives here in the vault, technical docs live in the repo under `docs/`.
 - 2026-09-30: Build a **companion site** to the official FPL Draft, not our own draft game.
 - 2026-09-30: Scope is **one league, the friends group** (14 managers in 2026/27, up from 12).
@@ -70,5 +71,6 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Step 3 built: Draft tab with draft grades, steals and busts, draft-only table (best XI each week), where the points come from, hindsight redraft
 - [x] Step 4 built: League tab with table and position chart, form, fixture luck, head to head, records and streaks. Everything the old site did is now on the new one.
 - [ ] Decide what to do with the old site (index.html + data.json at the repo root)
-- [ ] Step 5: live gameweek page
+- [x] Step 5 built: Live tab (live H2H scores with provisional bonus and projected auto-subs, table if it ended now, next gameweek, PL fixtures)
+- [x] Full review (30 Sept): UX pass, regression tests on live data, 7 bugs and 7 UX fixes (see repo docs/review-2026-09-30.md). Biggest: friends no longer see Adam's team as theirs (first-visit team picker), and the site no longer gets stuck pre-season
 - [ ] Step 6: waiver suggestions

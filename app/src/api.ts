@@ -15,10 +15,12 @@ async function getJson<T>(path: string): Promise<T> {
   return (await res.json()) as T;
 }
 
-/** Loads an /api route and refreshes it on a timer while the page is open. */
-export function useApi<T>(path: string, refreshSeconds = 120): Loadable<T> {
+/** Loads an /api route and refreshes it on a timer while the page is open.
+ * Pass null to skip loading (hooks can't be called conditionally). */
+export function useApi<T>(path: string | null, refreshSeconds = 120): Loadable<T> {
   const [state, setState] = useState<Loadable<T>>({ status: "loading" });
   useEffect(() => {
+    if (path === null) return;
     let cancelled = false;
     const load = () =>
       getJson<T>(path)

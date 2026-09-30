@@ -20,8 +20,9 @@ export function LivePage({ data, myTeam }: { data: LeagueData; myTeam: number | 
   const event = data.game.current_event;
   const live = useApi<Envelope<LiveGameweek>>(`/api/live/${event}`, 60);
   const hasNext = data.game.current_event_finished && data.league.matches.some((m) => m.event === event + 1);
-  const next = useApi<Envelope<LiveGameweek>>(`/api/live/${hasNext ? event + 1 : event}`, 3600);
+  const next = useApi<Envelope<LiveGameweek>>(hasNext ? `/api/live/${event + 1}` : null, 3600);
 
+  if (event < 1) return <p className="notice">The season hasn't started yet. Live scores appear here from gameweek 1.</p>;
   if (live.status === "loading") return <p className="notice">Loading gameweek {event}…</p>;
   if (live.status === "error") return <p className="notice error">Couldn't load the live scores. {live.message}</p>;
   return (

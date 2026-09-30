@@ -34,8 +34,13 @@ export interface LeagueData {
   entries: Map<number, LeagueEntry>;
   /** Short manager names keyed by entry_id. */
   labels: Map<number, string>;
+  /** When the fast-moving data (league, trades, waivers) was last fetched. */
   fetchedAt: string;
   stale: boolean;
+  /** The current gameweek has started but FPL hasn't marked it finished. */
+  inProgress: boolean;
+  /** Gameweeks that couldn't be loaded (retried in the background). */
+  missingGameweeks: number[];
 }
 
 const REFRESH = 120;
@@ -48,7 +53,7 @@ export function useLeagueData(): Loadable<LeagueData> {
   const trades = useApi<Envelope<{ trades: Trade[] }>>("/api/trades", REFRESH);
   const transactions = useApi<Envelope<{ transactions: Transaction[] }>>("/api/transactions", REFRESH);
   const draft = useApi<Envelope<{ choices: DraftChoice[] }>>("/api/draft", 3600);
-  const gameweeks = useGameweeks(game.status === "ready" ? game.value.data.current_event : 0);
+  const gameweeks = useGameweeks(game.status === "ready" ? game.value.data.current_event : null);
 
   return useMemo((): Loadable<LeagueData> => {
     const all = [config, league, game, players, trades, transactions, draft, gameweeks];
@@ -67,6 +72,8 @@ export function useLeagueData(): Loadable<LeagueData> {
       return { status: "loading" };
     }
     const envelopes = [league.value, game.value, players.value, trades.value, transactions.value, draft.value];
+    // Players and draft picks only refresh hourly, so leave them out of "Updated X ago".
+    const fast = [league.value, game.value, trades.value, transactions.value];
     const entries = league.value.data.league_entries;
     const effective = cancelReversals(trades.value.data.trades);
     return {
@@ -82,36 +89,55 @@ export function useLeagueData(): Loadable<LeagueData> {
         reversals: effective.reversals,
         transactions: transactions.value.data.transactions,
         draft: draft.value.data.choices,
-        seasons: new Seasons(gameweeks.value),
+        seasons: new Seasons(gameweeks.value.loaded),
         entries: new Map(entries.map((e) => [e.entry_id, e])),
         labels: managerLabels(entries),
-        fetchedAt: envelopes.map((e) => e.fetchedAt).sort()[0],
+        fetchedAt: fast.map((e) => e.fetchedAt).sort()[0],
         stale: envelopes.some((e) => e.stale),
+        inProgress: game.value.data.current_event >= 1 && !game.value.data.current_event_finished,
+        missingGameweeks: gameweeks.value.missing,
       },
     };
   }, [config, league, game, players, trades, transactions, draft, gameweeks]);
 }
 
-/** Loads GW1..current. Finished ones load once; the current one refreshes. */
-function useGameweeks(current: number): Loadable<Gameweek[]> {
-  const [state, setState] = useState<Loadable<Gameweek[]>>({ status: "loading" });
+/**
+ * Loads GW1..current. Finished ones load once; the current one refreshes.
+ * A gameweek that fails doesn't stop the site loading: it's listed as missing
+ * and retried on the next refresh.
+ */
+function useGameweeks(current: number | null): Loadable<{ loaded: Gameweek[]; missing: number[] }> {
+  const [state, setState] = useState<Loadable<{ loaded: Gameweek[]; missing: number[] }>>({ status: "loading" });
   useEffect(() => {
-    if (current < 1) return;
+    if (current === null) return;
+    if (current < 1) {
+      // Pre-season: no gameweeks yet.
+      setState({ status: "ready", value: { loaded: [], missing: [] } });
+      return;
+    }
     let cancelled = false;
     const done = new Map<number, Gameweek>();
     const get = async (n: number) => {
       const res = await fetch(`/api/gw/${n}`);
-      if (!res.ok) throw new Error(`Couldn't load gameweek ${n}`);
+      if (!res.ok) throw new Error(`Couldn't load gameweek ${n}.`);
       return ((await res.json()) as Envelope<Gameweek>).data;
     };
-    const load = async (onlyCurrent: boolean) => {
-      const wanted = onlyCurrent ? [current] : Array.from({ length: current }, (_, i) => i + 1);
-      const loaded = await Promise.all(wanted.map(get));
-      loaded.forEach((g) => done.set(g.event, g));
-      if (!cancelled) setState({ status: "ready", value: [...done.values()] });
+    const load = async (refresh: boolean) => {
+      const all = Array.from({ length: current }, (_, i) => i + 1);
+      // First load: everything. Refreshes: the current gameweek plus any that failed.
+      const wanted = refresh ? all.filter((n) => n === current || !done.has(n)) : all;
+      const results = await Promise.allSettled(wanted.map(get));
+      results.forEach((r) => r.status === "fulfilled" && done.set(r.value.event, r.value));
+      if (cancelled) return;
+      const missing = all.filter((n) => !done.has(n));
+      if (missing.length === all.length) {
+        setState((s) => (s.status === "ready" ? s : { status: "error", message: "Couldn't load any gameweeks." }));
+        return;
+      }
+      setState({ status: "ready", value: { loaded: [...done.values()].sort((a, b) => a.event - b.event), missing } });
     };
-    load(false).catch((err: Error) => !cancelled && setState({ status: "error", message: err.message }));
-    const timer = window.setInterval(() => load(true).catch(() => {}), REFRESH * 1000);
+    load(false);
+    const timer = window.setInterval(() => load(true), REFRESH * 1000);
     return () => {
       cancelled = true;
       window.clearInterval(timer);

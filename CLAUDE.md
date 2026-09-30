@@ -16,7 +16,7 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 - Existing app: a static, read-only stats viewer. `index.html` (single file, ~4.4k lines, vanilla JS) loads `data.json` and renders results/form tables, luck, charts, streaks, records, H2H, waiver and trade analysis, and player search for one league ("Drafty In Here", league id 6573, 12 managers, 2025/26).
 - `data.json` is a snapshot of the official FPL Draft API, refreshed by manual "Update League Data" commits. There is no build step, backend, or CI.
 - Live league for 2026/27: league ID `634` ("Drafty In Here", 14 managers, H2H, waivers, trades on), owner's entry ID `1412`. The old data.json league (6573) is last season's and that ID has since been reused by another league.
-- New site (steps 1-4 built; pages: Trades, Waivers, Draft, Players, League): `app/` React, `worker/` Cloudflare Worker, `shared/` league maths, `fixtures/` real API data. Run `npm run check` before every merge. See `docs/setup.md`.
+- New site (steps 1-5 built; pages: Trades, Waivers, Draft, Players, League, Live): `app/` React, `worker/` Cloudflare Worker, `shared/` league maths, `fixtures/` real API data. Run `npm run check` before every merge, and `npx tsx scripts/regression.ts` (checks every calculation against live FPL data) after anything touching `shared/`. See `docs/setup.md`.
 - See `docs/architecture.md` (agreed plan), `docs/existing-app.md` and `docs/fpl-draft-api.md`.
 
 - **Live site:** https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main` automatically). Cloudflare's PR preview builds fail instantly for a setup reason we can't see; the GitHub `check` job is the real gate.
