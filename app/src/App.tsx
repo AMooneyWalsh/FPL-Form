@@ -5,6 +5,8 @@ import { timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
 import { LEAGUE_VIEWS, LeaguePage } from "./LeaguePage";
 import { LIVE_VIEWS, LivePage } from "./LivePage";
+import { ManagerPage } from "./ManagerPage";
+import { PlayerPage } from "./PlayersPage";
 import { MOVES_VIEWS, MovesPage } from "./MovesPage";
 
 const PAGES = [
@@ -14,9 +16,11 @@ const PAGES = [
   { id: "draft", label: "Draft" },
 ] as const;
 type PageId = (typeof PAGES)[number]["id"];
+/** Pages without a tab of their own, reached by tapping a name. */
+type DetailId = "player" | "manager";
 interface Route {
   /** undefined = no link given, so App picks the landing page (Live while games are on, else League). */
-  page: PageId | undefined;
+  page: PageId | DetailId | undefined;
   /** The part after the page, e.g. "luck" in #/league/luck. Each page checks its own. */
   sub: string | undefined;
 }
@@ -26,14 +30,19 @@ function routeFromHash(): Route {
   // Old links (#/table, #/trades, #/waivers, #/players) still work.
   if (first === "table") return { page: "league", sub: "table" };
   if (first === "trades" || first === "waivers" || first === "players") return { page: "moves", sub: first };
+  if (first === "player" || first === "manager") return { page: first, sub: second };
   const page = PAGES.find((p) => p.id === first)?.id;
   return { page, sub: second };
 }
+
+/** Page changes this visit, so Back only steps back within the site. */
+let moves = 0;
 
 function useRoute(): Route {
   const [page, setPage] = useState<Route>(routeFromHash);
   useEffect(() => {
     const onChange = () => {
+      moves++;
       setPage(routeFromHash());
       window.scrollTo(0, 0);
     };
@@ -48,7 +57,8 @@ export function App() {
   const route = useRoute();
   const ready = data.status === "ready" ? data.value : null;
   const { sub } = route;
-  const page: PageId = route.page ?? (ready?.inProgress ? "live" : "league");
+  const page: PageId | DetailId = route.page ?? (ready?.inProgress ? "live" : "league");
+  const detail = page === "player" || page === "manager";
   const { myTeam, decided, setMyTeam } = useMyTeam(ready ? [...ready.entries.keys()] : undefined);
 
   return (
@@ -111,6 +121,9 @@ export function App() {
                 {ready.missingGameweeks.length === 1 ? "it" : "them"} out. Trying again in the background.
               </p>
             )}
+            {detail && <BackLink />}
+            {page === "player" && <PlayerPage id={Number(sub)} data={ready} myTeam={myTeam} />}
+            {page === "manager" && <ManagerPage id={Number(sub)} data={ready} myTeam={myTeam} />}
             {page === "moves" && (
               <MovesPage data={ready} myTeam={myTeam} view={MOVES_VIEWS.find((v) => v.id === sub)?.id ?? "trades"} />
             )}
@@ -130,6 +143,24 @@ export function App() {
         )}
       </main>
     </div>
+  );
+}
+
+/** Back to wherever they tapped the name, or the home page if they arrived by a shared link. */
+function BackLink() {
+  return (
+    <a
+      className="link back-link"
+      href="#/"
+      onClick={(e) => {
+        if (moves > 0) {
+          e.preventDefault();
+          window.history.back();
+        }
+      }}
+    >
+      ← Back
+    </a>
   );
 }
 

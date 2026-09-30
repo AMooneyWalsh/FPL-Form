@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
-import { Manager, PlayerName, Pts, ShowFilter, SubNav } from "./bits";
+import { Manager, PlayerName, Pts, ShowFilter, useShownManager, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 
 export const DRAFT_VIEWS = [
@@ -102,7 +102,7 @@ function Grades({ grades, data, myTeam }: { grades: ReturnType<typeof draftGrade
 // ---------------------------------------------------------------- steals & busts
 
 function StealsAndBusts({ reports, data, myTeam }: { reports: PickReport[]; data: LeagueData; myTeam: number | null }) {
-  const [who, setWho] = useState<number | null>(null);
+  const [who, setWho] = useShownManager();
   const pool = who === null ? reports : reports.filter((r) => r.entryId === who);
   const steals = [...pool].sort((a, b) => b.value - a.value).slice(0, 5);
   const busts = [...pool].sort((a, b) => a.value - b.value).slice(0, 5);
@@ -279,7 +279,7 @@ function SquadOrigins({ origins, data, myTeam }: { origins: Origins[]; data: Lea
 
 function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsightRedraft>; data: LeagueData; myTeam: number | null }) {
   const [rounds, setRounds] = useState(2);
-  const [who, setWho] = useState<number | null>(null);
+  const [who, setWho] = useShownManager();
   const shown = who !== null ? redraft.filter((r) => r.entryId === who) : redraft.filter((r) => r.round <= rounds);
   return (
     <section>

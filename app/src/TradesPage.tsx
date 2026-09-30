@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
-import { Manager, nobody, PlayerName, Pts, ShowFilter } from "./bits";
+import { Manager, nobody, PlayerName, Pts, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
-  const [who, setWho] = useState<number | null>(null);
+  const [who, setWho] = useShownManager();
   const verdicts = useMemo(() => tradeVerdicts(data.trades, data.seasons, data.transactions), [data]);
   const ledger = useMemo(() => tradeLedger(verdicts, [...data.entries.keys()]), [verdicts, data]);
   const shown =
@@ -91,7 +91,7 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
   );
 }
 
-function TradeCard({ v, data, myTeam }: { v: TradeVerdict; data: LeagueData; myTeam: number | null }) {
+export function TradeCard({ v, data, myTeam }: { v: TradeVerdict; data: LeagueData; myTeam: number | null }) {
   const date = new Date(v.time).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
   return (
     <article className="card" id={`trade-${v.id}`}>

@@ -1545,3 +1545,66 @@ table.lv-bonus td {
   margin: 0;
   padding: 0;
 }
+
+/* Names are links to the player and manager pages. Keep them looking like text. */
+a.player,
+a.mgr,
+a.team {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.player:hover,
+a.mgr:hover,
+a.team:hover {
+  text-decoration: underline;
+}
+
+a.team {
+  display: block;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.squad-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+a.link {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
