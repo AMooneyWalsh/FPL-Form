@@ -148,44 +148,50 @@ function DraftOnlyTable({
     <section>
       <h2>If nobody had made a move</h2>
       <p className="hint">
-        The table if every manager had kept their 15 draft picks all season, playing the same fixtures. Nobody picked
-        these teams week to week, so each one fields its best possible XI every gameweek. That makes the scores higher
-        than real ones, but it's the same for everyone.
+        Where each manager would be if they'd kept their 15 draft picks all season and never made a waiver claim or
+        trade, next to where they actually are. "Moves" is how many places better or worse off their waivers and trades have left them.
+      </p>
+      <p className="hint">
+        Nobody picked these draft-only teams week to week, so each one fields its best possible XI every gameweek. That
+        makes the scores higher than real ones, but it's the same for everyone.
       </p>
       <div className="table-wrap">
         <table className="data">
           <thead>
             <tr>
-              <th className="num">#</th>
+              <th className="num">
+                Draft
+                <br />
+                only
+              </th>
               <th className="left">Manager</th>
-              <th className="num">W</th>
-              <th className="num">D</th>
-              <th className="num">L</th>
-              <th className="num">Pts</th>
-              <th className="num">Real</th>
+              <th className="num hide-narrow">W-D-L</th>
+              <th className="num hide-narrow">Pts</th>
+              <th className="num">Actual</th>
+              <th className="left">Moves</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => {
               const actual = real.find((x) => x.leagueEntryId === r.leagueEntryId)!.rank;
-              const moved = r.rank - actual; // positive: doing better in real life
+              const better = r.rank - actual; // positive: higher in the real table
               return (
                 <tr key={r.leagueEntryId} className={r.entryId === myTeam ? "mine" : undefined}>
-                  <td className="num rank">{r.rank}</td>
+                  <td className="num rank">{ordinal(r.rank)}</td>
                   <td className="left">
                     <Manager id={r.entryId} data={data} />
                   </td>
-                  <td className="num">{r.won}</td>
-                  <td className="num">{r.drawn}</td>
-                  <td className="num">{r.lost}</td>
-                  <td className="num strong">{r.total}</td>
-                  <td className="num">
-                    {actual}
-                    {moved !== 0 && (
-                      <span className={moved > 0 ? "pts-pos" : "pts-neg"} title={moved > 0 ? "Higher in real life" : "Lower in real life"}>
-                        {" "}
-                        {moved > 0 ? "▲" : "▼"}
-                        {Math.abs(moved)}
+                  <td className="num hide-narrow">
+                    {r.won}-{r.drawn}-{r.lost}
+                  </td>
+                  <td className="num hide-narrow">{r.total}</td>
+                  <td className="num strong">{ordinal(actual)}</td>
+                  <td className="left">
+                    {better === 0 ? (
+                      <span className="muted nowrap">No change</span>
+                    ) : (
+                      <span className={`nowrap ${better > 0 ? "pts-pos" : "pts-neg"}`}>
+                        {better > 0 ? "▲" : "▼"} {Math.abs(better)} {better > 0 ? "better" : "worse"}
                       </span>
                     )}
                   </td>
@@ -195,7 +201,6 @@ function DraftOnlyTable({
           </tbody>
         </table>
       </div>
-      <p className="hint">▲ means they're higher in the real table, so their moves since the draft have helped.</p>
     </section>
   );
 }

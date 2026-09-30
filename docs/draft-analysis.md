@@ -22,7 +22,7 @@ The 5 highest and 5 lowest pick values in the league (or just yours, with "Just 
 The H2H table if every manager had kept their 15 draft picks all season and played the same fixtures.
 
 - Nobody picked these teams week to week, so **each team fields its best possible legal XI every gameweek**: 1 GKP, 3-5 DEF, 2-5 MID, 1-3 FWD, 11 players, using the league's own squad rules from FPL. That makes the scores higher than real ones, but every manager gets the same treatment.
-- The "Real" column shows their actual position. ▲ means they're higher in real life, so their moves since the draft have helped.
+- Columns: **Draft only** (their position in this table), **Actual** (their real position), and **Moves**: how many places better (▲) or worse (▼) off their waivers and trades have left them. Adam flagged that the first version's "Real" column with a bare arrow wasn't clear.
 - Real teams can score more than draft-only teams, because draft-only teams can't add anyone. Draft-only teams can score more than real teams, because they always pick the perfect XI.
 
 ## Where the points come from (squad origins)
