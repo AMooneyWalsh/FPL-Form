@@ -26,7 +26,12 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
   );
   const grades = useMemo(() => draftGrades(pickReports(data.draft, data.seasons)), [data]);
   const [, setShown] = useShownManager();
-  const season = useMemo(() => seasonSummary(data, id, ids), [data, id, ids]);
+  const all = useMemo(() => allSummaries(data, ids), [data, ids]);
+  const season = all.get(id) ?? null;
+  const summaries = [...all.values()];
+  /** "Highest in league", "3rd highest", "joint 2nd most"... for any number on the page. */
+  const rank = (get: (s: Summary) => number, word: RankWord = "highest") =>
+    season ? rankText(summaries.map(get), get(season), word) : undefined;
 
   if (!entry) return <p className="notice">Couldn't find that manager.</p>;
 
@@ -52,7 +57,7 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
             <Stat label="Position" value={ordinal(standing.rank)} />
             <Stat label="Record" value={`${standing.won}-${standing.drawn}-${standing.lost}`} />
             <Stat label="Points" value={String(standing.total)} />
-            <Stat label="Scored" value={String(standing.pointsFor)} />
+            <Stat label="Scored" value={String(standing.pointsFor)} rank={rank((x) => x.pointsFor)} />
           </div>
         )}
         {standing && standing.results.length > 0 && (
@@ -79,7 +84,7 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
         )}
       </section>
 
-      {season && <SeasonSummary s={season} data={data} myTeam={myTeam} mine={mine} />}
+      {season && <SeasonSummary s={season} data={data} myTeam={myTeam} mine={mine} rank={rank} />}
 
       <section>
         <h2>Trades</h2>
@@ -146,11 +151,12 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, rank }: { label: string; value: string; rank?: string }) {
   return (
     <div className="stat">
       <span className="stat-value">{value}</span>
       <span className="stat-label">{label}</span>
+      {rank && <span className="stat-rank">{rank}</span>}
     </div>
   );
 }
@@ -188,13 +194,46 @@ interface Summary {
   top: { element: number; points: number }[];
   benchPoints: number;
   sources: { label: string; points: number }[];
+  pointsFor: number;
+  trades: number;
+  tradeNet: number;
+  waiversWon: number;
+  freeAgents: number;
+  pickupPoints: number;
 }
 
-function seasonSummary(data: LeagueData, id: number, ids: number[]): Summary | null {
-  const mine = scores(data.league).filter((s) => s.entryId === id);
+/** Every manager's summary, so each number can be ranked against the league. */
+function allSummaries(data: LeagueData, ids: number[]): Map<number, Summary> {
+  const ctx: SummaryCtx = {
+    scores: scores(data.league),
+    luckRows: fixtureLuck(data.league),
+    streaks: streaks(data.league),
+    origins: squadOrigins(ids, data.seasons, { transactions: data.transactions, trades: data.trades, draft: data.draft }),
+    ledger: tradeLedger(tradeVerdicts(data.trades, data.seasons, data.transactions), ids),
+    waivers: waiverRecord(data.transactions, data.seasons, ids),
+  };
+  const out = new Map<number, Summary>();
+  for (const id of ids) {
+    const s = seasonSummary(data, id, ctx);
+    if (s) out.set(id, s);
+  }
+  return out;
+}
+
+interface SummaryCtx {
+  scores: Score[];
+  luckRows: ReturnType<typeof fixtureLuck>;
+  streaks: ReturnType<typeof streaks>;
+  origins: ReturnType<typeof squadOrigins>;
+  ledger: ReturnType<typeof tradeLedger>;
+  waivers: ReturnType<typeof waiverRecord>;
+}
+
+function seasonSummary(data: LeagueData, id: number, ctx: SummaryCtx): Summary | null {
+  const mine = ctx.scores.filter((s) => s.entryId === id);
   if (mine.length === 0) return null;
 
-  const luckRows = fixtureLuck(data.league);
+  const luckRows = ctx.luckRows;
   const luckRow = luckRows.find((r) => r.entryId === id);
   const byLuck = [...luckRows].sort((a, b) => b.luck - a.luck);
 
@@ -203,7 +242,9 @@ function seasonSummary(data: LeagueData, id: number, ids: number[]): Summary | n
   const wins = mine.filter((s) => s.result === "W").sort((a, b) => margin(b) - margin(a));
   const losses = mine.filter((s) => s.result === "L").sort((a, b) => margin(a) - margin(b));
 
-  const st = streaks(data.league).find((r) => r.entryId === id);
+  const st = ctx.streaks.find((r) => r.entryId === id);
+  const ledger = ctx.ledger.find((r) => r.entryId === id);
+  const waiver = ctx.waivers.find((r) => r.entryId === id);
 
   // Who has actually scored for them: points only count in the XI that played.
   const played = new Set<number>();
@@ -222,11 +263,7 @@ function seasonSummary(data: LeagueData, id: number, ids: number[]): Summary | n
   }
   const top = [...pts].map(([element, points]) => ({ element, points })).sort((a, b) => b.points - a.points).slice(0, 3);
 
-  const origins = squadOrigins(ids, data.seasons, {
-    transactions: data.transactions,
-    trades: data.trades,
-    draft: data.draft,
-  }).find((o) => o.entryId === id);
+  const origins = ctx.origins.find((o) => o.entryId === id);
   const sources = origins
     ? [
         { label: "Draft", points: origins.points.draft },
@@ -260,12 +297,48 @@ function seasonSummary(data: LeagueData, id: number, ids: number[]): Summary | n
     top,
     benchPoints,
     sources,
+    pointsFor: mine.reduce((t, s) => t + s.score, 0),
+    trades: ledger?.trades ?? 0,
+    tradeNet: ledger?.net ?? 0,
+    waiversWon: waiver?.won ?? 0,
+    freeAgents: waiver?.freeAgents ?? 0,
+    pickupPoints: waiver?.pickupPoints ?? 0,
   };
+}
+
+type RankWord = "highest" | "most" | "lowest" | "fewest";
+
+/** Where `value` sits among `values`, biggest first (or smallest first for "lowest"/"fewest"). */
+function rankText(values: number[], value: number, word: RankWord): string {
+  const asc = word === "lowest" || word === "fewest";
+  const better = values.filter((v) => (asc ? v < value : v > value)).length;
+  const tied = values.filter((v) => v === value).length > 1;
+  const pos = better + 1;
+  if (pos === 1) return tied ? `Joint ${word}` : `${cap(word)} in league`;
+  const opposite: Record<RankWord, RankWord> = { highest: "lowest", lowest: "highest", most: "fewest", fewest: "most" };
+  if (pos === values.length && !tied) return `${cap(opposite[word])} in league`;
+  return `${tied ? "Joint " : ""}${ordinal(pos)} ${word}`;
+}
+
+function cap(w: string): string {
+  return w[0].toUpperCase() + w.slice(1);
 }
 
 const STREAK_WORD: Record<string, [string, string]> = { W: ["win", "wins"], D: ["draw", "draws"], L: ["defeat", "defeats"] };
 
-function SeasonSummary({ s, data, myTeam, mine }: { s: Summary; data: LeagueData; myTeam: number | null; mine: boolean }) {
+function SeasonSummary({
+  s,
+  data,
+  myTeam,
+  mine,
+  rank,
+}: {
+  s: Summary;
+  data: LeagueData;
+  myTeam: number | null;
+  mine: boolean;
+  rank: (get: (s: Summary) => number, word?: RankWord) => string | undefined;
+}) {
   const gws = (list: number[]) => list.map((n) => `GW${n}`).join(", ");
   const luckWord = s.luck.value > 0 ? "jammy" : s.luck.value < 0 ? "hard done by" : "about even";
   const streakText =
@@ -278,10 +351,13 @@ function SeasonSummary({ s, data, myTeam, mine }: { s: Summary; data: LeagueData
 
       <h3 className="card-title">Luck</h3>
       <div className="stat-row">
-        <Stat label="Luck" value={`${s.luck.value > 0 ? "+" : ""}${round1(s.luck.value)}`} />
-        <Stat label="Luck rank" value={`${ordinal(s.luck.rank)}/${s.luck.of}`} />
-        <Stat label="Lucky wins" value={String(s.luck.luckyWins.length)} />
-        <Stat label="Unlucky losses" value={String(s.luck.unluckyLosses.length)} />
+        <Stat label="Luck" value={`${s.luck.value > 0 ? "+" : ""}${round1(s.luck.value)}`} rank={rank((x) => x.luck.value)} />
+        <Stat label="Lucky wins" value={String(s.luck.luckyWins.length)} rank={rank((x) => x.luck.luckyWins.length, "most")} />
+        <Stat
+          label="Unlucky losses"
+          value={String(s.luck.unluckyLosses.length)}
+          rank={rank((x) => x.luck.unluckyLosses.length, "most")}
+        />
       </div>
       <p className="hint">
         {round1(s.luck.value) === 0
@@ -296,10 +372,10 @@ function SeasonSummary({ s, data, myTeam, mine }: { s: Summary; data: LeagueData
 
       <h3 className="card-title">Scores</h3>
       <div className="stat-row">
-        <Stat label={`Best (GW${s.high.event})`} value={String(s.high.score)} />
-        <Stat label={`Worst (GW${s.low.event})`} value={String(s.low.score)} />
-        <Stat label="Average" value={String(s.average)} />
-        <Stat label="Bench pts" value={String(s.benchPoints)} />
+        <Stat label={`Best (GW${s.high.event})`} value={String(s.high.score)} rank={rank((x) => x.high.score)} />
+        <Stat label={`Worst (GW${s.low.event})`} value={String(s.low.score)} rank={rank((x) => x.low.score, "lowest")} />
+        <Stat label="Average" value={String(s.average)} rank={rank((x) => x.average)} />
+        <Stat label="Bench pts" value={String(s.benchPoints)} rank={rank((x) => x.benchPoints, "most")} />
       </div>
       <ul className="plain facts">
         {s.bigWin && (
@@ -321,9 +397,10 @@ function SeasonSummary({ s, data, myTeam, mine }: { s: Summary; data: LeagueData
 
       <h3 className="card-title">Players</h3>
       <div className="stat-row">
-        <Stat label="Have played" value={String(s.playersUsed)} />
-        <Stat label="Owned" value={String(s.squadsUsed)} />
+        <Stat label="Have played" value={String(s.playersUsed)} rank={rank((x) => x.playersUsed, "most")} />
+        <Stat label="Owned" value={String(s.squadsUsed)} rank={rank((x) => x.squadsUsed, "most")} />
       </div>
+
       {s.top.length > 0 && (
         <ul className="plain facts">
           {s.top.map((t, i) => (
@@ -340,6 +417,13 @@ function SeasonSummary({ s, data, myTeam, mine }: { s: Summary; data: LeagueData
           {s.sources.map((x) => `${x.label} ${x.points}`).join(", ")}.
         </p>
       )}
+      <h3 className="card-title">Transfers</h3>
+      <div className="stat-row">
+        <Stat label="Trades" value={String(s.trades)} rank={rank((x) => x.trades, "most")} />
+        <Stat label="Trade net" value={`${s.tradeNet > 0 ? "+" : ""}${s.tradeNet}`} rank={rank((x) => x.tradeNet)} />
+        <Stat label="Waivers won" value={String(s.waiversWon)} rank={rank((x) => x.waiversWon, "most")} />
+        <Stat label="Pickup pts" value={String(s.pickupPoints)} rank={rank((x) => x.pickupPoints)} />
+      </div>
     </section>
   );
 }
