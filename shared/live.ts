@@ -8,12 +8,51 @@ type Position = Player["position"];
 
 // ---------------------------------------------------------------- data shapes
 
+/** The stats that score points, in the order they're shown. */
+export const STAT_KEYS = [
+  "goals_scored",
+  "assists",
+  "clean_sheets",
+  "goals_conceded",
+  "own_goals",
+  "penalties_saved",
+  "penalties_missed",
+  "yellow_cards",
+  "red_cards",
+  "saves",
+  "defensive_contribution",
+] as const;
+export type StatKey = (typeof STAT_KEYS)[number];
+
 export interface LiveElement {
   minutes: number;
   /** FPL's running total. Includes bonus only once FPL has confirmed it. */
   points: number;
   bonus: number;
   bps: number;
+  /** 1 if he started the match (0 means he came off the bench or didn't play). */
+  starts: number;
+  /** Non-zero match stats only. */
+  stats: Partial<Record<StatKey | "minutes", number>>;
+  /** Where his points came from: [stat, count, points], e.g. ["clean_sheets", 1, 4]. */
+  breakdown: [string, number, number][];
+}
+
+/** Match events, for the fixtures view. */
+export const EVENT_KEYS = [
+  "goals_scored",
+  "assists",
+  "own_goals",
+  "penalties_saved",
+  "penalties_missed",
+  "yellow_cards",
+  "red_cards",
+] as const;
+export type EventKey = (typeof EVENT_KEYS)[number];
+export interface MatchEvent {
+  element: number;
+  value: number;
+  home: boolean;
 }
 
 export interface LiveFixture {
@@ -32,6 +71,8 @@ export interface LiveFixture {
   bonusConfirmed: boolean;
   /** Bonus points system scores for everyone who played, both teams. */
   bps: { element: number; value: number }[];
+  /** Goals, assists, cards and so on, with who did them. */
+  events: Partial<Record<EventKey, MatchEvent[]>>;
 }
 
 export interface LivePicks {
@@ -62,7 +103,15 @@ interface RawStat {
 }
 
 export interface RawLiveResponse {
-  elements: Record<string, { stats: { minutes: number; total_points: number; bonus: number; bps: number } }>;
+  elements: Record<
+    string,
+    {
+      stats: { minutes: number; total_points: number; bonus: number; bps: number; starts?: number } & Partial<
+        Record<StatKey, number>
+      >;
+      explain?: [{ stat: string; value: number; points: number }[], number][];
+    }
+  >;
   fixtures: {
     id: number;
     kickoff_time: string | null;
@@ -84,7 +133,28 @@ export function toLiveGameweek(event: number, raw: RawLiveResponse, picks: Recor
   for (const [id, el] of Object.entries(raw.elements)) {
     const s = el.stats;
     if (s.minutes === 0 && s.total_points === 0 && s.bps === 0) continue;
-    elements[Number(id)] = { minutes: s.minutes, points: s.total_points, bonus: s.bonus, bps: s.bps };
+    const stats: LiveElement["stats"] = {};
+    for (const k of ["minutes", ...STAT_KEYS] as const) {
+      const v = s[k];
+      if (v) stats[k] = v;
+    }
+    // Merge double-gameweek lines so "Minutes" appears once with both games added.
+    const merged = new Map<string, [number, number]>();
+    for (const [items] of el.explain ?? []) {
+      for (const x of items) {
+        const cur = merged.get(x.stat) ?? [0, 0];
+        merged.set(x.stat, [cur[0] + x.value, cur[1] + x.points]);
+      }
+    }
+    elements[Number(id)] = {
+      minutes: s.minutes,
+      points: s.total_points,
+      bonus: s.bonus,
+      bps: s.bps,
+      starts: s.starts ?? 0,
+      stats,
+      breakdown: [...merged.entries()].map(([stat, [value, points]]) => [stat, value, points]),
+    };
   }
   const fixtures: LiveFixture[] = raw.fixtures.map((f) => {
     const stat = (name: string) => f.stats.find((s) => s.s === name);
@@ -103,6 +173,15 @@ export function toLiveGameweek(event: number, raw: RawLiveResponse, picks: Recor
       scoreA: f.team_a_score,
       bonusConfirmed: !!bonus && bonus.h.length + bonus.a.length > 0,
       bps: bps ? [...bps.h, ...bps.a] : [],
+      events: Object.fromEntries(
+        EVENT_KEYS.flatMap((k) => {
+          const st = stat(k);
+          const list = st
+            ? [...st.h.map((x) => ({ ...x, home: true })), ...st.a.map((x) => ({ ...x, home: false }))]
+            : [];
+          return list.length ? [[k, list]] : [];
+        }),
+      ),
     };
   });
   return { event, elements, fixtures, picks };
@@ -151,8 +230,20 @@ export interface LivePlayer {
   /** Points including provisional bonus. */
   points: number;
   provisionalBonus: number;
+  /** Bonus FPL has confirmed. */
+  bonus: number;
   minutes: number;
   status: PlayerStatus;
+  teamId: number;
+  /** Non-zero match stats (minutes, goals, assists, clean sheet, saves, ...). */
+  stats: LiveElement["stats"];
+  breakdown: LiveElement["breakdown"];
+  /** He started the match. */
+  started: boolean;
+  /** He came on as a substitute in the real match. */
+  cameOn: boolean;
+  /** He was taken off (or sent off) before the end of a finished match. */
+  cameOff: boolean;
   /** In the XI that counts (after subs). */
   counts: boolean;
   subbedIn: boolean;
@@ -167,13 +258,20 @@ export interface LiveSquad {
   started: number;
   /** Counting players still to play. */
   toPlay: number;
+  /** Points scored by players who didn't count (the bench, and anyone subbed out). */
+  benchPoints: number;
   /** Subs came from FPL (true) or are our projection (false). */
   officialSubs: boolean;
 }
 
+/** A club's matches this gameweek (none, one, or two in a double gameweek). */
+export function gamesOf(teamId: number | undefined, gw: LiveGameweek): LiveFixture[] {
+  return gw.fixtures.filter((f) => f.teamH === teamId || f.teamA === teamId);
+}
+
 function statusOf(element: number, gw: LiveGameweek, info: Map<number, PlayerInfo>): PlayerStatus {
   const team = info.get(element)?.teamId;
-  const games = gw.fixtures.filter((f) => f.teamH === team || f.teamA === team);
+  const games = gamesOf(team, gw);
   if (games.length === 0) return "no-game";
   const minutes = gw.elements[element]?.minutes ?? 0;
   if (games.some((f) => f.started && !f.finishedProvisional)) return "playing";
@@ -195,14 +293,24 @@ export function liveSquad(
     .map((p) => {
       const el = gw.elements[p.element];
       const prov = bonus.get(p.element) ?? 0;
+      const status = statusOf(p.element, gw, info);
+      const started = (el?.starts ?? 0) > 0;
       return {
         element: p.element,
         slot: p.position,
         position: info.get(p.element)?.position ?? "MID",
         points: (el?.points ?? 0) + prov,
         provisionalBonus: prov,
+        bonus: el?.bonus ?? 0,
         minutes: el?.minutes ?? 0,
-        status: statusOf(p.element, gw, info),
+        status,
+        teamId: info.get(p.element)?.teamId ?? 0,
+        stats: el?.stats ?? {},
+        breakdown: el?.breakdown ?? [],
+        started,
+        cameOn: !started && (el?.minutes ?? 0) > 0,
+        // Only judged once his matches are over, so a live player isn't marked off early.
+        cameOff: started && status === "played" && (el?.minutes ?? 0) < 90 * gamesOf(info.get(p.element)?.teamId, gw).filter((f) => f.finishedProvisional).length,
         counts: p.position <= rules.play,
         subbedIn: false,
         subbedOut: false,
@@ -232,6 +340,7 @@ export function liveSquad(
     score: counting.reduce((s, p) => s + p.points, 0),
     started: counting.filter((p) => p.status === "played" || p.status === "playing" || p.status === "did-not-play").length,
     toPlay: counting.filter((p) => p.status === "to-play").length,
+    benchPoints: players.filter((p) => !p.counts).reduce((sum, p) => sum + p.points, 0),
     officialSubs,
   };
 }
@@ -326,4 +435,80 @@ export function liveTable(details: LeagueDetails, event: number, matches: LiveMa
         : m,
     ),
   });
+}
+
+// ---------------------------------------------------------------- league-wide views
+
+export interface Owner {
+  entryId: number;
+  /** In the XI that counts (false = on the bench, or subbed out). */
+  counts: boolean;
+}
+
+/** Who in the league owns each player this gameweek (a player has one owner). */
+export function leagueOwners(matches: LiveMatch[]): Map<number, Owner> {
+  const out = new Map<number, Owner>();
+  for (const m of matches) {
+    for (const squad of [m.home, m.away]) {
+      if (!squad) continue;
+      for (const p of squad.players) out.set(p.element, { entryId: squad.entryId, counts: p.counts });
+    }
+  }
+  return out;
+}
+
+export interface Performer {
+  element: number;
+  entryId: number;
+  points: number;
+  counts: boolean;
+}
+
+/**
+ * The gameweek's best scores among players in the XI that counted, and the
+ * best scores stuck on benches ("left on the bench").
+ */
+export function topPerformers(matches: LiveMatch[], n = 5): { best: Performer[]; benched: Performer[] } {
+  const all: Performer[] = [];
+  for (const m of matches) {
+    for (const squad of [m.home, m.away]) {
+      if (!squad) continue;
+      for (const p of squad.players) all.push({ element: p.element, entryId: squad.entryId, points: p.points, counts: p.counts });
+    }
+  }
+  const byPoints = (a: Performer, b: Performer) => b.points - a.points || a.element - b.element;
+  return {
+    best: all.filter((p) => p.counts).sort(byPoints).slice(0, n),
+    benched: all.filter((p) => !p.counts && p.points > 0).sort(byPoints).slice(0, n),
+  };
+}
+
+export interface BonusRow {
+  element: number;
+  bps: number;
+  /** 3, 2, 1 or 0. */
+  bonus: number;
+}
+
+export interface FixtureBonus {
+  fixture: LiveFixture;
+  /** Highest BPS first. Empty until the match has started. */
+  rows: BonusRow[];
+}
+
+/** Every started match's BPS leaders with the bonus they'd get (or got, once confirmed). */
+export function bonusTable(gw: LiveGameweek, top = 8): FixtureBonus[] {
+  return [...gw.fixtures]
+    .sort((a, b) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id)
+    .map((fixture) => {
+      if (!fixture.started) return { fixture, rows: [] };
+      const awards = bonusFromBps(fixture.bps);
+      const sorted = [...fixture.bps].sort((a, b) => b.value - a.value || a.element - b.element);
+      // Show everyone who gets bonus (ties can make it more than 3), then the next few.
+      const awarded = sorted.filter((p) => awards.has(p.element)).length;
+      return {
+        fixture,
+        rows: sorted.slice(0, Math.max(top, awarded)).map((p) => ({ element: p.element, bps: p.value, bonus: awards.get(p.element) ?? 0 })),
+      };
+    });
 }

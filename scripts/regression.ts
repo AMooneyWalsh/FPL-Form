@@ -3,7 +3,7 @@
 // Run: npx tsx scripts/regression.ts   (needs network access to FPL)
 import { buildGameweek, squadScore, type RawLive, type RawPicks } from "../shared/gameweek";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins } from "../shared/draft";
-import { liveMatches, toLiveGameweek, type LivePicks, type PlayerInfo, type RawLiveResponse } from "../shared/live";
+import { bonusTable, leagueOwners, liveMatches, toLiveGameweek, type LivePicks, type PlayerInfo, type RawLiveResponse } from "../shared/live";
 import { cancelReversals, playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "../shared/moves";
 import { fixtureLuck, positionsByGameweek, records, streaks } from "../shared/results";
 import { computeStandings } from "../shared/standings";
@@ -60,6 +60,15 @@ for (let gw = 1; gw <= game.current_event; gw++) {
   // Live scoring gives the same answer.
   const lg = toLiveGameweek(gw, JSON.parse(live) as RawLiveResponse, byEntry as unknown as Record<number, LivePicks>);
   const lm = liveMatches(league, lg, info, rules);
+  check(
+    Object.values(lg.elements).every((el) => el.breakdown.reduce((sum, [, , pts]) => sum + pts, 0) === el.points),
+    `GW${gw}: every player's points breakdown adds up to his points`,
+  );
+  check(leagueOwners(lm).size === entries.length * 15, `GW${gw}: every lineup player has a league owner`);
+  check(
+    bonusTable(lg).every(({ fixture, rows }) => !fixture.bonusConfirmed || rows.every((r) => r.bonus === (lg.elements[r.element]?.bonus ?? 0))),
+    `GW${gw}: bonus worked out from BPS matches FPL's confirmed bonus`,
+  );
   check(
     lm.every((m) => {
       const real = matches.find((x) => toEntry.get(x.league_entry_1) === m.homeEntry);

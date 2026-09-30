@@ -6,11 +6,14 @@ import leagueJson from "../fixtures/league-634-details.json";
 import { trimPlayers } from "../worker/index";
 import {
   bonusFromBps,
+  bonusTable,
+  leagueOwners,
   liveMatches,
   liveSquad,
   liveTable,
   provisionalBonus,
   toLiveGameweek,
+  topPerformers,
   type LivePicks,
   type PlayerInfo,
   type RawLiveResponse,
@@ -170,5 +173,98 @@ describe("live matches and table", () => {
   it("shows no squads before the deadline", () => {
     const before = toLiveGameweek(6, { elements: {}, fixtures: [] }, {});
     expect(liveSquad(1412, before, info, rules)).toBeNull();
+  });
+});
+
+describe("player stats and points breakdown (GW5)", () => {
+  const matches = liveMatches(league, gw, info, rules);
+  const all = matches.flatMap((m) => [m.home!, m.away!]).flatMap((sq) => sq.players.map((p) => ({ sq, p })));
+  const byId = (id: number) => all.find((x) => x.p.element === id)!.p;
+
+  it("explains every player's points exactly", () => {
+    for (const [id, el] of Object.entries(gw.elements)) {
+      const sum = el.breakdown.reduce((s, [, , pts]) => s + pts, 0);
+      expect(sum, `player ${id}`).toBe(el.points);
+    }
+  });
+
+  it("keeps only the stats that happened", () => {
+    const brobbey = byId(552); // 3 goals, 3 bonus, 17 points
+    expect(brobbey.stats).toMatchObject({ minutes: 90, goals_scored: 3 });
+    expect(brobbey.stats.yellow_cards).toBeUndefined();
+    expect(brobbey.breakdown.find(([stat]) => stat === "goals_scored")).toEqual(["goals_scored", 3, 12]);
+    expect(brobbey.breakdown.find(([stat]) => stat === "bonus")![2]).toBe(3);
+  });
+
+  it("knows who started, who came on and who went off", () => {
+    const tonali = byId(455); // started, 84 minutes
+    expect(tonali).toMatchObject({ started: true, cameOn: false, cameOff: true });
+    const roefs = byId(529); // started, 90 minutes
+    expect(roefs).toMatchObject({ started: true, cameOff: false });
+    const jebbison = byId(607); // came off the bench, 15 minutes
+    expect(jebbison).toMatchObject({ started: false, cameOn: true, cameOff: false });
+    expect(byId(142)).toMatchObject({ started: false, cameOn: false }); // James never played
+  });
+
+  it("doesn't mark a player as taken off while his match is still going", () => {
+    const midMatch = {
+      ...gw,
+      fixtures: gw.fixtures.map((f) => ({ ...f, finishedProvisional: false, minutes: 60 })),
+    };
+    const squad = liveSquad(171050, midMatch, info, rules)!;
+    expect(squad.players.every((p) => !p.cameOff)).toBe(true);
+  });
+
+  it("adds up points left on the bench", () => {
+    for (const { sq } of all) {
+      const bench = sq.players.filter((p) => !p.counts).reduce((s, p) => s + p.points, 0);
+      expect(sq.benchPoints).toBe(bench);
+    }
+    // Adam had Kostoulas on the bench for 10 points.
+    const adam = matches.flatMap((m) => [m.home!, m.away!]).find((sq) => sq.entryId === 1412)!;
+    expect(adam.benchPoints).toBe(10);
+  });
+
+  it("finds each match's goals and cards with who did them", () => {
+    const f = gw.fixtures.find((x) => x.id === 41)!; // NEW 2-1 HUL... first fixture in the file
+    const goals = f.events.goals_scored ?? [];
+    expect(goals.reduce((s, g) => s + g.value, 0)).toBe((f.scoreH ?? 0) + (f.scoreA ?? 0) - (f.events.own_goals ?? []).reduce((s, g) => s + g.value, 0));
+    expect(goals.every((g) => typeof g.home === "boolean")).toBe(true);
+  });
+});
+
+describe("league-wide views (GW5)", () => {
+  const matches = liveMatches(league, gw, info, rules);
+
+  it("knows the owner of every player in a lineup", () => {
+    const owners = leagueOwners(matches);
+    expect(owners.size).toBe(14 * 15);
+    expect(owners.get(552)).toEqual({ entryId: 171050, counts: true });
+    expect(owners.get(35)?.entryId ?? 1).toBeDefined();
+  });
+
+  it("lists the best scores in counting XIs and the best stuck on benches", () => {
+    const { best, benched } = topPerformers(matches, 5);
+    // Brobbey and Semenyo both scored 17, the best of the week.
+    expect(best.slice(0, 2).map((p) => p.element).sort()).toEqual([397, 552]);
+    expect(best[0]).toMatchObject({ points: 17, counts: true });
+    expect(best.every((p, i) => i === 0 || best[i - 1].points >= p.points)).toBe(true);
+    expect(benched.every((p) => !p.counts && p.points > 0)).toBe(true);
+    expect(benched[0].points).toBeGreaterThanOrEqual(10);
+  });
+
+  it("shows each started match's BPS leaders with the bonus FPL gave", () => {
+    const table = bonusTable(gw);
+    expect(table).toHaveLength(10);
+    for (const { fixture, rows } of table) {
+      expect(rows.length).toBeGreaterThanOrEqual(8);
+      expect(rows.every((r, i) => i === 0 || rows[i - 1].bps >= r.bps)).toBe(true);
+      for (const r of rows) expect(r.bonus, `fixture ${fixture.id} player ${r.element}`).toBe(gw.elements[r.element]?.bonus ?? 0);
+    }
+  });
+
+  it("shows nothing for matches that haven't started", () => {
+    const notStarted = { ...gw, fixtures: gw.fixtures.map((f) => ({ ...f, started: false })) };
+    expect(bonusTable(notStarted).every((t) => t.rows.length === 0)).toBe(true);
   });
 });

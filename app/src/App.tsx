@@ -4,8 +4,8 @@ import { DraftPage } from "./DraftPage";
 import { timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
 import { PlayersPage } from "./PlayersPage";
-import { LEAGUE_VIEWS, LeaguePage, type LeagueView } from "./LeaguePage";
-import { LivePage } from "./LivePage";
+import { LEAGUE_VIEWS, LeaguePage } from "./LeaguePage";
+import { LIVE_VIEWS, LivePage } from "./LivePage";
 import { TradesPage } from "./TradesPage";
 import { WaiversPage } from "./WaiversPage";
 
@@ -20,16 +20,16 @@ const PAGES = [
 type PageId = (typeof PAGES)[number]["id"];
 interface Route {
   page: PageId;
-  view: LeagueView;
+  /** The part after the page, e.g. "luck" in #/league/luck. Each page checks its own. */
+  sub: string | undefined;
 }
 
 function routeFromHash(): Route {
   const [first, second] = window.location.hash.replace(/^#\/?/, "").split("/");
   // Old links to #/table still work.
-  if (first === "table") return { page: "league", view: "table" };
+  if (first === "table") return { page: "league", sub: "table" };
   const page = PAGES.find((p) => p.id === first)?.id ?? "trades";
-  const view = LEAGUE_VIEWS.find((v) => v.id === second)?.id ?? "table";
-  return { page, view };
+  return { page, sub: second };
 }
 
 function useRoute(): Route {
@@ -47,7 +47,7 @@ function useRoute(): Route {
 
 export function App() {
   const data = useLeagueData();
-  const { page, view } = useRoute();
+  const { page, sub } = useRoute();
   const ready = data.status === "ready" ? data.value : null;
   const { myTeam, decided, setMyTeam } = useMyTeam(ready ? [...ready.entries.keys()] : undefined);
 
@@ -115,8 +115,12 @@ export function App() {
             {page === "waivers" && <WaiversPage data={ready} myTeam={myTeam} />}
             {page === "draft" && <DraftPage data={ready} myTeam={myTeam} />}
             {page === "players" && <PlayersPage data={ready} myTeam={myTeam} />}
-            {page === "league" && <LeaguePage data={ready} myTeam={myTeam} view={view} />}
-            {page === "live" && <LivePage data={ready} myTeam={myTeam} />}
+            {page === "league" && (
+              <LeaguePage data={ready} myTeam={myTeam} view={LEAGUE_VIEWS.find((v) => v.id === sub)?.id ?? "table"} />
+            )}
+            {page === "live" && (
+              <LivePage data={ready} myTeam={myTeam} view={LIVE_VIEWS.find((v) => v.id === sub)?.id ?? "matches"} />
+            )}
             <footer className="footer-row">
               <span className="updated">Updated {timeAgo(ready.fetchedAt)}</span>
             </footer>

@@ -183,11 +183,11 @@ describe("trimPlayers", () => {
     const trimmed = trimPlayers(raw);
     expect(trimmed.length).toBeLessThan(raw.length / 5);
     const { players, rules } = JSON.parse(trimmed) as {
-      players: { id: number; name: string; team: string; position: string }[];
+      players: { id: number; name: string; team: string; teamCode: number; position: string }[];
       rules: unknown;
     };
     expect(players.length).toBe(bootstrap.elements.length);
-    expect(players.find((p) => p.name === "Saka")).toMatchObject({ team: "ARS", position: "MID" });
+    expect(players.find((p) => p.name === "Saka")).toMatchObject({ team: "ARS", teamCode: 3, position: "MID" });
     expect(rules).toEqual({
       play: 11,
       select: { GKP: 2, DEF: 5, MID: 5, FWD: 3 },
@@ -200,12 +200,17 @@ describe("trimPlayers", () => {
 describe("live route", () => {
   const league = { league: { id: 634 }, league_entries: [{ id: 1, entry_id: 11 }, { id: 2, entry_id: 22 }], matches: [] };
   const live = {
-    elements: { "5": { stats: { minutes: 90, total_points: 7, bonus: 0, bps: 30 } } },
+    elements: {
+      "5": {
+        stats: { minutes: 90, total_points: 7, bonus: 0, bps: 30, starts: 1, goals_scored: 1 },
+        explain: [[[{ stat: "minutes", value: 90, points: 2 }, { stat: "goals_scored", value: 1, points: 5 }], 9]],
+      },
+    },
     fixtures: [
       {
         id: 9, kickoff_time: "2026-10-10T11:30:00Z", started: true, finished: false, finished_provisional: false, minutes: 60,
         team_h: 1, team_a: 2, team_h_score: 1, team_a_score: 0,
-        stats: [{ s: "bps", h: [{ element: 5, value: 30 }], a: [] }, { s: "bonus", h: [], a: [] }],
+        stats: [{ s: "bps", h: [{ element: 5, value: 30 }], a: [] }, { s: "bonus", h: [], a: [] }, { s: "goals_scored", h: [{ element: 5, value: 1 }], a: [] }],
       },
     ],
   };
@@ -227,8 +232,17 @@ describe("live route", () => {
       new Response(JSON.stringify({ picks: [{ element: 5, position: 1, multiplier: 1 }], subs: [] })),
     );
     const body = (await (await get("/api/live/6", makeEnv())).json()) as { data: Record<string, any> };
-    expect(body.data.elements).toEqual({ "5": { minutes: 90, points: 7, bonus: 0, bps: 30 } });
-    expect(body.data.fixtures[0]).toMatchObject({ id: 9, started: true, bonusConfirmed: false, bps: [{ element: 5, value: 30 }] });
+    expect(body.data.elements).toEqual({
+      "5": {
+        minutes: 90, points: 7, bonus: 0, bps: 30, starts: 1,
+        stats: { minutes: 90, goals_scored: 1 },
+        breakdown: [["minutes", 90, 2], ["goals_scored", 1, 5]],
+      },
+    });
+    expect(body.data.fixtures[0]).toMatchObject({
+      id: 9, started: true, bonusConfirmed: false, bps: [{ element: 5, value: 30 }],
+      events: { goals_scored: [{ element: 5, value: 1, home: true }] },
+    });
     expect(Object.keys(body.data.picks)).toEqual(["11", "22"]);
     expect(body.data.picks["11"].picks).toEqual([{ element: 5, position: 1 }]);
   });
