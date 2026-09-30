@@ -31,3 +31,7 @@ Two very different projects:
 2. **Full draft game** (own snake draft, waivers, trades, lineups, scoring): replaces the official game. Needs accounts, a realtime backend, a player and points feed, and real ongoing upkeep.
 
 This is the first thing to settle with the owner.
+
+## Decisions (2026-09-30)
+
+Companion site, one league of 12, hosted as a static site plus Cloudflare Worker, light weekly maintenance, budget up to 5 to 10 a month, clean rebuild. See the vault note for the running list.

@@ -20,6 +20,13 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 
 ## Decisions
 - 2026-09-30: Repo is `fpl-form`. Planning lives here in the vault, technical docs live in the repo under `docs/`.
+- 2026-09-30: Build a **companion site** to the official FPL Draft, not our own draft game.
+- 2026-09-30: Scope is **one league, the 12 friends**.
+- 2026-09-30: Must-haves: live H2H scores, standings/form/stats, waiver and trade tools. Discord bot is a nice-to-have.
+- 2026-09-30: Maintenance appetite is light, weekly.
+- 2026-09-30: Hosting is **static site plus Cloudflare Worker** (caches FPL data, enables live scores, no manual data commits).
+- 2026-09-30: Budget up to 5 to 10 a month.
+- 2026-09-30: **Rebuild cleanly** rather than extending `index.html`. Reuse the data logic and ideas from the old version.
 
 ## Findings
 - draftfpl.live is a companion to the official FPL Draft game (live H2H scores, standings, stats, waiver tips, Discord bot, free plus Pro tier). It doesn't run drafts itself.
@@ -27,9 +34,14 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - FPL Draft API is unofficial. Reads look open, actions need a logged-in session.
 
 ## Open questions
-- Companion site or full draft game?
-- Players, must-haves vs nice-to-haves, hosting, budget, maintenance appetite.
+- Tech stack for the rebuild (plain JS vs Vite plus a framework)?
+- Custom domain?
+- Nice-to-have ordering (Discord bot, waiver suggestions, draft recap).
+- Does the FPL Draft API allow browser or Worker requests reliably? Verify from a normal machine.
+- Do managers need to log in, or is the site public by link?
 
 ## Progress
 - [x] Repo set up, CLAUDE.md, docs
-- [ ] Scope interview
+- [x] Scope interview, round 1 (type, scale, must-haves, hosting, budget)
+- [ ] Stack decision
+- [ ] Verify FPL Draft API endpoints
