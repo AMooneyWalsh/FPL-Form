@@ -51,7 +51,7 @@ function capitalise(s: string): string {
  * because the API's `matches_played` and `winning_league_entry` are wrong.
  * Ties on league points are split by total points scored, as FPL Draft does.
  */
-export function computeStandings(details: LeagueDetails, upToEvent = Infinity): StandingRow[] {
+export function computeStandings(details: LeagueDetails, upToEvent = Infinity, fromEvent = 1): StandingRow[] {
   const rows = new Map<number, StandingRow>();
   for (const e of details.league_entries) {
     rows.set(e.id, {
@@ -72,7 +72,7 @@ export function computeStandings(details: LeagueDetails, upToEvent = Infinity): 
   }
 
   const finished = details.matches
-    .filter((m) => m.finished && m.event <= upToEvent)
+    .filter((m) => m.finished && m.event <= upToEvent && m.event >= fromEvent)
     .sort((a, b) => a.event - b.event);
 
   for (const m of finished) {

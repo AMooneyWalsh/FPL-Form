@@ -68,4 +68,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [ ] Optional: switch off Cloudflare's non-production branch builds (they fail instantly and aren't needed)
 - [ ] Optional: set up KV storage so finished gameweeks survive restarts (needs a namespace id)
 - [x] Step 3 built: Draft tab with draft grades, steals and busts, draft-only table (best XI each week), where the points come from, hindsight redraft
-- [ ] Step 4: rest of the old site's stats (form, luck, charts, streaks, records, H2H)
+- [x] Step 4 built: League tab with table and position chart, form, fixture luck, head to head, records and streaks. Everything the old site did is now on the new one.
+- [ ] Decide what to do with the old site (index.html + data.json at the repo root)
+- [ ] Step 5: live gameweek page
+- [ ] Step 6: waiver suggestions

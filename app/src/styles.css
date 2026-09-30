@@ -223,7 +223,8 @@ table.standings {
 .tabs a {
   flex: 1;
   text-align: center;
-  padding: 12px 10px;
+  padding: 12px 6px;
+  font-size: 15px;
   color: var(--brand-text);
   opacity: 0.7;
   text-decoration: none;
@@ -697,4 +698,220 @@ button.more {
 
 .nowrap {
   white-space: nowrap;
+}
+
+/* ---- league page ---- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.chips.small {
+  margin-bottom: 10px;
+}
+
+.chip-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.chip-btn.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-text);
+}
+
+.select {
+  font: inherit;
+  font-size: 14px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  max-width: 100%;
+}
+
+.chart-card {
+  padding: 10px 8px 6px;
+}
+
+.position-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.position-chart .grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.position-chart .axis {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.position-chart .line-other {
+  fill: none;
+  stroke: var(--muted);
+  stroke-opacity: 0.3;
+  stroke-width: 1.5;
+}
+
+.position-chart .line-hl {
+  fill: none;
+  stroke-width: 2;
+}
+
+.position-chart .s-line1 {
+  stroke: var(--series-1);
+}
+
+.position-chart .s-line2 {
+  stroke: var(--series-2);
+}
+
+.position-chart .dot {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.position-chart .s-dot1 {
+  fill: var(--series-1);
+}
+
+.position-chart .s-dot2 {
+  fill: var(--series-2);
+}
+
+.position-chart .end-label {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.chart-note {
+  margin: 6px 6px 0;
+}
+
+.verdicts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.verdict-card {
+  margin-bottom: 0;
+}
+
+.verdict-big {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 2px 0;
+}
+
+.weeks {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.week {
+  flex: 0 0 auto;
+  min-width: 64px;
+  text-align: center;
+  padding: 8px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.week.robbed {
+  border-color: var(--loss);
+}
+
+.week.jammy {
+  border-color: var(--win);
+}
+
+.week-gw,
+.week-median {
+  color: var(--muted);
+}
+
+.week .chip {
+  margin: 4px 0;
+}
+
+.week-score {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.week-tag {
+  margin-top: 2px;
+  font-weight: 700;
+}
+
+.week.robbed .week-tag {
+  color: var(--loss);
+}
+
+.week.jammy .week-tag {
+  color: var(--win);
+}
+
+.h2h-pickers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.h2h-card {
+  text-align: center;
+}
+
+.h2h-score {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.chip.wide {
+  width: auto;
+  padding: 0 6px;
+}
+
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.record-detail {
+  text-align: right;
+}
+
+.records-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }

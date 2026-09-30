@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { computeStandings } from "../../shared/standings";
-import { useLeagueData, type LeagueData } from "./data";
+import { useEffect, useState } from "react";
+import { useLeagueData } from "./data";
 import { DraftPage } from "./DraftPage";
 import { timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
 import { PlayersPage } from "./PlayersPage";
-import { StandingsTable } from "./StandingsTable";
+import { LEAGUE_VIEWS, LeaguePage, type LeagueView } from "./LeaguePage";
 import { TradesPage } from "./TradesPage";
 import { WaiversPage } from "./WaiversPage";
 
@@ -14,20 +13,28 @@ const PAGES = [
   { id: "waivers", label: "Waivers" },
   { id: "draft", label: "Draft" },
   { id: "players", label: "Players" },
-  { id: "table", label: "Table" },
+  { id: "league", label: "League" },
 ] as const;
 type PageId = (typeof PAGES)[number]["id"];
-
-function pageFromHash(): PageId {
-  const id = window.location.hash.replace(/^#\/?/, "");
-  return PAGES.find((p) => p.id === id)?.id ?? "trades";
+interface Route {
+  page: PageId;
+  view: LeagueView;
 }
 
-function usePage(): PageId {
-  const [page, setPage] = useState<PageId>(pageFromHash);
+function routeFromHash(): Route {
+  const [first, second] = window.location.hash.replace(/^#\/?/, "").split("/");
+  // Old links to #/table still work.
+  if (first === "table") return { page: "league", view: "table" };
+  const page = PAGES.find((p) => p.id === first)?.id ?? "trades";
+  const view = LEAGUE_VIEWS.find((v) => v.id === second)?.id ?? "table";
+  return { page, view };
+}
+
+function useRoute(): Route {
+  const [page, setPage] = useState<Route>(routeFromHash);
   useEffect(() => {
     const onChange = () => {
-      setPage(pageFromHash());
+      setPage(routeFromHash());
       window.scrollTo(0, 0);
     };
     window.addEventListener("hashchange", onChange);
@@ -38,7 +45,7 @@ function usePage(): PageId {
 
 export function App() {
   const data = useLeagueData();
-  const page = usePage();
+  const { page, view } = useRoute();
   const ready = data.status === "ready" ? data.value : null;
   const [myTeam, setMyTeam] = useMyTeam(ready?.config.defaultEntryId);
 
@@ -72,7 +79,7 @@ export function App() {
             {page === "waivers" && <WaiversPage data={ready} myTeam={myTeam} />}
             {page === "draft" && <DraftPage data={ready} myTeam={myTeam} />}
             {page === "players" && <PlayersPage data={ready} myTeam={myTeam} />}
-            {page === "table" && <TablePage data={ready} myTeam={myTeam} />}
+            {page === "league" && <LeaguePage data={ready} myTeam={myTeam} view={view} />}
             <footer className="footer-row">
               <label className="picker">
                 My team{" "}
@@ -92,15 +99,5 @@ export function App() {
         )}
       </main>
     </div>
-  );
-}
-
-function TablePage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
-  const standings = useMemo(() => computeStandings(data.league), [data]);
-  return (
-    <section>
-      <h2>League table</h2>
-      <StandingsTable rows={standings} myTeam={myTeam} />
-    </section>
   );
 }
