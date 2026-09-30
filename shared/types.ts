@@ -117,6 +117,7 @@ export interface Player {
   name: string;
   fullName: string;
   team: string;
+  teamId: number;
   position: "GKP" | "DEF" | "MID" | "FWD";
   totalPoints: number;
   /** FPL's pre-season draft ranking (lower = expected to be better). */

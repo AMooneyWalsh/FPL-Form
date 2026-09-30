@@ -915,3 +915,185 @@ button.more {
   padding: 0;
   margin: 0;
 }
+
+/* ---- live page ---- */
+
+.phase {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+.phase-live {
+  background: var(--loss);
+  border-color: var(--loss);
+  color: #fff;
+}
+
+.match {
+  padding: 0;
+}
+
+.mine-card {
+  border-color: var(--accent);
+}
+
+.match-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.match-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.match-side.right {
+  text-align: right;
+}
+
+.match-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-score {
+  display: flex;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.lead {
+  color: var(--win);
+}
+
+.lineups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 14px 12px;
+  border-top: 1px solid var(--line);
+}
+
+.lineup-row {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 4px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.lineup-mark {
+  color: var(--muted);
+  text-align: center;
+}
+
+.status-played .lineup-mark {
+  color: var(--win);
+}
+
+.status-playing .lineup-mark {
+  color: var(--loss);
+}
+
+.status-did-not-play,
+.status-no-game {
+  color: var(--muted);
+}
+
+.lineup-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lineup-pts {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.prov {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.sub-in {
+  color: var(--win);
+}
+
+.sub-out {
+  color: var(--loss);
+}
+
+.bench-label {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bench {
+  opacity: 0.75;
+}
+
+.fixture-list li {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr 32px;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.fixture-list li:first-child {
+  border-top: 0;
+}
+
+.fx-team.right {
+  text-align: right;
+}
+
+.fx-score {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  min-width: 70px;
+}
+
+.fx-state {
+  font-size: 12px;
+  text-align: right;
+}
+
+.pairings li {
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pairings li:first-child {
+  border-top: 0;
+}

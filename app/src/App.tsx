@@ -5,6 +5,7 @@ import { timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
 import { PlayersPage } from "./PlayersPage";
 import { LEAGUE_VIEWS, LeaguePage, type LeagueView } from "./LeaguePage";
+import { LivePage } from "./LivePage";
 import { TradesPage } from "./TradesPage";
 import { WaiversPage } from "./WaiversPage";
 
@@ -14,6 +15,7 @@ const PAGES = [
   { id: "draft", label: "Draft" },
   { id: "players", label: "Players" },
   { id: "league", label: "League" },
+  { id: "live", label: "Live" },
 ] as const;
 type PageId = (typeof PAGES)[number]["id"];
 interface Route {
@@ -80,6 +82,7 @@ export function App() {
             {page === "draft" && <DraftPage data={ready} myTeam={myTeam} />}
             {page === "players" && <PlayersPage data={ready} myTeam={myTeam} />}
             {page === "league" && <LeaguePage data={ready} myTeam={myTeam} view={view} />}
+            {page === "live" && <LivePage data={ready} myTeam={myTeam} />}
             <footer className="footer-row">
               <label className="picker">
                 My team{" "}
