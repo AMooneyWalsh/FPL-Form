@@ -710,6 +710,25 @@ button.more {
   margin-bottom: 14px;
 }
 
+/* Section menu under the top tabs. Sticks just below them while scrolling. */
+.chips.subnav {
+  position: sticky;
+  top: var(--tabs-h, 44px);
+  z-index: 4;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin: -16px -16px 14px;
+  padding: 10px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+}
+
+.chips.subnav .chip-btn {
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
 .chips.small {
   margin-bottom: 10px;
 }

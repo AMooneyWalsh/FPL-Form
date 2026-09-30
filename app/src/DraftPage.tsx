@@ -1,10 +1,19 @@
 import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
-import { Manager, PlayerName, Pts, ShowFilter } from "./bits";
+import { Manager, PlayerName, Pts, ShowFilter, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 
-export function DraftPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
+export const DRAFT_VIEWS = [
+  { id: "grades", label: "Grades" },
+  { id: "picks", label: "Steals" },
+  { id: "no-moves", label: "No moves" },
+  { id: "origins", label: "Points" },
+  { id: "redraft", label: "Redraft" },
+] as const;
+export type DraftView = (typeof DRAFT_VIEWS)[number]["id"];
+
+export function DraftPage({ data, myTeam, view }: { data: LeagueData; myTeam: number | null; view: DraftView }) {
   const reports = useMemo(() => pickReports(data.draft, data.seasons), [data]);
   const grades = useMemo(() => draftGrades(reports), [reports]);
   const positions = useMemo(() => new Map(data.playerList.map((p) => [p.id, p.position])), [data]);
@@ -26,16 +35,17 @@ export function DraftPage({ data, myTeam }: { data: LeagueData; myTeam: number |
 
   return (
     <>
+      <SubNav page="draft" views={DRAFT_VIEWS} current={view} label="Draft sections" />
       <p className="hint">
         {data.seasons.lastEvent === 0
           ? "No gameweeks have been played yet, so all of this starts at zero until gameweek 1."
           : `Everything here uses points from ${data.seasons.lastEvent === 1 ? "the first gameweek" : `the ${data.seasons.lastEvent} gameweeks`} played so far${data.inProgress ? `, including gameweek ${data.game.current_event} as it stands` : ""}, so early on it can swing a lot from week to week.`}
       </p>
-      <Grades grades={grades} data={data} myTeam={myTeam} />
-      <StealsAndBusts reports={reports} data={data} myTeam={myTeam} />
-      <DraftOnlyTable rows={draftTable} real={realTable} data={data} myTeam={myTeam} />
-      <SquadOrigins origins={origins} data={data} myTeam={myTeam} />
-      <Redraft redraft={redraft} data={data} myTeam={myTeam} />
+      {view === "grades" && <Grades grades={grades} data={data} myTeam={myTeam} />}
+      {view === "picks" && <StealsAndBusts reports={reports} data={data} myTeam={myTeam} />}
+      {view === "no-moves" && <DraftOnlyTable rows={draftTable} real={realTable} data={data} myTeam={myTeam} />}
+      {view === "origins" && <SquadOrigins origins={origins} data={data} myTeam={myTeam} />}
+      {view === "redraft" && <Redraft redraft={redraft} data={data} myTeam={myTeam} />}
     </>
   );
 }

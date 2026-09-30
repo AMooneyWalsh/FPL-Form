@@ -1,34 +1,32 @@
 import { useEffect, useState } from "react";
 import { useLeagueData, type LeagueData } from "./data";
-import { DraftPage } from "./DraftPage";
+import { DRAFT_VIEWS, DraftPage } from "./DraftPage";
 import { timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
-import { PlayersPage } from "./PlayersPage";
 import { LEAGUE_VIEWS, LeaguePage } from "./LeaguePage";
 import { LIVE_VIEWS, LivePage } from "./LivePage";
-import { TradesPage } from "./TradesPage";
-import { WaiversPage } from "./WaiversPage";
+import { MOVES_VIEWS, MovesPage } from "./MovesPage";
 
 const PAGES = [
-  { id: "trades", label: "Trades" },
-  { id: "waivers", label: "Waivers" },
-  { id: "draft", label: "Draft" },
-  { id: "players", label: "Players" },
-  { id: "league", label: "League" },
   { id: "live", label: "Live" },
+  { id: "league", label: "League" },
+  { id: "moves", label: "Moves" },
+  { id: "draft", label: "Draft" },
 ] as const;
 type PageId = (typeof PAGES)[number]["id"];
 interface Route {
-  page: PageId;
+  /** undefined = no link given, so App picks the landing page (Live while games are on, else League). */
+  page: PageId | undefined;
   /** The part after the page, e.g. "luck" in #/league/luck. Each page checks its own. */
   sub: string | undefined;
 }
 
 function routeFromHash(): Route {
   const [first, second] = window.location.hash.replace(/^#\/?/, "").split("/");
-  // Old links to #/table still work.
+  // Old links (#/table, #/trades, #/waivers, #/players) still work.
   if (first === "table") return { page: "league", sub: "table" };
-  const page = PAGES.find((p) => p.id === first)?.id ?? "trades";
+  if (first === "trades" || first === "waivers" || first === "players") return { page: "moves", sub: first };
+  const page = PAGES.find((p) => p.id === first)?.id;
   return { page, sub: second };
 }
 
@@ -47,8 +45,10 @@ function useRoute(): Route {
 
 export function App() {
   const data = useLeagueData();
-  const { page, sub } = useRoute();
+  const route = useRoute();
   const ready = data.status === "ready" ? data.value : null;
+  const { sub } = route;
+  const page: PageId = route.page ?? (ready?.inProgress ? "live" : "league");
   const { myTeam, decided, setMyTeam } = useMyTeam(ready ? [...ready.entries.keys()] : undefined);
 
   return (
@@ -111,10 +111,12 @@ export function App() {
                 {ready.missingGameweeks.length === 1 ? "it" : "them"} out. Trying again in the background.
               </p>
             )}
-            {page === "trades" && <TradesPage data={ready} myTeam={myTeam} />}
-            {page === "waivers" && <WaiversPage data={ready} myTeam={myTeam} />}
-            {page === "draft" && <DraftPage data={ready} myTeam={myTeam} />}
-            {page === "players" && <PlayersPage data={ready} myTeam={myTeam} />}
+            {page === "moves" && (
+              <MovesPage data={ready} myTeam={myTeam} view={MOVES_VIEWS.find((v) => v.id === sub)?.id ?? "trades"} />
+            )}
+            {page === "draft" && (
+              <DraftPage data={ready} myTeam={myTeam} view={DRAFT_VIEWS.find((v) => v.id === sub)?.id ?? "grades"} />
+            )}
             {page === "league" && (
               <LeaguePage data={ready} myTeam={myTeam} view={LEAGUE_VIEWS.find((v) => v.id === sub)?.id ?? "table"} />
             )}

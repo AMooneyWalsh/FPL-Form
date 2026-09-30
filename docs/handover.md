@@ -5,7 +5,8 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 ## Where things stand
 
 - Live site: https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main`).
-- Built and live: Trades, Waivers, Draft, Players, League, Live (Matches / Bonus / Fixtures).
+- Built and live: four tabs, Live / League / Moves / Draft (see `docs/navigation-review.md`). Moves holds Trades, Waivers and Player journeys. Every tab has a sticky chip menu (`SubNav` in `app/src/bits.tsx`) with its own link, e.g. `#/draft/redraft`. With no link the site opens on Live while a gameweek is in progress, else League. Old links (`#/trades`, `#/waivers`, `#/players`, `#/table`) redirect.
+- Next up: navigation step 2 (player pop-up on any name, manager page, remembered manager filter). The owner approved it.
 - Last work (PRs #9-#11): Live tab v2 and lineup fixes.
   - Lineups are one two-column grid so rows line up.
   - Shirts load via the Worker route `/api/shirt/{code}`, because FPL's image host failed on the owner's phone.

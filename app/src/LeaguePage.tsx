@@ -11,7 +11,7 @@ import {
   type Score,
 } from "../../shared/results";
 import { computeStandings } from "../../shared/standings";
-import { Manager, Pts } from "./bits";
+import { Manager, Pts, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { StandingsTable } from "./StandingsTable";
 
@@ -27,13 +27,7 @@ export type LeagueView = (typeof LEAGUE_VIEWS)[number]["id"];
 export function LeaguePage({ data, myTeam, view }: { data: LeagueData; myTeam: number | null; view: LeagueView }) {
   return (
     <>
-      <nav className="chips" aria-label="League sections">
-        {LEAGUE_VIEWS.map((v) => (
-          <a key={v.id} href={`#/league/${v.id}`} className={v.id === view ? "chip-btn active" : "chip-btn"}>
-            {v.label}
-          </a>
-        ))}
-      </nav>
+      <SubNav page="league" views={LEAGUE_VIEWS} current={view} label="League sections" />
       {view === "table" && <TableView data={data} myTeam={myTeam} />}
       {view === "form" && <FormView data={data} myTeam={myTeam} />}
       {view === "luck" && <LuckView data={data} myTeam={myTeam} />}
