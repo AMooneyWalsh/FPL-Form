@@ -104,6 +104,16 @@ function TradeCard({ v, data, myTeam }: { v: TradeVerdict; data: LeagueData; myT
         <Side side={v.offerer} v={v} data={data} myTeam={myTeam} />
         <Side side={v.receiver} v={v} data={data} myTeam={myTeam} />
       </div>
+      {data.reversals
+        .filter((r) => r.tradeId === v.id)
+        .map((r) => (
+          <p key={r.undoneBy} className="hint undone">
+            {r.players.map((id) => data.players.get(id)?.name ?? "someone").join(" and ")} were swapped back{" "}
+            in the same gameweek (
+            {new Date(r.undoneAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+            ), so they're left out of this trade.
+          </p>
+        ))}
     </article>
   );
 }
