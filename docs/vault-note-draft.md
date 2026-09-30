@@ -29,6 +29,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: **Rebuild cleanly** rather than extending `index.html`. Reuse the data logic and ideas from the old version.
 - 2026-09-30: Stack is **Vite + React + TypeScript**, deployed on Cloudflare Pages with the Worker in the same repo.
 - 2026-09-30: Site is **public by link**, no logins. "My team" can be remembered per browser.
+- 2026-09-30: Use the **free Cloudflare Pages address** for now. Buy a domain later if the group uses it.
 
 ## Findings
 - draftfpl.live is a companion to the official FPL Draft game (live H2H scores, standings, stats, waiver tips, Discord bot, free plus Pro tier). It doesn't run drafts itself.
@@ -36,7 +37,6 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - FPL Draft API is unofficial. Reads look open, actions need a logged-in session.
 
 ## Open questions
-- Custom domain?
 - Nice-to-have ordering (Discord bot, waiver suggestions, draft recap).
 - Does the FPL Draft API allow browser or Worker requests reliably? Verify from a normal machine.
 
