@@ -315,3 +315,24 @@ function howAcquired(
   if (pick) return { how: "draft", draftPick: pick.index };
   return { how: "unknown" };
 }
+
+export interface Hop {
+  entryId: number;
+  event: number;
+}
+
+/** Managers who got this player in a trade but moved him on before he played
+ * a gameweek for them, so they never show up in the squads. */
+export function passedThrough(element: number, trades: Trade[], seasons: Seasons): Hop[] {
+  const hops: Hop[] = [];
+  for (const t of trades) {
+    if (t.state !== "p" || t.event > seasons.lastEvent) continue;
+    for (const item of t.tradeitem_set) {
+      const recipient = item.element_in === element ? t.offered_entry : item.element_out === element ? t.received_entry : null;
+      if (recipient !== null && seasons.ownerAt(element, t.event)?.entryId !== recipient) {
+        hops.push({ entryId: recipient, event: t.event });
+      }
+    }
+  }
+  return hops.sort((a, b) => a.event - b.event);
+}

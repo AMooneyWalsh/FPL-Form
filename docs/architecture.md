@@ -1,6 +1,6 @@
 # Architecture (draft for review)
 
-Status: agreed 2026-09-30. Step 1 built.
+Status: agreed 2026-09-30. Steps 1 and 2 built.
 
 ---
 
@@ -52,8 +52,8 @@ Each step ends with something you can open and use:
 
 | Step | You get |
 |---|---|
-| 1 | The site is live at a Cloudflare address, showing the league table. Proves the whole chain works. |
-| 2 | Trades and waivers: trade verdicts, trade ledger, waiver battles, player journeys. |
+| 1 | The site is live at a Cloudflare address, showing the league table. Proves the whole chain works. **Built, waiting on Cloudflare account.** |
+| 2 | Trades and waivers: trade verdicts, trade ledger, waiver battles, player journeys. **Built.** |
 | 3 | Draft: steals and busts, draft-only table, squad origins, hindsight redraft. |
 | 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). |
 | 5 | Live gameweek page. |
@@ -95,17 +95,19 @@ Once step 4 is done, the new site can replace the old one. Until then the old `i
 
 Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per isolate (the Cache API does nothing on `workers.dev`) and writes a last-good copy to KV (throttled to stay within KV free write limits).
 
-| Our route | Upstream | Cache (match live) | Cache (otherwise) |
-|---|---|---|---|
-| `/api/bootstrap` | `bootstrap-static` | 1 h | 6 h |
-| `/api/league` | `league/{LEAGUE_ID}/details` | 1 min | 30 min |
-| `/api/live/{gw}` | `event/{gw}/live` | 60 s | 1 h (6 h after GW finalised) |
-| `/api/picks/{gw}` | `entry/{entry_id}/event/{gw}` for all 14 entries, merged | 5 min | 6 h |
-| `/api/transactions` | `draft/league/{LEAGUE_ID}/transactions` | 2 min | 2 min |
-| `/api/trades` | `draft/league/{LEAGUE_ID}/trades` | 2 min | 2 min |
-| `/api/history/{gw}` | `event/{gw}/live` + all 14 entries' picks for a finished GW | stored in KV permanently once the GW is finalised | same |
-| `/api/draft` | `draft/{LEAGUE_ID}/choices` (to verify) | 24 h | 24 h |
-| `/api/status` | none | n/a | n/a |
+| Our route | Upstream | Cache |
+|---|---|---|
+| `/api/config` | none (Worker settings) | 5 min |
+| `/api/game` | `game` | 1 min |
+| `/api/league` | `league/{LEAGUE_ID}/details` | 2 min |
+| `/api/trades` | `draft/league/{LEAGUE_ID}/trades` | 2 min, all week |
+| `/api/transactions` | `draft/league/{LEAGUE_ID}/transactions` | 2 min, all week |
+| `/api/ownership` | `league/{LEAGUE_ID}/element-status` | 2 min |
+| `/api/draft` | `draft/{LEAGUE_ID}/choices` (trimmed to picks) | 6 h |
+| `/api/players` | `bootstrap-static` (trimmed from ~1 MB to the fields we use) | 1 h |
+| `/api/gw/{n}` | `event/{n}/live` + `entry/{id}/event/{n}` for all 14 managers, built into points + fielded XIs | finished GWs kept for good (memory + KV); current GW 2 min |
+
+Live-match-aware timings come with the live gameweek page (step 5).
 
 "Match live" = current event started and not `data_checked`, and a fixture kicked off in the last ~2.5 h. Worth checking: the exact live flags in `bootstrap-static.events` and `fixtures`.
 
@@ -124,6 +126,14 @@ Analysis needs "what did each player score for each owner, and were they startin
 - Ownership timeline: draft picks + transactions (`kind` `w` waiver / `f` free agent, `result` `a` accepted, `di`/`do` denied) + trades.
 
 Finished, finalised gameweeks never change, so each is fetched once and stored in KV for good (about 15 upstream calls per GW, once). Only the current GW is refetched. Checked in the 2025/26 data: public trades all have `state: "p"` (processed), so pending offers are not visible. Denied waiver claims are visible, which allows "waiver battles" (who else wanted a player).
+
+### How the analysis counts points (as built)
+
+- A player earns for a manager only in gameweeks that manager owned him and he was in the XI that counted (after auto-subs). Verified: rebuilding every H2H score from squads matches all 70 GW1-5 scores.
+- **Trade verdict:** each side's received players, from the trade's gameweek until they leave that manager. Pending until a gameweek has been played.
+- **Trade ledger:** gained = points from everyone traded in; given = points scored for new owners by players traded away, *excluding* players the manager had themselves got by trade. Without that, passing a player straight on counts against you twice (it took Daire from -143 to -45 after GW5).
+- **Waiver battles:** waiver claims (`kind` `w`) grouped by gameweek and player where 2+ managers claimed; one line per manager (their best claim).
+- **Journeys:** stints from squads, with how each started (draft pick by overall `index`, waiver, free agent, trade), plus "passed through" managers who held him only between gameweeks via trades.
 
 ### Live H2H scoring
 

@@ -202,3 +202,339 @@ table.standings {
     display: none;
   }
 }
+
+/* ---- layout for the analysis pages ---- */
+
+.masthead {
+  margin-bottom: 0;
+}
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  margin: 0 -16px 16px;
+  padding: 0 8px;
+  background: var(--brand);
+  overflow-x: auto;
+}
+
+.tabs a {
+  flex: 1;
+  text-align: center;
+  padding: 12px 10px;
+  color: var(--brand-text);
+  opacity: 0.7;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.tabs a.active {
+  opacity: 1;
+  border-bottom-color: var(--accent);
+}
+
+section {
+  margin-bottom: 28px;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+h3 {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 16px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.hint {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.toggle {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data th,
+.data td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.data tr:last-child td {
+  border-bottom: 0;
+}
+
+.data th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.data .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.data .left {
+  text-align: left;
+}
+
+.data tr.mine td {
+  background: var(--mine);
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.of {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pts-pos {
+  color: var(--win);
+}
+
+.pts-neg {
+  color: var(--loss);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.card-head .player {
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.verdict {
+  font-weight: 600;
+}
+
+.verdict.win {
+  color: var(--win);
+}
+
+.trade-sides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.side {
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+}
+
+.side.won {
+  background: var(--mine);
+}
+
+.side-head {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.side-head .mgr {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.mine-name {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+ul.plain,
+ol.journey {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 8px;
+  padding: 3px 0;
+}
+
+.side li .pts {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.note {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.side-total {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  text-align: right;
+  font-weight: 700;
+}
+
+.player-meta {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.battle-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.battle-pts {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.claims {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.claim {
+  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.claim.won {
+  background: var(--win);
+  color: #fff;
+  font-weight: 600;
+}
+
+.claim.is-mine {
+  outline: 2px solid var(--accent);
+}
+
+.claim-why {
+  font-size: 11px;
+}
+
+.search {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.results li {
+  border-bottom: 1px solid var(--line);
+}
+
+button.link {
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 10px 0;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.journey li {
+  display: grid;
+  grid-template-columns: minmax(70px, auto) 1fr auto;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.journey li.is-mine {
+  background: var(--mine);
+}
+
+.journey-who {
+  font-weight: 600;
+}
+
+.journey-when {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.journey-pts {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.footer-row {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.hops {
+  margin: 8px 0 0;
+}

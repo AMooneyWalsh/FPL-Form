@@ -5,7 +5,7 @@ import leagueJson from "../fixtures/league-634-details.json";
 import tradesJson from "../fixtures/trades.json";
 import transactionsJson from "../fixtures/transactions.json";
 import type { Gameweek } from "./gameweek";
-import { playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "./moves";
+import { passedThrough, playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "./moves";
 import type { DraftChoice, Trade, Transaction } from "./types";
 
 const gameweeks = gameweeksJson as unknown as Gameweek[];
@@ -101,6 +101,15 @@ function trade(id: number, event: number, offered: number, received: number, ite
     tradeitem_set: items.map(([element_in, element_out]) => ({ element_in, element_out })),
   };
 }
+
+describe("players passed straight through", () => {
+  it("spots Daire having Saka for a moment in GW2 without him ever playing for Daire", () => {
+    const SAKA = 12;
+    const stints = playerJourney(SAKA, seasons, { transactions, trades, draft });
+    expect(stints.map((s) => s.entryId)).toEqual([174816]);
+    expect(passedThrough(SAKA, trades, seasons)).toEqual([{ entryId: 1679, event: 2 }]);
+  });
+});
 
 describe("points rules", () => {
   // Manager 1 owns player 10 in GW1-2, benches him in GW2, then loses him.
