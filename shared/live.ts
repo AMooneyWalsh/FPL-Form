@@ -287,8 +287,11 @@ export function liveSquad(
   info: Map<number, PlayerInfo>,
   rules: SquadRules,
 ): LiveSquad | null {
-  const raw = gw.picks[entryId];
-  if (!raw) return null;
+  const listed = gw.picks[entryId];
+  if (!listed) return null;
+  const officialSubs = listed.subs.length > 0;
+  // Show the lineup as the manager set it; the subs are applied below.
+  const raw = officialSubs ? { ...lineupAsPicked(listed, info, rules), subs: listed.subs } : listed;
   const bonus = provisionalBonus(gw);
   const players: LivePlayer[] = [...raw.picks]
     .sort((a, b) => a.position - b.position)
@@ -319,7 +322,6 @@ export function liveSquad(
       };
     });
 
-  const officialSubs = raw.subs.length > 0;
   const swap = (outEl: number, inEl: number) => {
     const out = players.find((p) => p.element === outEl);
     const inn = players.find((p) => p.element === inEl);
@@ -347,6 +349,28 @@ export function liveSquad(
     benchPoints: players.filter((p) => !p.counts).reduce((sum, p) => sum + p.points, 0),
     officialSubs,
   };
+}
+
+/**
+ * After a gameweek is processed FPL writes its auto-subs into the lineup
+ * (each sub swaps slots with the starter he replaced) and re-sorts the XI by
+ * position. This puts the lineup back the way the manager set it, with no
+ * subs listed. The order within a position is FPL's, the best we can know.
+ */
+export function lineupAsPicked(p: LivePicks, info: Map<number, PlayerInfo>, rules: SquadRules): LivePicks {
+  const slot = new Map(p.picks.map((x) => [x.element, x.position]));
+  for (const s of [...p.subs].reverse()) {
+    const a = slot.get(s.element_in);
+    const b = slot.get(s.element_out);
+    if (a === undefined || b === undefined) continue;
+    slot.set(s.element_in, b);
+    slot.set(s.element_out, a);
+  }
+  const order = { GKP: 0, DEF: 1, MID: 2, FWD: 3 };
+  const pos = (el: number) => order[info.get(el)?.position ?? "MID"];
+  const xi = [...slot.entries()].filter(([, n]) => n <= rules.play).sort((a, b) => pos(a[0]) - pos(b[0]) || a[1] - b[1]);
+  xi.forEach(([el], i) => slot.set(el, i + 1));
+  return { picks: p.picks.map((x) => ({ element: x.element, position: slot.get(x.element)! })), subs: [] };
 }
 
 /**
