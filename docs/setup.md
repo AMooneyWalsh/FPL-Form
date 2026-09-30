@@ -23,7 +23,7 @@ From then on, every change merged into `main` goes live on its own.
 - In the Claude cloud sandbox, `wrangler dev` can't reach FPL (workerd bypasses the sandbox proxy, gets 403). Test the Worker with the mocked unit tests and the UI against `fixtures/` instead.
 - Refresh fixtures with curl from `https://draft.premierleague.com/api/...` (works through the sandbox proxy).
 - Settings: `LEAGUE_ID` and `DEFAULT_ENTRY_ID` in `wrangler.jsonc`. Change `LEAGUE_ID` each August.
-- Optional KV "last good" store: create a KV namespace called `LAST_GOOD` and add it to `wrangler.jsonc` under `kv_namespaces`. Without it the site still works, it just can't show saved data in a brand new Worker instance while FPL is down.
+- Optional KV "last good" store: create a KV namespace (Cloudflare dashboard, Storage & Databases, KV) and add it to `wrangler.jsonc` as `"kv_namespaces": [{ "binding": "LAST_GOOD", "id": "<namespace id>" }]`. Don't rely on Wrangler's auto-provisioning (no id): it failed the Workers Builds preview build on PR #2. Without it the site still works, it just can't show saved data in a brand new Worker instance while FPL is down.
 
 ## Layout
 

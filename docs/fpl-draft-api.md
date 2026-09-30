@@ -35,9 +35,11 @@ The API is unofficial and undocumented, so it can change without notice. Base UR
 
 ## Shapes worth knowing (from the GW5 fixtures)
 
-- `trades[]`: `offered_entry`, `received_entry` (entry_ids), `event`, `state` (`p` processed; only processed trades appear), `tradeitem_set[]` of `{element_in, element_out}` from the offering side's view.
-- `transactions[]`: `entry`, `event`, `kind` (`w` waiver, `f` free agent), `result` (`a` accepted, `di` and `do` denied), `element_in`, `element_out`, `priority`, `added`. 388 rows by GW5, so waiver battles have plenty of data.
-- `choices[]`: 210 picks (14 managers x 15 rounds, snake order).
+- `trades[]`: `offered_entry`, `received_entry` (entry_ids), `event`, `state` (`p` processed; only processed trades appear), `tradeitem_set[]` of `{element_in, element_out}`: the offering manager receives `element_in`, the receiving manager gets `element_out`. Managers sometimes pass a traded player straight on in another trade the same GW, so squads, not trades, are the truth for who owned whom.
+- `transactions[]`: `entry`, `event` (the GW the move applies to), `kind` (`w` waiver, `f` free agent), `result` (`a` accepted, `di` lost to a higher claim, `do` the player being dropped had already gone in an earlier accepted claim; both checked against all 232 denials by GW5), `element_in`, `element_out`, `priority`, `added`. 388 rows by GW5, so waiver battles have plenty of data.
+- `choices[]`: 210 picks (14 managers x 15 rounds, snake order). **`index` is the overall pick (1 to 210); `pick` is the pick within the round (1 to 14).** Easy to mix up.
 - `entry/{id}/event/{gw}`: `picks[]` with `position` 1 to 15 (12 to 15 is the bench) plus `subs[]` (auto-subs FPL applied) and `entry_history`.
 - `event/{gw}/live`: `elements` keyed by player id with `stats` (incl. `total_points`, `minutes`, `bps`, `bonus`) and `explain`, plus `fixtures`.
 - `game.trades_time_for_approval: true` means trades go through an approval window before processing.
+- Working out every H2H score from squads (starting XI after `subs`, summing `event/{gw}/live` `total_points`) reproduces all 70 GW1-5 scores exactly. No captains in Draft.
+- `bootstrap-static.elements[].draft_rank` is FPL's pre-season draft ranking, useful for draft analysis.

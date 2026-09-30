@@ -13,5 +13,8 @@
     "LEAGUE_ID": "634",
     "DEFAULT_ENTRY_ID": "1412"
   },
+  // KV (binding LAST_GOOD) is optional and not set up yet: auto-provisioning
+  // broke the Workers Builds preview build. Add it back with an explicit
+  // namespace id once one exists. See docs/setup.md.
   "observability": { "enabled": true }
 }

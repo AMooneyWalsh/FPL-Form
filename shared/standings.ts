@@ -27,6 +27,25 @@ export function managerName(e: LeagueEntry): string {
   return `${e.player_first_name} ${e.player_last_name}`;
 }
 
+/** Short names for tight spaces: first name, plus surname initial when two
+ * managers share a first name. Keyed by entry_id. */
+export function managerLabels(entries: LeagueEntry[]): Map<number, string> {
+  const first = (e: LeagueEntry) => capitalise(e.player_first_name.trim());
+  const counts = new Map<string, number>();
+  for (const e of entries) counts.set(first(e).toLowerCase(), (counts.get(first(e).toLowerCase()) ?? 0) + 1);
+  return new Map(
+    entries.map((e) => {
+      const f = first(e);
+      const clash = (counts.get(f.toLowerCase()) ?? 0) > 1;
+      return [e.entry_id, clash ? `${f} ${e.player_last_name.trim().charAt(0).toUpperCase()}` : f];
+    }),
+  );
+}
+
+function capitalise(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 /**
  * Builds the H2H table from finished matches. We work this out ourselves
  * because the API's `matches_played` and `winning_league_entry` are wrong.

@@ -39,6 +39,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 
 ## Findings
+- Daire has made 18 of the league's 21 trades by GW6, often passing players straight on. The trade ledger was changed so that isn't double counted.
 - draftfpl.live is a companion to the official FPL Draft game (live H2H scores, standings, stats, waiver tips, Discord bot, free plus Pro tier). It doesn't run drafts itself.
 - Existing repo is already a read-only companion for league 6573 "Drafty In Here" (12 managers, H2H, waivers, trades): one `index.html` plus a hand-refreshed `data.json`.
 - FPL Draft API is unofficial. Reads are open (verified 2026-09-30, no login), actions need a logged-in session.
@@ -59,4 +60,5 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Save real API responses (network access to draft.premierleague.com allowed in the cloud environment, all endpoints verified)
 - [x] Step 1 built: league table from live FPL data, my-team highlight, fallback when FPL is down, automatic checks
 - [ ] Adam: create Cloudflare account and connect the repo (docs/setup.md)
-- [ ] Step 2: trades and waivers
+- [x] Step 2 built: trade verdicts, trade ledger, waiver record and battles, player journeys (Trades is the landing page)
+- [ ] Step 3: draft analysis
