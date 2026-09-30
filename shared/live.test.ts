@@ -10,6 +10,7 @@ import {
   leagueOwners,
   liveMatches,
   liveSquad,
+  lineupAsPicked,
   liveTable,
   provisionalBonus,
   toLiveGameweek,
@@ -86,21 +87,7 @@ describe("live scoring on GW5 (finished)", () => {
     // After a gameweek is processed FPL writes the subs into the lineup (the
     // sub moves into the XI slot) and also lists them. Put each lineup back
     // the way it was before the subs, with none listed, as it looks live.
-    const beforeSubs = (p: LivePicks): LivePicks => {
-      const slot = new Map(p.picks.map((x) => [x.element, x.position]));
-      for (const s of p.subs) {
-        const a = slot.get(s.element_in)!;
-        slot.set(s.element_in, slot.get(s.element_out)!);
-        slot.set(s.element_out, a);
-      }
-      // FPL keeps the XI in position order (GKP, DEF, MID, FWD), so re-sort it.
-      const order = { GKP: 0, DEF: 1, MID: 2, FWD: 3 };
-      const xi = [...slot.entries()]
-        .filter(([, pos]) => pos <= rules.play)
-        .sort((a, b) => order[info.get(a[0])!.position] - order[info.get(b[0])!.position] || a[1] - b[1]);
-      xi.forEach(([el], i) => slot.set(el, i + 1));
-      return { picks: p.picks.map((x) => ({ element: x.element, position: slot.get(x.element)! })), subs: [] };
-    };
+    const beforeSubs = (p: LivePicks): LivePicks => lineupAsPicked(p, info, rules);
     const noSubs = toLiveGameweek(
       5,
       raw,
@@ -266,5 +253,23 @@ describe("league-wide views (GW5)", () => {
   it("shows nothing for matches that haven't started", () => {
     const notStarted = { ...gw, fixtures: gw.fixtures.map((f) => ({ ...f, started: false })) };
     expect(bonusTable(notStarted).every((t) => t.rows.length === 0)).toBe(true);
+  });
+});
+
+describe("lineups as the manager set them", () => {
+  it("puts subbed-off starters back in the XI and subs back on the bench", () => {
+    for (const [entryId, p] of Object.entries(picks)) {
+      if (p.subs.length === 0) continue;
+      const squad = liveSquad(Number(entryId), gw, info, rules)!;
+      for (const s of p.subs) {
+        const out = squad.players.find((x) => x.element === s.element_out)!;
+        const inn = squad.players.find((x) => x.element === s.element_in)!;
+        expect(out.slot).toBeLessThanOrEqual(rules.play);
+        expect(inn.slot).toBeGreaterThan(rules.play);
+        expect(out.subFor).toBe(inn.element);
+        expect(inn.counts && !out.counts).toBe(true);
+      }
+      expect(squad.players.filter((x) => x.counts)).toHaveLength(rules.play);
+    }
   });
 });

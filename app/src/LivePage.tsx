@@ -277,18 +277,18 @@ function Dots({ squad }: { squad: LiveSquad }) {
 
 // ---------------------------------------------------------------- lineups
 
-const POSITION_ORDER = { GKP: 0, DEF: 1, MID: 2, FWD: 3 } as const;
-
-const byPosition = (a: LivePlayer, b: LivePlayer) => POSITION_ORDER[a.position] - POSITION_ORDER[b.position] || a.slot - b.slot;
 
 /**
  * Both lineups side by side as one table: row n holds each side's nth player,
  * so the two rows always line up even when one player has more to show.
  */
 function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: Ctx }) {
+  // In the order the manager set them: auto-subs are shown as notes, not moves.
+  const play = ctx.data.rules.play;
+  const bySlot = (a: LivePlayer, b: LivePlayer) => a.slot - b.slot;
   const split = (s: LiveSquad) => ({
-    xi: s.players.filter((p) => p.counts).sort(byPosition),
-    bench: s.players.filter((p) => !p.counts).sort((a, b) => a.slot - b.slot),
+    xi: s.players.filter((p) => p.slot <= play).sort(bySlot),
+    bench: s.players.filter((p) => p.slot > play).sort(bySlot),
   });
   const h = split(home);
   const a = split(away);
@@ -389,23 +389,27 @@ function PlayerRow({ p, squad, bench, ctx }: { p: LivePlayer; squad: LiveSquad; 
   const [open, setOpen] = useState(false);
   const player = ctx.data.players.get(p.element);
   const parts = statParts(p);
-  const other = p.subFor ? ctx.data.players.get(p.subFor)?.name : undefined;
-  const projected = ctx.phase !== "done" && !squad.officialSubs;
-  // A starter whose games are over without playing, and nobody could come on for him.
-  const blank = !bench && (p.status === "did-not-play" || p.status === "no-game");
+  const other = (p.subFor ? ctx.data.players.get(p.subFor)?.name : undefined) ?? "a starter";
+  // Until FPL confirms the subs they are our projection of what will happen.
+  const pending = ctx.phase !== "done" && !squad.officialSubs;
+  const blank = !bench && p.counts && (p.status === "did-not-play" || p.status === "no-game");
   const note = p.subbedIn
-    ? { cls: "in", text: `${projected ? "Coming on" : "On"} for ${other ?? "a starter"}` }
+    ? { cls: "in", text: pending ? `Will come on for ${other}` : `Came on for ${other}` }
     : p.subbedOut
-      ? { cls: "out", text: `${projected ? "Coming off" : "Off"}, didn't play` }
+      ? { cls: "out", text: pending ? `Didn't play, ${other} will come on` : `0 mins, replaced by ${other}` }
       : blank
-        ? { cls: "out", text: "Didn't play, no sub could come on" }
+        ? { cls: "out", text: ctx.phase === "done" ? "Didn't play, no sub could come on" : "Didn't play, no sub available yet" }
         : null;
+  const benchNo = bench ? (p.position === "GKP" ? "GK" : String(p.slot - ctx.data.rules.play - 1)) : null;
   return (
-    <div className={`lv-row ${bench ? "benched" : ""} ${p.status}`} role="cell">
+    <div className={`lv-row ${!p.counts ? (bench ? "benched" : "off") : ""} ${p.status}`} role="cell">
       <button className="lv-row-main" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
         <span className="lv-row-body">
-          <span className="lv-row-name">{player?.name ?? `Player ${p.element}`}</span>
+          <span className="lv-row-name">
+            {benchNo && <span className="lv-bench-no">{benchNo}</span>}
+            {player?.name ?? `Player ${p.element}`}
+          </span>
           {note && <span className={`lv-note ${note.cls}`}>{note.text}</span>}
           {parts.length > 0 && <span className="lv-row-stats">{parts.join(", ")}</span>}
           {fixtureLines(p.teamId, ctx).map((line) => (

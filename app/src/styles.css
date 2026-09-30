@@ -1264,9 +1264,23 @@ button.small-link {
   min-width: 0;
 }
 
-/* Everyone on the bench is greyed the same: none of them count. */
-.lv-row.benched .lv-row-main {
+/* Greyed: bench players who don't count, and starters who were subbed off. */
+.lv-row.benched .lv-row-main,
+.lv-row.off .lv-row-main {
   opacity: 0.55;
+}
+
+.lv-row.off .lv-row-name {
+  text-decoration: line-through;
+}
+
+.lv-bench-no {
+  display: inline-block;
+  min-width: 18px;
+  margin-right: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 .lv-row-main {
