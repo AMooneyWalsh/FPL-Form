@@ -40,7 +40,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Some API fields are unreliable (`matches_played`, `winning_league_entry`), so the site calculates results itself.
 
 ## Open questions
-- What is the group's 2026/27 league ID? Is the group playing this season?
+- What is the group's 2026/27 league ID? Adam's 2026/27 entry ID is 1412; the league ID should be in `league_set` at `api/entry/1412/public`.
 
 ## Progress
 - [x] Repo set up, CLAUDE.md, docs
