@@ -1,6 +1,6 @@
 # Architecture (draft for review)
 
-Status: agreed 2026-09-30. Steps 1 and 2 built.
+Status: agreed 2026-09-30. Steps 1-3 built.
 
 ---
 
@@ -54,7 +54,7 @@ Each step ends with something you can open and use:
 |---|---|
 | 1 | The site is live at a Cloudflare address, showing the league table. Proves the whole chain works. **Built, waiting on Cloudflare account.** |
 | 2 | Trades and waivers: trade verdicts, trade ledger, waiver battles, player journeys. **Built.** |
-| 3 | Draft: steals and busts, draft-only table, squad origins, hindsight redraft. |
+| 3 | Draft: steals and busts, draft-only table, squad origins, hindsight redraft. **Built** (see `docs/draft-analysis.md`). |
 | 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). |
 | 5 | Live gameweek page. |
 | 6 | Waiver suggestions. |
@@ -104,7 +104,7 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per
 | `/api/transactions` | `draft/league/{LEAGUE_ID}/transactions` | 2 min, all week |
 | `/api/ownership` | `league/{LEAGUE_ID}/element-status` | 2 min |
 | `/api/draft` | `draft/{LEAGUE_ID}/choices` (trimmed to picks) | 6 h |
-| `/api/players` | `bootstrap-static` (trimmed from ~1 MB to the fields we use) | 1 h |
+| `/api/players` | `bootstrap-static` trimmed to `{ players, rules }` (fields we use + squad rules) | 1 h |
 | `/api/gw/{n}` | `event/{n}/live` + `entry/{id}/event/{n}` for all 14 managers, built into points + fielded XIs | finished GWs kept for good (memory + KV); current GW 2 min |
 
 Live-match-aware timings come with the live gameweek page (step 5).

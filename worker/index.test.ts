@@ -182,8 +182,17 @@ describe("trimPlayers", () => {
     const raw = JSON.stringify(bootstrap);
     const trimmed = trimPlayers(raw);
     expect(trimmed.length).toBeLessThan(raw.length / 5);
-    const players = JSON.parse(trimmed) as { id: number; name: string; team: string; position: string }[];
+    const { players, rules } = JSON.parse(trimmed) as {
+      players: { id: number; name: string; team: string; position: string }[];
+      rules: unknown;
+    };
     expect(players.length).toBe(bootstrap.elements.length);
     expect(players.find((p) => p.name === "Saka")).toMatchObject({ team: "ARS", position: "MID" });
+    expect(rules).toEqual({
+      play: 11,
+      select: { GKP: 2, DEF: 5, MID: 5, FWD: 3 },
+      minPlay: { GKP: 1, DEF: 3, MID: 2, FWD: 1 },
+      maxPlay: { GKP: 1, DEF: 5, MID: 5, FWD: 3 },
+    });
   });
 });

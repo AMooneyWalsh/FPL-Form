@@ -9,6 +9,8 @@ import type {
   LeagueDetails,
   LeagueEntry,
   Player,
+  PlayersPayload,
+  SquadRules,
   SiteConfig,
   Trade,
   Transaction,
@@ -21,6 +23,8 @@ export interface LeagueData {
   league: LeagueDetails;
   game: GameStatus;
   players: Map<number, Player>;
+  playerList: Player[];
+  rules: SquadRules;
   /** Processed trades, with same-gameweek swap-backs cancelled out. */
   trades: Trade[];
   reversals: Reversal[];
@@ -40,7 +44,7 @@ export function useLeagueData(): Loadable<LeagueData> {
   const config = useApi<SiteConfig>("/api/config", 3600);
   const league = useApi<Envelope<LeagueDetails>>("/api/league", REFRESH);
   const game = useApi<Envelope<GameStatus>>("/api/game", REFRESH);
-  const players = useApi<Envelope<Player[]>>("/api/players", 3600);
+  const players = useApi<Envelope<PlayersPayload>>("/api/players", 3600);
   const trades = useApi<Envelope<{ trades: Trade[] }>>("/api/trades", REFRESH);
   const transactions = useApi<Envelope<{ transactions: Transaction[] }>>("/api/transactions", REFRESH);
   const draft = useApi<Envelope<{ choices: DraftChoice[] }>>("/api/draft", 3600);
@@ -71,7 +75,9 @@ export function useLeagueData(): Loadable<LeagueData> {
         config: config.value,
         league: league.value.data,
         game: game.value.data,
-        players: new Map(players.value.data.map((p) => [p.id, p])),
+        players: new Map(players.value.data.players.map((p) => [p.id, p])),
+        playerList: players.value.data.players,
+        rules: players.value.data.rules,
         trades: effective.trades,
         reversals: effective.reversals,
         transactions: transactions.value.data.transactions,

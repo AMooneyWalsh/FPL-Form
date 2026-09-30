@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { computeStandings } from "../../shared/standings";
 import { useLeagueData, type LeagueData } from "./data";
+import { DraftPage } from "./DraftPage";
 import { timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
 import { PlayersPage } from "./PlayersPage";
@@ -11,6 +12,7 @@ import { WaiversPage } from "./WaiversPage";
 const PAGES = [
   { id: "trades", label: "Trades" },
   { id: "waivers", label: "Waivers" },
+  { id: "draft", label: "Draft" },
   { id: "players", label: "Players" },
   { id: "table", label: "Table" },
 ] as const;
@@ -68,6 +70,7 @@ export function App() {
             )}
             {page === "trades" && <TradesPage data={ready} myTeam={myTeam} />}
             {page === "waivers" && <WaiversPage data={ready} myTeam={myTeam} />}
+            {page === "draft" && <DraftPage data={ready} myTeam={myTeam} />}
             {page === "players" && <PlayersPage data={ready} myTeam={myTeam} />}
             {page === "table" && <TablePage data={ready} myTeam={myTeam} />}
             <footer className="footer-row">

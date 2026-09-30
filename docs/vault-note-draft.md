@@ -41,6 +41,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 
 ## Findings
+- After GW5: best draft steal Groß (pick 142, Daire), worst bust Watkins (pick 11, Jack). If nobody had made a move, Daire would top the table; Adam has kept 13 of 15 picks and is top for real.
 - Daire has made 18 of the league's 21 trades by GW6, often passing players straight on. The trade ledger was changed so that isn't double counted.
 - draftfpl.live is a companion to the official FPL Draft game (live H2H scores, standings, stats, waiver tips, Discord bot, free plus Pro tier). It doesn't run drafts itself.
 - Existing repo is already a read-only companion for league 6573 "Drafty In Here" (12 managers, H2H, waivers, trades): one `index.html` plus a hand-refreshed `data.json`.
@@ -66,4 +67,5 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Step 2 live and checked against real data (2026-09-30)
 - [ ] Optional: switch off Cloudflare's non-production branch builds (they fail instantly and aren't needed)
 - [ ] Optional: set up KV storage so finished gameweeks survive restarts (needs a namespace id)
-- [ ] Step 3: draft analysis
+- [x] Step 3 built: Draft tab with draft grades, steals and busts, draft-only table (best XI each week), where the points come from, hindsight redraft
+- [ ] Step 4: rest of the old site's stats (form, luck, charts, streaks, records, H2H)
