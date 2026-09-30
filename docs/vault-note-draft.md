@@ -35,13 +35,16 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 ## Findings
 - draftfpl.live is a companion to the official FPL Draft game (live H2H scores, standings, stats, waiver tips, Discord bot, free plus Pro tier). It doesn't run drafts itself.
 - Existing repo is already a read-only companion for league 6573 "Drafty In Here" (12 managers, H2H, waivers, trades): one `index.html` plus a hand-refreshed `data.json`.
-- FPL Draft API is unofficial. Reads look open, actions need a logged-in session.
+- FPL Draft API is unofficial. Reads are open (verified 2026-09-30, no login), actions need a logged-in session.
+- League IDs get reused each season: 6573 is now someone else's league. The league ID has to be a setting, updated each season.
+- Some API fields are unreliable (`matches_played`, `winning_league_entry`), so the site calculates results itself.
 
 ## Open questions
-- Does the FPL Draft API allow browser or Worker requests reliably? Verify from a normal machine.
+- What is the group's 2026/27 league ID? Is the group playing this season?
 
 ## Progress
 - [x] Repo set up, CLAUDE.md, docs
 - [x] Scope interview, round 1 (type, scale, must-haves, hosting, budget)
 - [x] Stack decision
-- [ ] Verify FPL Draft API endpoints
+- [x] Verify FPL Draft API reads work without login
+- [ ] Get the 2026/27 league ID
