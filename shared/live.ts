@@ -248,6 +248,8 @@ export interface LivePlayer {
   counts: boolean;
   subbedIn: boolean;
   subbedOut: boolean;
+  /** The player he was auto-subbed for (either direction). */
+  subFor?: number;
 }
 
 export interface LiveSquad {
@@ -326,6 +328,8 @@ export function liveSquad(
     out.subbedOut = true;
     inn.counts = true;
     inn.subbedIn = true;
+    out.subFor = inEl;
+    inn.subFor = outEl;
   };
   if (officialSubs) {
     for (const s of raw.subs) swap(s.element_out, s.element_in);
