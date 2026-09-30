@@ -1,6 +1,6 @@
 # Architecture (draft for review)
 
-Status: agreed 2026-09-30. Steps 1-3 built.
+Status: agreed 2026-09-30. Steps 1-4 built.
 
 ---
 
@@ -55,7 +55,7 @@ Each step ends with something you can open and use:
 | 1 | The site is live at a Cloudflare address, showing the league table. Proves the whole chain works. **Built, waiting on Cloudflare account.** |
 | 2 | Trades and waivers: trade verdicts, trade ledger, waiver battles, player journeys. **Built.** |
 | 3 | Draft: steals and busts, draft-only table, squad origins, hindsight redraft. **Built** (see `docs/draft-analysis.md`). |
-| 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). |
+| 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). **Built** as the League tab (`shared/results.ts`). |
 | 5 | Live gameweek page. |
 | 6 | Waiver suggestions. |
 
