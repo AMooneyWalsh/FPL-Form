@@ -34,6 +34,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: Adam isn't technical and relies on Claude for all of the build and upkeep. Site must run and recover by itself; Adam's jobs are clicks only.
 - 2026-09-30: **Claude publishes changes without Adam's review** once automatic tests pass, then tells Adam what changed.
 - 2026-09-30: **Focus on the differentiators vs draftfpl.live: trade analysis and draft analysis.** New build order: skeleton, trades/waivers, draft analysis, table/stats, live gameweek, waiver suggestions.
+- 2026-09-30: Analysis features, all eight chosen: trade verdicts, manager trade ledger, waiver battles, player journeys; steals and busts, draft-only table, squad origins, hindsight redraft.
 - 2026-09-30: Trades and waivers refresh every ~2 minutes, all week. Finished gameweeks are stored once and kept.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 
@@ -46,7 +47,6 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 
 ## Open questions
 - Is the old site live somewhere friends use (GitHub Pages)? Unanswered; old files stay put until the new site replaces them, so it's safe either way.
-- Which trade and draft analyses matter most?
 
 ## Progress
 - [x] Repo set up, CLAUDE.md, docs
@@ -55,4 +55,6 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Verify FPL Draft API reads work without login
 - [x] Get the 2026/27 league ID (634)
 - [x] Confirm league 634 details: "Drafty In Here", 14 managers, H2H, waivers, trades on, 30s draft on 16 Aug
-- [x] Architecture doc drafted (`docs/architecture.md`), waiting on review
+- [x] Architecture doc agreed (`docs/architecture.md`)
+- [ ] Save real API responses for trades, transactions, draft picks, squads, live points
+- [ ] Step 1: skeleton site live on Cloudflare

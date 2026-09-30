@@ -53,17 +53,27 @@ Each step ends with something you can open and use:
 | Step | You get |
 |---|---|
 | 1 | The site is live at a Cloudflare address, showing the league table. Proves the whole chain works. |
-| 2 | Trades and waivers analysis. |
-| 3 | Draft analysis. |
+| 2 | Trades and waivers: trade verdicts, trade ledger, waiver battles, player journeys. |
+| 3 | Draft: steals and busts, draft-only table, squad origins, hindsight redraft. |
 | 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). |
 | 5 | Live gameweek page. |
 | 6 | Waiver suggestions. |
 
 Once step 4 is done, the new site can replace the old one. Until then the old `index.html` and `data.json` stay exactly where they are, so if friends use a link to it, it keeps working.
 
-### Questions for you
+### Analysis features (all chosen by the owner, 2026-09-30)
 
-1. Which trade and draft analyses matter most (being asked in chat).
+**Trades and waivers**
+- **Trade verdicts:** who won each trade, from the points each side's players have scored for their new owner since (starters only).
+- **Manager trade ledger:** each manager's net points from trading, and who they trade with most.
+- **Waiver battles:** everyone who claimed the same player, who got them, and how it's worked out.
+- **Player journeys:** every owner a player has had this season and what he scored for each.
+
+**Draft**
+- **Steals and busts:** every pick's points since the draft against where it was taken, plus a draft grade for each manager.
+- **Draft-only table:** the league table if nobody had made a waiver or trade since the draft.
+- **Squad origins:** how much of each squad, and its points, came from the draft, waivers or trades.
+- **Hindsight redraft:** the draft done again with what we know now.
 
 ---
 
