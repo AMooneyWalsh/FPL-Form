@@ -2,10 +2,13 @@
 // fetches from the FPL Draft API, caches it, and falls back to the last good
 // copy when FPL is down. See docs/architecture.md.
 
+import { buildGameweek, type RawLive, type RawPicks } from "../shared/gameweek";
+import type { GameStatus, LeagueDetails, Player } from "../shared/types";
+
 export interface Env {
   LEAGUE_ID: string;
   DEFAULT_ENTRY_ID: string;
-  /** Optional: long-lived "last good" copies. The site works without it. */
+  /** Optional: long-lived copies. The site works without it. */
   LAST_GOOD?: KVNamespace;
   ASSETS: Fetcher;
 }
@@ -18,11 +21,15 @@ const KV_WRITE_INTERVAL_MS = 30 * 60_000;
 
 const MINUTE = 60;
 const HOUR = 60 * MINUTE;
+/** Gameweeks that are over never change, so keep them for good. */
+const FOREVER = Number.POSITIVE_INFINITY;
 
 interface Route {
   upstream: (env: Env) => string;
   /** Seconds a fresh copy is reused before asking FPL again. */
   ttl: number;
+  /** Optional reshaping, e.g. to trim a huge response down. */
+  transform?: (raw: string) => string;
 }
 
 // Trades and waivers happen all week, so those stay on a short timer
@@ -33,17 +40,19 @@ export const ROUTES: Record<string, Route> = {
   trades: { upstream: (env) => `draft/league/${env.LEAGUE_ID}/trades`, ttl: 2 * MINUTE },
   transactions: { upstream: (env) => `draft/league/${env.LEAGUE_ID}/transactions`, ttl: 2 * MINUTE },
   ownership: { upstream: (env) => `league/${env.LEAGUE_ID}/element-status`, ttl: 2 * MINUTE },
-  draft: { upstream: (env) => `draft/${env.LEAGUE_ID}/choices`, ttl: 6 * HOUR },
-  bootstrap: { upstream: () => "bootstrap-static", ttl: HOUR },
+  draft: { upstream: (env) => `draft/${env.LEAGUE_ID}/choices`, ttl: 6 * HOUR, transform: trimDraft },
+  players: { upstream: () => "bootstrap-static", ttl: HOUR, transform: trimPlayers },
 };
 
 interface Cached {
   body: string;
   fetchedAt: number;
+  /** A finished gameweek: never needs fetching again. */
+  final?: boolean;
 }
 
-// Per-isolate memory cache. With a small group this is plenty; KV covers the
-// "FPL is down and this isolate is new" case.
+// Per-isolate memory cache (the Cache API does nothing on workers.dev).
+// KV covers "FPL is down and this isolate is new", and finished gameweeks.
 const memory = new Map<string, Cached>();
 const lastKvWrite = new Map<string, number>();
 
@@ -65,37 +74,102 @@ export default {
     if (name === "config") {
       return json({ leagueId: Number(env.LEAGUE_ID), defaultEntryId: Number(env.DEFAULT_ENTRY_ID) }, 200, 300);
     }
+    const gwMatch = /^gw\/(\d{1,2})$/.exec(name);
+    if (gwMatch) {
+      return serveGameweek(Number(gwMatch[1]), env, ctx);
+    }
     const route = ROUTES[name];
     if (!route) {
       return json({ error: "Not found" }, 404);
     }
-    return serve(name, route, env, ctx);
+    return respond(() =>
+      cached(`${env.LEAGUE_ID}:${name}`, route.ttl, env, ctx, async () => {
+        const raw = await fetchUpstream(route.upstream(env));
+        return route.transform ? route.transform(raw) : raw;
+      }),
+    );
   },
 } satisfies ExportedHandler<Env>;
 
-async function serve(name: string, route: Route, env: Env, ctx: ExecutionContext): Promise<Response> {
-  const key = `${env.LEAGUE_ID}:${name}`;
+/**
+ * Every player's points and every manager's squad for one gameweek. Past
+ * gameweeks are stored for good; the current one refreshes every 2 minutes.
+ */
+async function serveGameweek(event: number, env: Env, ctx: ExecutionContext): Promise<Response> {
+  const key = `${env.LEAGUE_ID}:gw:${event}`;
+  const final = await readFinal(key, env);
+  if (final) return envelope(final, false, HOUR);
+
+  return respond(async () => {
+    const game = JSON.parse(
+      (await cached(`${env.LEAGUE_ID}:game`, ROUTES.game.ttl, env, ctx, () => fetchUpstream("game"))).value.body,
+    ) as GameStatus;
+    if (event < 1 || event > game.current_event) {
+      throw new NotFound("That gameweek hasn't started yet.");
+    }
+    const isOver = event < game.current_event;
+    return cached(key, isOver ? FOREVER : 2 * MINUTE, env, ctx, async () => {
+      const league = JSON.parse(
+        (await cached(`${env.LEAGUE_ID}:league`, ROUTES.league.ttl, env, ctx, () => fetchUpstream(ROUTES.league.upstream(env)))).value.body,
+      ) as LeagueDetails;
+      const [live, ...picks] = await Promise.all([
+        fetchUpstream(`event/${event}/live`),
+        ...league.league_entries.map((e) => fetchUpstream(`entry/${e.entry_id}/event/${event}`)),
+      ]);
+      const byEntry: Record<number, RawPicks> = {};
+      league.league_entries.forEach((e, i) => (byEntry[e.entry_id] = JSON.parse(picks[i]) as RawPicks));
+      return JSON.stringify(buildGameweek(event, JSON.parse(live) as RawLive, byEntry));
+    }, isOver);
+  });
+}
+
+class NotFound extends Error {}
+
+interface Result {
+  value: Cached;
+  stale: boolean;
+  ttl: number;
+}
+
+/**
+ * Returns a fresh-enough copy, fetching with `load` when needed. If FPL fails,
+ * falls back to the last copy we have (memory, then KV) marked stale.
+ */
+async function cached(
+  key: string,
+  ttl: number,
+  env: Env,
+  ctx: ExecutionContext,
+  load: () => Promise<string>,
+  permanent = false,
+): Promise<Result> {
   const now = Date.now();
   const hit = memory.get(key);
-  if (hit && now - hit.fetchedAt < route.ttl * 1000) {
-    return envelope(hit, false, route.ttl);
+  if (hit && now - hit.fetchedAt < ttl * 1000) {
+    return { value: hit, stale: false, ttl };
   }
-
   try {
-    const body = await fetchUpstream(route.upstream(env));
-    const fresh = { body, fetchedAt: now };
+    const fresh: Cached = permanent ? { body: await load(), fetchedAt: now, final: true } : { body: await load(), fetchedAt: now };
     memory.set(key, fresh);
-    if (env.LAST_GOOD && now - (lastKvWrite.get(key) ?? 0) > KV_WRITE_INTERVAL_MS) {
+    if (env.LAST_GOOD && (permanent || now - (lastKvWrite.get(key) ?? 0) > KV_WRITE_INTERVAL_MS)) {
       lastKvWrite.set(key, now);
       ctx.waitUntil(env.LAST_GOOD.put(key, JSON.stringify(fresh)).catch(() => {}));
     }
-    return envelope(fresh, false, route.ttl);
+    return { value: fresh, stale: false, ttl };
   } catch (err) {
-    console.error(`Upstream ${name} failed:`, err);
+    console.error(`Loading ${key} failed:`, err);
     const fallback = hit ?? (await readKv(env, key));
-    if (fallback) {
-      return envelope(fallback, true, MINUTE);
-    }
+    if (fallback) return { value: fallback, stale: true, ttl: MINUTE };
+    throw err;
+  }
+}
+
+async function respond(get: () => Promise<Result>): Promise<Response> {
+  try {
+    const { value, stale, ttl } = await get();
+    return envelope(value, stale, ttl);
+  } catch (err) {
+    if (err instanceof NotFound) return json({ error: err.message }, 404);
     return json({ error: "FPL is not responding and there is no saved copy yet." }, 502);
   }
 }
@@ -106,13 +180,13 @@ async function fetchUpstream(path: string): Promise<string> {
     signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+    throw new Error(`HTTP ${res.status} for ${path}`);
   }
   const body = await res.text();
   // FPL sometimes answers with an HTML maintenance page. Only keep real JSON.
   const parsed: unknown = JSON.parse(body);
   if (parsed === null || typeof parsed !== "object") {
-    throw new Error("Unexpected response shape");
+    throw new Error(`Unexpected response shape for ${path}`);
   }
   return body;
 }
@@ -126,6 +200,59 @@ async function readKv(env: Env, key: string): Promise<Cached | null> {
     return null;
   }
 }
+
+async function readFinal(key: string, env: Env): Promise<Cached | null> {
+  const hit = memory.get(key);
+  if (hit?.final) return hit;
+  const stored = await readKv(env, key);
+  if (stored?.final) {
+    memory.set(key, stored);
+    return stored;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------- trimming
+
+const POSITIONS = { 1: "GKP", 2: "DEF", 3: "MID", 4: "FWD" } as const;
+
+interface RawBootstrap {
+  elements: {
+    id: number;
+    web_name: string;
+    first_name: string;
+    second_name: string;
+    team: number;
+    element_type: 1 | 2 | 3 | 4;
+    total_points: number;
+    draft_rank: number;
+  }[];
+  teams: { id: number; short_name: string }[];
+}
+
+/** bootstrap-static is ~1 MB; phones only need a few fields per player. */
+export function trimPlayers(raw: string): string {
+  const b = JSON.parse(raw) as RawBootstrap;
+  const teams = new Map(b.teams.map((t) => [t.id, t.short_name]));
+  const players: Player[] = b.elements.map((e) => ({
+    id: e.id,
+    name: e.web_name,
+    fullName: `${e.first_name} ${e.second_name}`,
+    team: teams.get(e.team) ?? "",
+    position: POSITIONS[e.element_type],
+    totalPoints: e.total_points,
+    draftRank: e.draft_rank,
+  }));
+  return JSON.stringify(players);
+}
+
+/** The choices endpoint also carries every player's status; keep just the picks. */
+function trimDraft(raw: string): string {
+  const d = JSON.parse(raw) as { choices: unknown[] };
+  return JSON.stringify({ choices: d.choices });
+}
+
+// ---------------------------------------------------------------- responses
 
 function envelope(c: Cached, stale: boolean, maxAge: number): Response {
   // Built by hand so large responses aren't parsed and re-serialised.

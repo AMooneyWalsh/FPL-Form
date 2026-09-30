@@ -62,3 +62,63 @@ export interface SiteConfig {
   leagueId: number;
   defaultEntryId: number;
 }
+
+export interface TradeItem {
+  /** Goes to the offering manager. */
+  element_in: number;
+  /** Goes to the receiving manager. */
+  element_out: number;
+}
+
+export interface Trade {
+  id: number;
+  event: number;
+  /** entry_id of the manager who made the offer. */
+  offered_entry: number;
+  /** entry_id of the manager who accepted it. */
+  received_entry: number;
+  offer_time: string;
+  response_time: string | null;
+  /** "p" = processed. Only processed trades are public. */
+  state: string;
+  tradeitem_set: TradeItem[];
+}
+
+export interface Transaction {
+  id: number;
+  entry: number;
+  event: number;
+  /** "w" waiver claim, "f" free agent pick-up. */
+  kind: "w" | "f";
+  /** "a" accepted; "di" lost the player to a higher claim; "do" the player
+   * offered in exchange had already gone in an earlier successful claim. */
+  result: "a" | "di" | "do";
+  element_in: number;
+  element_out: number;
+  priority: number;
+  added: string;
+}
+
+export interface DraftChoice {
+  /** Overall pick number, 1 to (managers x 15), in snake order. */
+  index: number;
+  /** Pick number within the round (1 to managers), NOT the overall pick. */
+  pick: number;
+  round: number;
+  /** entry_id */
+  entry: number;
+  element: number;
+  was_auto: boolean;
+  choice_time: string;
+}
+
+export interface Player {
+  id: number;
+  name: string;
+  fullName: string;
+  team: string;
+  position: "GKP" | "DEF" | "MID" | "FWD";
+  totalPoints: number;
+  /** FPL's pre-season draft ranking (lower = expected to be better). */
+  draftRank: number;
+}

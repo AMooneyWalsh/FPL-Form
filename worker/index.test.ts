@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import worker, { resetCachesForTests, type Env } from "./index";
+import bootstrap from "../fixtures/bootstrap-static.json";
+import worker, { resetCachesForTests, trimPlayers, type Env } from "./index";
 
 class FakeKv {
   store = new Map<string, string>();
@@ -111,5 +112,78 @@ describe("worker", () => {
     expect((await get("/api/nope", makeEnv())).status).toBe(404);
     const post = await worker.fetch(new Request("https://example.test/api/trades", { method: "POST" }), makeEnv(), ctx);
     expect(post.status).toBe(405);
+  });
+});
+
+describe("gameweek route", () => {
+  const league = {
+    league: { id: 634 },
+    league_entries: [
+      { id: 1, entry_id: 11 },
+      { id: 2, entry_id: 22 },
+    ],
+    matches: [],
+  };
+  const live = { elements: { "5": { stats: { total_points: 7, minutes: 90 } } } };
+  const picks = (el: number) => ({ picks: [{ element: el, position: 1 }], subs: [] });
+
+  function fakeFpl(currentEvent: number) {
+    upstream.mockImplementation(async (input) => {
+      const path = String(input).replace("https://draft.premierleague.com/api/", "");
+      if (path === "game") return new Response(JSON.stringify({ current_event: currentEvent }));
+      if (path === "league/634/details") return new Response(JSON.stringify(league));
+      if (/^event\/\d+\/live$/.test(path)) return new Response(JSON.stringify(live));
+      if (path.startsWith("entry/11/")) return new Response(JSON.stringify(picks(5)));
+      if (path.startsWith("entry/22/")) return new Response(JSON.stringify(picks(6)));
+      return new Response("nope", { status: 404 });
+    });
+  }
+
+  it("builds points and squads for every manager", async () => {
+    fakeFpl(3);
+    const res = await get("/api/gw/2", makeEnv());
+    const body = (await res.json()) as { data: { event: number; points: Record<string, number>; squads: Record<string, unknown> } };
+    expect(body.data.event).toBe(2);
+    expect(body.data.points).toEqual({ "5": 7 });
+    expect(body.data.squads).toEqual({ "11": { played: [5], bench: [] }, "22": { played: [6], bench: [] } });
+  });
+
+  it("keeps a finished gameweek for good, even after the memory cache is gone", async () => {
+    const kv = new FakeKv();
+    fakeFpl(3);
+    await get("/api/gw/2", makeEnv(kv));
+    await Promise.all(waits);
+    resetCachesForTests();
+    upstream.mockReset();
+    vi.setSystemTime(new Date("2026-12-30T12:00:00Z"));
+    const res = await get("/api/gw/2", makeEnv(kv));
+    expect(res.status).toBe(200);
+    expect(upstream).not.toHaveBeenCalled();
+  });
+
+  it("refreshes the gameweek that's still going", async () => {
+    fakeFpl(3);
+    const env = makeEnv();
+    await get("/api/gw/3", env);
+    const calls = upstream.mock.calls.length;
+    vi.setSystemTime(new Date("2026-09-30T12:03:00Z"));
+    await get("/api/gw/3", env);
+    expect(upstream.mock.calls.length).toBeGreaterThan(calls);
+  });
+
+  it("says no to gameweeks that haven't started", async () => {
+    fakeFpl(3);
+    expect((await get("/api/gw/4", makeEnv())).status).toBe(404);
+  });
+});
+
+describe("trimPlayers", () => {
+  it("shrinks the 1 MB player list to what the site needs", () => {
+    const raw = JSON.stringify(bootstrap);
+    const trimmed = trimPlayers(raw);
+    expect(trimmed.length).toBeLessThan(raw.length / 5);
+    const players = JSON.parse(trimmed) as { id: number; name: string; team: string; position: string }[];
+    expect(players.length).toBe(bootstrap.elements.length);
+    expect(players.find((p) => p.name === "Saka")).toMatchObject({ team: "ARS", position: "MID" });
   });
 });

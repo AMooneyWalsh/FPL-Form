@@ -13,5 +13,9 @@
     "LEAGUE_ID": "634",
     "DEFAULT_ENTRY_ID": "1412"
   },
+  // No id: Wrangler creates the namespace on first deploy. If it can't, the
+  // site still works (see worker/index.ts), it just can't keep finished
+  // gameweeks between restarts.
+  "kv_namespaces": [{ "binding": "LAST_GOOD" }],
   "observability": { "enabled": true }
 }
