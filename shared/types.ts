@@ -122,3 +122,18 @@ export interface Player {
   /** FPL's pre-season draft ranking (lower = expected to be better). */
   draftRank: number;
 }
+
+/** Squad rules from bootstrap-static settings.squad. */
+export interface SquadRules {
+  /** Players in the XI. */
+  play: number;
+  /** How many of each position a squad has. */
+  select: Record<Player["position"], number>;
+  minPlay: Record<Player["position"], number>;
+  maxPlay: Record<Player["position"], number>;
+}
+
+export interface PlayersPayload {
+  players: Player[];
+  rules: SquadRules;
+}

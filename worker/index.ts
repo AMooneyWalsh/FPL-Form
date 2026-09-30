@@ -3,7 +3,7 @@
 // copy when FPL is down. See docs/architecture.md.
 
 import { buildGameweek, type RawLive, type RawPicks } from "../shared/gameweek";
-import type { GameStatus, LeagueDetails, Player } from "../shared/types";
+import type { GameStatus, LeagueDetails, Player, PlayersPayload, SquadRules } from "../shared/types";
 
 export interface Env {
   LEAGUE_ID: string;
@@ -228,9 +228,11 @@ interface RawBootstrap {
     draft_rank: number;
   }[];
   teams: { id: number; short_name: string }[];
+  settings: { squad: Record<string, number> };
 }
 
-/** bootstrap-static is ~1 MB; phones only need a few fields per player. */
+/** bootstrap-static is ~1 MB; phones only need a few fields per player,
+ * plus the squad rules. */
 export function trimPlayers(raw: string): string {
   const b = JSON.parse(raw) as RawBootstrap;
   const teams = new Map(b.teams.map((t) => [t.id, t.short_name]));
@@ -243,7 +245,14 @@ export function trimPlayers(raw: string): string {
     totalPoints: e.total_points,
     draftRank: e.draft_rank,
   }));
-  return JSON.stringify(players);
+  const sq = b.settings.squad;
+  const byPos = (prefix: string) =>
+    Object.fromEntries(Object.values(POSITIONS).map((pos) => [pos, sq[`${prefix}${pos}`]])) as SquadRules["select"];
+  const payload: PlayersPayload = {
+    players,
+    rules: { play: sq.play, select: byPos("select_"), minPlay: byPos("min_play_"), maxPlay: byPos("max_play_") },
+  };
+  return JSON.stringify(payload);
 }
 
 /** The choices endpoint also carries every player's status; keep just the picks. */
