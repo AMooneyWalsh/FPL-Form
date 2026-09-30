@@ -21,7 +21,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 ## Decisions
 - 2026-09-30: Repo is `fpl-form`. Planning lives here in the vault, technical docs live in the repo under `docs/`.
 - 2026-09-30: Build a **companion site** to the official FPL Draft, not our own draft game.
-- 2026-09-30: Scope is **one league, the 12 friends**.
+- 2026-09-30: Scope is **one league, the friends group** (14 managers in 2026/27, up from 12).
 - 2026-09-30: Must-haves: live H2H scores, standings/form/stats, waiver and trade tools. Discord bot was a nice-to-have (later dropped, see below).
 - 2026-09-30: Maintenance appetite is light, weekly.
 - 2026-09-30: Hosting is **static site plus Cloudflare Worker** (caches FPL data, enables live scores, no manual data commits).
@@ -48,4 +48,5 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Stack decision
 - [x] Verify FPL Draft API reads work without login
 - [x] Get the 2026/27 league ID (634)
-- [ ] Confirm league 634 details (name, managers, settings)
+- [x] Confirm league 634 details: "Drafty In Here", 14 managers, H2H, waivers, trades on, 30s draft on 16 Aug
+- [ ] Architecture doc for review

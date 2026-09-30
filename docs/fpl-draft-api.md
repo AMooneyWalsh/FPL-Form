@@ -28,3 +28,5 @@ The API is unofficial and undocumented, so it can change without notice. Base UR
 - `winning_league_entry` and `winning_method` were null on every finished match, including non-draws. Work out results from the points.
 - Future matches are listed with `started: false` and 0 points, so filter on `finished`.
 - Opening the URL in a browser tab doesn't prove cross-origin `fetch` from our site is allowed (CORS). That doesn't matter because the Worker makes the requests server side.
+- **Two different IDs per manager.** `league_entries[].entry_id` (the team, used by transactions, picks and `entry/{id}/...`) and `league_entries[].id` (the league entry, used by `matches` and `standings`) are equal for some managers and different for others (e.g. 1848 vs 1849). Always map between them via `league_entries`, never assume they match.
+- A sample response for league 634 after GW5 is saved in `fixtures/league-634-details-gw5.json` for tests.
