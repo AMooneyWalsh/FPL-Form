@@ -5,7 +5,7 @@ import leagueJson from "../fixtures/league-634-details.json";
 import tradesJson from "../fixtures/trades.json";
 import transactionsJson from "../fixtures/transactions.json";
 import type { Gameweek } from "./gameweek";
-import { passedThrough, playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "./moves";
+import { cancelReversals, passedThrough, playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "./moves";
 import type { DraftChoice, Trade, Transaction } from "./types";
 
 const gameweeks = gameweeksJson as unknown as Gameweek[];
@@ -125,6 +125,52 @@ describe("following a player through onward trades (real data)", () => {
     const ledger = tradeLedger(verdicts, entryIds);
     const daire = ledger.find((r) => r.entryId === 1679)!;
     expect(daire.net).toBe(-45);
+  });
+});
+
+describe("trades undone the same gameweek", () => {
+  const { trades: effective, reversals } = cancelReversals(trades);
+  const SAKA = 12;
+  const SZOBOSZLAI = 368;
+
+  it("treats Daire sending Saka back to Ross for Szoboszlai as an undo", () => {
+    expect(reversals).toEqual([
+      { tradeId: 101798, undoneBy: 106984, undoneAt: "2026-08-26T18:29:17.089599Z", players: [SZOBOSZLAI, SAKA] },
+    ]);
+    expect(effective.find((t) => t.id === 106984)).toBeUndefined();
+    const morning = effective.find((t) => t.id === 101798)!;
+    // What was left: Daire gets Hill (60) and Doku (400) for Mitchell (204) and Groß (124).
+    expect(morning.tradeitem_set).toEqual([
+      { element_in: 60, element_out: 204 },
+      { element_in: 400, element_out: 124 },
+    ]);
+  });
+
+  it("leaves every other trade alone", () => {
+    expect(effective).toHaveLength(trades.length - 1);
+    expect(reversals).toHaveLength(1);
+  });
+
+  it("no longer shows Saka passing through Daire", () => {
+    expect(passedThrough(SAKA, effective, seasons)).toEqual([]);
+  });
+
+  it("does not treat a later trade as an undo if it does anything else too", () => {
+    const t1 = trade(1, 2, 1, 2, [[20, 10]], "2026-08-20T10:00:00Z");
+    const t2 = trade(2, 2, 1, 2, [[10, 20], [30, 40]], "2026-08-20T11:00:00Z");
+    expect(cancelReversals([t1, t2]).reversals).toEqual([]);
+  });
+
+  it("does not treat a swap back in a later gameweek as an undo", () => {
+    const t1 = trade(1, 2, 1, 2, [[20, 10]], "2026-08-20T10:00:00Z");
+    const t2 = trade(2, 3, 2, 1, [[20, 10]], "2026-08-28T11:00:00Z");
+    expect(cancelReversals([t1, t2]).reversals).toEqual([]);
+  });
+
+  it("recognises the swap back whichever manager offers it", () => {
+    const t1 = trade(1, 2, 1, 2, [[20, 10]], "2026-08-20T10:00:00Z");
+    const t2 = trade(2, 2, 2, 1, [[20, 10]], "2026-08-20T11:00:00Z");
+    expect(cancelReversals([t1, t2]).trades).toEqual([]);
   });
 });
 

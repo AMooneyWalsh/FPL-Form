@@ -137,6 +137,67 @@ function toMove(t: Trade): Move {
   };
 }
 
+/** A later trade that simply undid part of an earlier one. */
+export interface Reversal {
+  /** The earlier trade, now counted without the swapped-back players. */
+  tradeId: number;
+  /** The trade that undid it (left out entirely). */
+  undoneBy: number;
+  undoneAt: string;
+  players: number[];
+}
+
+/**
+ * If the same two managers trade players straight back to each other in the
+ * same gameweek, treat it as an undo (e.g. a trade the league objected to):
+ * those players are removed from the earlier trade and the undoing trade is
+ * dropped. Only applies when the later trade does nothing but reverse the
+ * earlier one, so genuine follow-up trades are never touched.
+ */
+export function cancelReversals(trades: Trade[]): { trades: Trade[]; reversals: Reversal[] } {
+  const processed = trades
+    .filter((t) => t.state === "p")
+    .map((t) => ({ ...t, tradeitem_set: [...t.tradeitem_set] }))
+    .sort((a, b) => timeOf(a).localeCompare(timeOf(b)));
+  const dropped = new Set<number>();
+  const reversals: Reversal[] = [];
+
+  // (player, from, to) for everything a trade moves.
+  const movesOf = (t: Trade) =>
+    t.tradeitem_set.flatMap((i) => [
+      { player: i.element_in, from: t.received_entry, to: t.offered_entry },
+      { player: i.element_out, from: t.offered_entry, to: t.received_entry },
+    ]);
+
+  for (const later of processed) {
+    const laterMoves = movesOf(later);
+    const earlier = processed.find(
+      (a) =>
+        a !== later &&
+        !dropped.has(a.id) &&
+        a.event === later.event &&
+        timeOf(a) < timeOf(later) &&
+        laterMoves.every((m) => movesOf(a).some((x) => x.player === m.player && x.from === m.to && x.to === m.from)),
+    );
+    if (!earlier) continue;
+    const undone = new Set(laterMoves.map((m) => m.player));
+    const ins = earlier.tradeitem_set.map((i) => i.element_in).filter((p) => !undone.has(p));
+    const outs = earlier.tradeitem_set.map((i) => i.element_out).filter((p) => !undone.has(p));
+    if (ins.length !== outs.length) continue; // Can't happen with even trades, but stay safe.
+    earlier.tradeitem_set = ins.map((element_in, k) => ({ element_in, element_out: outs[k] }));
+    dropped.add(later.id);
+    reversals.push({ tradeId: earlier.id, undoneBy: later.id, undoneAt: timeOf(later), players: [...undone] });
+  }
+  return {
+    trades: processed.filter((t) => !dropped.has(t.id) && t.tradeitem_set.length > 0),
+    reversals,
+  };
+}
+
+function timeOf(t: Trade): string {
+  return t.response_time ?? t.offer_time;
+}
+
 export function tradeVerdicts(trades: Trade[], seasons: Seasons, transactions: Transaction[] = []): TradeVerdict[] {
   const moves = trades
     .filter((t) => t.state === "p")

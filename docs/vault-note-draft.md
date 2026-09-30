@@ -36,6 +36,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: **Focus on the differentiators vs draftfpl.live: trade analysis and draft analysis.** New build order: skeleton, trades/waivers, draft analysis, table/stats, live gameweek, waiver suggestions.
 - 2026-09-30: Analysis features, all eight chosen: trade verdicts, manager trade ledger, waiver battles, player journeys; steals and busts, draft-only table, squad origins, hindsight redraft.
 - 2026-09-30: **Trade cards follow the chain**: a player traded on is worth his points for you plus an equal share of what you got for him (dropping ends the chain). Cards also show an "on paper" raw-points number. The overall trade table never follows chains, so it never double counts. Came from Adam's Saka/Ndiaye/Bruno example. Details in repo `docs/trade-scoring.md`.
+- 2026-09-30: **Same-gameweek swap-backs count as an undo.** If two managers trade players straight back in the same gameweek (and that's all the second trade does), those players are removed from the first trade and the second is ignored. Came from the Ross/Daire Saka-Szoboszlai veto on 26 Aug; real trade was Hill + Doku for Mitchell + Groß (Ross +54).
 - 2026-09-30: Trades and waivers refresh every ~2 minutes, all week. Finished gameweeks are stored once and kept.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 

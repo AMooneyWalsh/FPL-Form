@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Gameweek } from "../../shared/gameweek";
-import { Seasons } from "../../shared/moves";
+import { cancelReversals, Seasons, type Reversal } from "../../shared/moves";
 import { managerLabels } from "../../shared/standings";
 import type {
   DraftChoice,
@@ -21,7 +21,9 @@ export interface LeagueData {
   league: LeagueDetails;
   game: GameStatus;
   players: Map<number, Player>;
+  /** Processed trades, with same-gameweek swap-backs cancelled out. */
   trades: Trade[];
+  reversals: Reversal[];
   transactions: Transaction[];
   draft: DraftChoice[];
   seasons: Seasons;
@@ -62,6 +64,7 @@ export function useLeagueData(): Loadable<LeagueData> {
     }
     const envelopes = [league.value, game.value, players.value, trades.value, transactions.value, draft.value];
     const entries = league.value.data.league_entries;
+    const effective = cancelReversals(trades.value.data.trades);
     return {
       status: "ready",
       value: {
@@ -69,7 +72,8 @@ export function useLeagueData(): Loadable<LeagueData> {
         league: league.value.data,
         game: game.value.data,
         players: new Map(players.value.data.map((p) => [p.id, p])),
-        trades: trades.value.data.trades,
+        trades: effective.trades,
+        reversals: effective.reversals,
         transactions: transactions.value.data.transactions,
         draft: draft.value.data.choices,
         seasons: new Seasons(gameweeks.value),

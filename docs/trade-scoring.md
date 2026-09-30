@@ -66,6 +66,22 @@ Across GW1-5 the rule changed the winner of two trades. Sarr for Tel went from M
 
 A player who was traded on shows a line like "↳ traded on in GW2 for Mitchell, Szoboszlai, Groß · 1/3 share = 30". Tapping it jumps to that trade's card.
 
+## Trades undone in the same gameweek
+
+Added 2026-09-30 at Adam's request. On 26 Aug the league objected to part of Daire and Ross's morning trade, and that evening Daire sent Saka back to Ross for Szoboszlai. The real trade was just Hill and Doku for Mitchell and Groß.
+
+**Rule:** if the same two managers trade players straight back to each other **in the same gameweek**, and that later trade does **nothing but** reverse the earlier one, it counts as an undo:
+
+- the swapped-back players are removed from the earlier trade,
+- the undoing trade is left out completely,
+- and the card says so ("Szoboszlai and Saka were swapped back in the same gameweek...").
+
+It applies everywhere: trade cards, the overall table, and player journeys (Saka no longer shows as passing through Daire). A swap back in a later gameweek, or one that also moves other players, is treated as a normal trade.
+
+Effect on the 26 Aug trade: Ross +70 became **Ross +54** (Hill 10 + Doku 4 against Mitchell 23 + Groß 45). In the overall table, Ross's net went from +82 to +59, because getting Saka back is no longer a trade gain. Daire's went from -45 to -57, because Szoboszlai counts as his own player again, so his later points for Peter count as given away. No other trade changed winner.
+
+Code: `cancelReversals` in `shared/moves.ts`, applied to the trade list before anything else uses it (`app/src/data.ts`).
+
 ## 2. Trade ledger
 
 Per manager, across all their trades:

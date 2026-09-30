@@ -557,3 +557,7 @@ button.inline-link {
   text-underline-offset: 2px;
   cursor: pointer;
 }
+
+.undone {
+  margin: 8px 0 0;
+}
