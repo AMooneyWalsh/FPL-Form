@@ -150,6 +150,9 @@ export interface UpcomingFixture {
   home: number;
   away: number;
   kickoff: string | null;
+  /** FPL's official 1 (easy) to 5 (hard) rating for each side, from the main game's API. */
+  homeDifficulty?: number;
+  awayDifficulty?: number;
 }
 
 /** Squad rules from bootstrap-static settings.squad. */

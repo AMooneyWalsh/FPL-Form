@@ -4,10 +4,11 @@ import choicesJson from "../fixtures/choices.json";
 import elementStatus from "../fixtures/element-status.json";
 import gameweeksJson from "../fixtures/gameweeks.json";
 import transactionsJson from "../fixtures/transactions.json";
-import { trimPlayers } from "../worker/index";
+import fplFixturesJson from "../fixtures/fpl-fixtures.json";
+import { trimFixtures, trimPlayers } from "../worker/index";
 import type { Gameweek } from "./gameweek";
 import { Seasons } from "./moves";
-import type { DraftChoice, PlayersPayload, Transaction } from "./types";
+import type { DraftChoice, PlayersPayload, Transaction, UpcomingFixture } from "./types";
 import { clubDifficulty, draftDay, fixtureRun, freeAgentSignings, isOut, waiverSuggestions, weakestAt } from "./waivers";
 
 const payload = JSON.parse(trimPlayers(JSON.stringify(bootstrap))) as PlayersPayload;
@@ -34,6 +35,19 @@ describe("fixtureRun", () => {
     expect(run.length).toBe(3);
     expect(run.map((f) => f.event)).toEqual([...run.map((f) => f.event)].sort((a, b) => a - b));
     expect(run.every((f) => f.opponent !== 1)).toBe(true);
+  });
+});
+
+describe("fixtureRun with FPL's ratings", () => {
+  it("uses the official difficulty for the right side", () => {
+    const raw = JSON.stringify(fplFixturesJson);
+    const { fixtures } = JSON.parse(trimFixtures(raw)) as { fixtures: UpcomingFixture[] };
+    const first = fixtures[0];
+    const [homeRun] = fixtureRun(first.home, [first], new Map());
+    const [awayRun] = fixtureRun(first.away, [first], new Map());
+    expect(homeRun.difficulty).toBe(first.homeDifficulty);
+    expect(awayRun.difficulty).toBe(first.awayDifficulty);
+    expect(fixtures.every((f) => f.homeDifficulty! >= 1 && f.homeDifficulty! <= 5)).toBe(true);
   });
 });
 

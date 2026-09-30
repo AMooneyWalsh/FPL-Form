@@ -4,9 +4,9 @@ import type { DraftChoice, Player, Transaction, UpcomingFixture } from "./types"
 // ---------------------------------------------------------------- fixture difficulty
 
 /**
- * 1 (easiest) to 5 (hardest) per club. FPL Draft doesn't publish difficulty
- * ratings, so this ranks clubs by the FPL points their players have scored
- * this season: the top four are 5, the bottom four are 1.
+ * 1 (easiest) to 5 (hardest) per club. Only a fallback: FPL's own ratings come
+ * from the main game's fixtures API (see fixtureRun). If that can't be
+ * reached, clubs are ranked by the FPL points their players have scored.
  */
 export function clubDifficulty(players: Player[]): Map<number, number> {
   const totals = new Map<number, number>();
@@ -35,8 +35,11 @@ export function fixtureRun(
     .sort((a, b) => a.event - b.event || (a.kickoff ?? "").localeCompare(b.kickoff ?? ""))
     .slice(0, count)
     .map((f) => {
-      const opponent = f.home === teamId ? f.away : f.home;
-      return { event: f.event, opponent, home: f.home === teamId, difficulty: difficulty.get(opponent) ?? 3 };
+      const home = f.home === teamId;
+      const opponent = home ? f.away : f.home;
+      // FPL's official rating when we have it; otherwise our estimate.
+      const official = home ? f.homeDifficulty : f.awayDifficulty;
+      return { event: f.event, opponent, home, difficulty: official ?? difficulty.get(opponent) ?? 3 };
     });
 }
 
