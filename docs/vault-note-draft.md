@@ -32,6 +32,9 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - 2026-09-30: Use the **free Cloudflare Pages address** for now. Buy a domain later if the group uses it.
 - 2026-09-30: 2026/27 league ID is **634**, Adam's entry ID is **1412** (default "my team"). Both are settings, updated each season.
 - 2026-09-30: Adam isn't technical and relies on Claude for all of the build and upkeep. Site must run and recover by itself; Adam's jobs are clicks only.
+- 2026-09-30: **Claude publishes changes without Adam's review** once automatic tests pass, then tells Adam what changed.
+- 2026-09-30: **Focus on the differentiators vs draftfpl.live: trade analysis and draft analysis.** New build order: skeleton, trades/waivers, draft analysis, table/stats, live gameweek, waiver suggestions.
+- 2026-09-30: Trades and waivers refresh every ~2 minutes, all week. Finished gameweeks are stored once and kept.
 - 2026-09-30: Nice-to-have order: **draft recap first**, then waiver suggestions. Chat reminders are **dropped** because the group uses WhatsApp, which has no simple free bot route.
 
 ## Findings
@@ -42,8 +45,8 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Some API fields are unreliable (`matches_played`, `winning_league_entry`), so the site calculates results itself.
 
 ## Open questions
-- Is the old site live somewhere friends use (GitHub Pages)?
-- Happy with the routine: Claude opens a pull request, Adam checks the preview and presses Merge?
+- Is the old site live somewhere friends use (GitHub Pages)? Unanswered; old files stay put until the new site replaces them, so it's safe either way.
+- Which trade and draft analyses matter most?
 
 ## Progress
 - [x] Repo set up, CLAUDE.md, docs

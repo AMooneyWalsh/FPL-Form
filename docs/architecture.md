@@ -10,10 +10,12 @@ Status: draft, 2026-09-30. Nothing here is built yet.
 
 A website for Drafty In Here that shows:
 
-1. **This gameweek, live.** All 7 head-to-head matches with scores updating during games, including bonus points and auto-subs, so you can see who's winning before FPL finalises it.
-2. **The table and the stats.** Standings, form, luck, streaks, records, head-to-head history, like the old site but always up to date.
-3. **Waivers and trades.** Who picked up whom, who's traded with whom, and how it's worked out.
-4. **Later:** a draft recap, then waiver suggestions.
+The focus is on what draftfpl.live and the official site **don't** do well: **trade analysis and draft analysis**.
+
+1. **Trades and waivers.** Who won each trade, who's traded with whom, waiver battles, and how every move has worked out since. Refreshed every few minutes, all week, because trades happen any day.
+2. **Draft analysis.** How every pick has aged: steals, busts, how much of each squad is still from the draft.
+3. **The table and the stats.** Standings, form, luck, streaks, records, head-to-head history, like the old site but always up to date.
+4. **Later:** a live gameweek page, then waiver suggestions.
 
 When you open it, it shows your team first. Anyone else can switch to their own team and the site remembers it on their phone.
 
@@ -22,20 +24,20 @@ When you open it, it shows your team first. Anyone else can switch to their own 
 There are three pieces:
 
 - **The official FPL Draft site.** It's where all the real data lives. We only ever read from it, never change anything.
-- **A small helper program on Cloudflare** (a "Worker"). When someone opens our site, the helper fetches the data from FPL, keeps a copy for a short time so we don't pester FPL, and hands it to the site. It checks more often during matches (every minute) and hardly at all midweek.
+- **A small helper program on Cloudflare** (a "Worker"). When someone opens our site, the helper fetches the data from FPL, keeps a copy for a short time so we don't pester FPL, and hands it to the site. Trades and waivers are checked every couple of minutes, every day of the week. Finished gameweeks never change, so those are saved once and kept for good.
 - **The website itself.** It's what your friends see. It runs on the same Cloudflare account and costs nothing at this size.
 
 ### What happens if something breaks
 
 - **If FPL is down or changes something,** the site keeps showing the last good data with a note saying when it was last updated, rather than a blank page.
-- **Every change I make gets tested automatically** before it can go live. If the tests fail, the change is blocked and the live site stays as it was.
+- **Every change I make gets tested automatically** before it can go live. If the tests fail, the change is blocked and the live site stays as it was. This matters more because I publish changes without waiting for you (your call, 2026-09-30).
 
 ### What you'll need to do
 
 This is kept to a minimum, and I'll walk you through each step with screenshots-level instructions:
 
 1. **Once:** create a free Cloudflare account and connect it to your GitHub repo (about 10 minutes, one time).
-2. **Each time I finish a piece of work:** I'll open a "pull request" on GitHub, which is a proposed change. You look at the preview link I send, and if you're happy, press the green **Merge** button. The site updates by itself a minute later.
+2. **Nothing per change.** I publish changes myself once the automatic tests pass, and tell you what's new. If you don't like something, just tell me.
 3. **Each August:** tell me the new league ID and I'll change the one setting.
 
 You won't need to run any commands, install anything or edit code.
@@ -51,18 +53,17 @@ Each step ends with something you can open and use:
 | Step | You get |
 |---|---|
 | 1 | The site is live at a Cloudflare address, showing the league table. Proves the whole chain works. |
-| 2 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). |
-| 3 | The live gameweek page. |
-| 4 | Waivers and trades. |
-| 5 | Draft recap. |
+| 2 | Trades and waivers analysis. |
+| 3 | Draft analysis. |
+| 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). |
+| 5 | Live gameweek page. |
 | 6 | Waiver suggestions. |
 
-Once step 2 is done, the new site can replace the old one.
+Once step 4 is done, the new site can replace the old one. Until then the old `index.html` and `data.json` stay exactly where they are, so if friends use a link to it, it keeps working.
 
 ### Questions for you
 
-1. **Is the old site live somewhere right now** (e.g. a GitHub Pages link your friends use)? If so, I'll leave it running until the new one has everything it had.
-2. **Are you happy with the "I open a pull request, you press Merge" routine?** The alternative is that I publish changes directly, which is quicker but means nobody looks before it goes live.
+1. Which trade and draft analyses matter most (being asked in chat).
 
 ---
 
@@ -74,6 +75,7 @@ Once step 2 is done, the new site can replace the old one.
 - One Cloudflare Worker with static assets: serves the built SPA and the `/api/*` routes from the same project and domain (no CORS). Note: this is the current Cloudflare recommendation over Pages + Functions. Address becomes `<name>.workers.dev` rather than `.pages.dev`. Same cost and free tier.
 - Workers KV for a "last good response" copy of each upstream call.
 - GitHub Actions: typecheck, lint, unit tests on every PR. Cloudflare's GitHub integration builds a preview URL per PR and deploys `main` on merge.
+- Owner decision 2026-09-30: Claude merges its own PRs once CI is green; no owner review step. Keep CI strict (typecheck, tests, build) since it's the only gate. Tell the owner in plain English what changed after each merge.
 
 ### Config
 
@@ -89,8 +91,9 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches with the Cach
 | `/api/league` | `league/{LEAGUE_ID}/details` | 1 min | 30 min |
 | `/api/live/{gw}` | `event/{gw}/live` | 60 s | 1 h (6 h after GW finalised) |
 | `/api/picks/{gw}` | `entry/{entry_id}/event/{gw}` for all 14 entries, merged | 5 min | 6 h |
-| `/api/transactions` | `draft/league/{LEAGUE_ID}/transactions` | 15 min | 1 h |
-| `/api/trades` | `draft/league/{LEAGUE_ID}/trades` | 15 min | 1 h |
+| `/api/transactions` | `draft/league/{LEAGUE_ID}/transactions` | 2 min | 2 min |
+| `/api/trades` | `draft/league/{LEAGUE_ID}/trades` | 2 min | 2 min |
+| `/api/history/{gw}` | `event/{gw}/live` + all 14 entries' picks for a finished GW | stored in KV permanently once the GW is finalised | same |
 | `/api/draft` | `draft/{LEAGUE_ID}/choices` (to verify) | 24 h | 24 h |
 | `/api/status` | none | n/a | n/a |
 
@@ -99,6 +102,18 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches with the Cach
 If upstream fails or returns something that doesn't parse, serve the KV copy with a `stale: true` flag and `fetchedAt`; the UI shows "last updated X ago". `/api/status` reports last successful fetch per route for debugging.
 
 Endpoints marked "to verify" in `docs/fpl-draft-api.md` get checked (by the owner opening them in a browser) before the step that needs them.
+
+### Trade and draft analysis data
+
+Trades and waivers happen all week (owner, 2026-09-30), so `transactions` and `trades` refresh every 2 minutes regardless of match state. Cheap: two small requests, shared by everyone via the cache.
+
+Analysis needs "what did each player score for each owner, and were they starting". Built from:
+
+- Per-GW player points: `event/{gw}/live`.
+- Per-GW squads: `entry/{entry_id}/event/{gw}` for each of the 14 entries.
+- Ownership timeline: draft picks + transactions (`kind` `w` waiver / `f` free agent, `result` `a` accepted, `di`/`do` denied) + trades.
+
+Finished, finalised gameweeks never change, so each is fetched once and stored in KV for good (about 15 upstream calls per GW, once). Only the current GW is refetched. Checked in the 2025/26 data: public trades all have `state: "p"` (processed), so pending offers are not visible. Denied waiver claims are visible, which allows "waiver battles" (who else wanted a player).
 
 ### Live H2H scoring
 

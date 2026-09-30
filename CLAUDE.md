@@ -24,7 +24,9 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 
 - Present options and trade-offs (stack, hosting, database) with a recommendation before building. Don't pick silently.
 - No code until scope has been agreed with the owner.
-- Develop on the branch named in the session instructions. Don't open PRs unless asked.
+- Develop on the branch named in the session instructions. The owner has said Claude can merge its own changes without their review, once CI passes. Tell them in plain English what changed.
+- Focus is trade and draft analysis (the differentiators vs draftfpl.live). Trades happen all week, so that data must stay fresh all the time.
+- Leave the old root `index.html` and `data.json` in place until the new site replaces them. It may be live on GitHub Pages.
 
 ## Notes for writing to the owner
 
