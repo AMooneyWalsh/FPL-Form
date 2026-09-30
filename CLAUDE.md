@@ -15,6 +15,7 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 
 - Existing app: a static, read-only stats viewer. `index.html` (single file, ~4.4k lines, vanilla JS) loads `data.json` and renders results/form tables, luck, charts, streaks, records, H2H, waiver and trade analysis, and player search for one league ("Drafty In Here", league id 6573, 12 managers, 2025/26).
 - `data.json` is a snapshot of the official FPL Draft API, refreshed by manual "Update League Data" commits. There is no build step, backend, or CI.
+- Live league for 2026/27: league ID `634`, owner's entry ID `1412`. The old data.json league (6573) is last season's and that ID has since been reused by another league.
 - See `docs/existing-app.md` and `docs/fpl-draft-api.md`.
 
 ## Working style
