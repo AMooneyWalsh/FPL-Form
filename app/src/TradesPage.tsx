@@ -1,15 +1,14 @@
 import { useMemo, useState } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
-import { Manager, MineToggle, PlayerName, Pts } from "./bits";
+import { Manager, nobody, PlayerName, Pts, ShowFilter } from "./bits";
 import type { LeagueData } from "./data";
 
 export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
-  const [justMine, setJustMine] = useState(false);
+  const [who, setWho] = useState<number | null>(null);
   const verdicts = useMemo(() => tradeVerdicts(data.trades, data.seasons, data.transactions), [data]);
   const ledger = useMemo(() => tradeLedger(verdicts, [...data.entries.keys()]), [verdicts, data]);
-  const shown = justMine
-    ? verdicts.filter((v) => v.offerer.entryId === myTeam || v.receiver.entryId === myTeam)
-    : verdicts;
+  const shown =
+    who === null ? verdicts : verdicts.filter((v) => v.offerer.entryId === who || v.receiver.entryId === who);
 
   return (
     <>
@@ -75,13 +74,15 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
       <section>
         <div className="section-head">
           <h2>Every trade</h2>
-          <MineToggle on={justMine} set={setJustMine} />
+          <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
         </div>
         <p className="hint">
           Big number: what each player was worth to the manager who got him. That's his points in their XI, plus, if
           they traded him on, a share of what they got for him. Small number: all his points since, whoever had him.
         </p>
-        {shown.length === 0 && <p className="notice">No trades to show.</p>}
+        {shown.length === 0 && (
+          <p className="notice">{who === null ? "No trades yet this season." : nobody(data, who, myTeam, "made any trades")}</p>
+        )}
         {shown.map((v) => (
           <TradeCard key={v.id} v={v} data={data} myTeam={myTeam} />
         ))}

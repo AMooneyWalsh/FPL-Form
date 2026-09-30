@@ -57,7 +57,7 @@ function TableView({ data, myTeam }: { data: LeagueData; myTeam: number | null }
       <section>
         <div className="section-head">
           <h2>Position each week</h2>
-          <ManagerSelect data={data} value={compare} onChange={setCompare} placeholder="Compare with…" exclude={myTeam} />
+          <ManagerSelect data={data} value={compare} onChange={setCompare} placeholder="Compare with…" exclude={myTeam} label="Compare with" />
         </div>
         <PositionChart data={data} myTeam={myTeam} compare={compare} />
       </section>
@@ -99,7 +99,8 @@ function PositionChart({ data, myTeam, compare }: { data: LeagueData; myTeam: nu
         {others.map((id) => (
           <path key={id} d={path(id)} className="line-other" />
         ))}
-        {highlighted.map((id, k) => {
+        {highlighted.map((id) => {
+          const k = id === myTeam ? 0 : 1;
           const last = weeks.at(-1)!.positions.get(id) ?? count;
           return (
             <g key={id}>
@@ -119,7 +120,9 @@ function PositionChart({ data, myTeam, compare }: { data: LeagueData; myTeam: nu
         })}
       </svg>
       <p className="hint chart-note">
-        Grey lines are everyone else. {myTeam !== null && <>Your team is in blue{compare !== null && ", the comparison in orange"}.</>}
+        Grey lines are everyone else.{myTeam !== null && " Your team is in blue."}
+        {compare !== null && ` ${data.labels.get(compare)} is in orange.`}
+        {myTeam === null && compare === null && " Pick a manager above to follow their line."}
       </p>
     </div>
   );
@@ -175,6 +178,9 @@ function LuckView({ data, myTeam }: { data: LeagueData; myTeam: number | null })
   const best = Math.max(...rows.map((r) => r.luck));
   const worst = Math.min(...rows.map((r) => r.luck));
   const names = (luck: number) => rows.filter((r) => r.luck === luck).map((r) => data.labels.get(r.entryId)).join(", ");
+  if (rows.every((r) => r.played === 0)) {
+    return <p className="notice">No results yet. Fixture luck starts after gameweek 1.</p>;
+  }
 
   return (
     <>
@@ -234,7 +240,7 @@ function LuckView({ data, myTeam }: { data: LeagueData; myTeam: number | null })
       <section>
         <div className="section-head">
           <h2>Week by week</h2>
-          <ManagerSelect data={data} value={who ?? myTeam} onChange={setWho} />
+          <ManagerSelect data={data} value={shown.entryId} onChange={setWho} label="Whose weeks" />
         </div>
         <WeekStrip row={shown} />
       </section>
@@ -267,19 +273,29 @@ function WeekStrip({ row }: { row: LuckRow }) {
 
 function HeadToHeadView({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const ids = [...data.entries.keys()];
-  const [a, setA] = useState<number | null>(myTeam ?? ids[0]);
+  const [a, setA] = useState<number | null>(null);
+  const defaultOpponent = (me: number) => {
+    // Your next opponent, or the last one if the season's over.
+    const toEntry = new Map(data.league.league_entries.map((e) => [e.id, e.entry_id]));
+    const mine = data.league.matches
+      .filter((m) => toEntry.get(m.league_entry_1) === me || toEntry.get(m.league_entry_2) === me)
+      .sort((x, y) => x.event - y.event);
+    const m = mine.find((x) => !x.finished) ?? mine.at(-1);
+    if (!m) return undefined;
+    return toEntry.get(m.league_entry_1) === me ? toEntry.get(m.league_entry_2) : toEntry.get(m.league_entry_1);
+  };
   const [b, setB] = useState<number | null>(null);
-  const first = a ?? ids[0];
-  const second = b ?? ids.find((id) => id !== first)!;
+  const first = a ?? myTeam ?? ids[0];
+  const second = b !== null && b !== first ? b : (defaultOpponent(first) ?? ids.find((id) => id !== first)!);
   const h = headToHead(data.league, first, second);
   const next = nextMeeting(data.league, first, second);
   return (
     <section>
       <h2>Head to head</h2>
       <div className="h2h-pickers">
-        <ManagerSelect data={data} value={first} onChange={setA} />
+        <ManagerSelect data={data} value={first} onChange={setA} label="First manager" />
         <span className="muted">v</span>
-        <ManagerSelect data={data} value={second} onChange={setB} exclude={first} />
+        <ManagerSelect data={data} value={second} onChange={setB} exclude={first} label="Second manager" />
       </div>
       <div className="card h2h-card">
         <div className="h2h-score">
@@ -407,6 +423,7 @@ function RecordList({
   return (
     <div className="card">
       <h3 className="card-title">{title}</h3>
+      {rows.length === 0 && <p className="hint">No results yet.</p>}
       <ol className="plain pick-list records-list">
         {rows.map((r) => (
           <li key={`${r.event}-${r.entryId}`} className={r.entryId === myTeam ? "is-mine record-row" : "record-row"}>
@@ -437,12 +454,14 @@ function ManagerSelect({
   onChange,
   placeholder,
   exclude,
+  label = "Manager",
 }: {
   data: LeagueData;
   value: number | null;
   onChange: (id: number | null) => void;
   placeholder?: string;
   exclude?: number | null;
+  label?: string;
 }) {
   const options = [...data.entries.keys()]
     .filter((id) => id !== exclude)
@@ -450,6 +469,7 @@ function ManagerSelect({
   return (
     <select
       className="select"
+      aria-label={label}
       value={value ?? ""}
       onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
     >

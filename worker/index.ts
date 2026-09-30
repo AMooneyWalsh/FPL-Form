@@ -3,6 +3,7 @@
 // copy when FPL is down. See docs/architecture.md.
 
 import { buildGameweek, type RawLive, type RawPicks } from "../shared/gameweek";
+import { toLiveGameweek, type LivePicks, type RawLiveResponse } from "../shared/live";
 import type { GameStatus, LeagueDetails, Player, PlayersPayload, SquadRules } from "../shared/types";
 
 export interface Env {
@@ -78,6 +79,10 @@ export default {
     if (gwMatch) {
       return serveGameweek(Number(gwMatch[1]), env, ctx);
     }
+    const liveMatch = /^live\/(\d{1,2})$/.exec(name);
+    if (liveMatch) {
+      return serveLive(Number(liveMatch[1]), env, ctx);
+    }
     const route = ROUTES[name];
     if (!route) {
       return json({ error: "Not found" }, 404);
@@ -120,6 +125,42 @@ async function serveGameweek(event: number, env: Env, ctx: ExecutionContext): Pr
       league.league_entries.forEach((e, i) => (byEntry[e.entry_id] = JSON.parse(picks[i]) as RawPicks));
       return JSON.stringify(buildGameweek(event, JSON.parse(live) as RawLive, byEntry));
     }, isOver);
+  });
+}
+
+/**
+ * Live scoring data for one gameweek: every player's live points and BPS,
+ * the Premier League fixtures, and each manager's lineup (once the deadline
+ * has passed). Refreshes every minute while games are on.
+ */
+async function serveLive(event: number, env: Env, ctx: ExecutionContext): Promise<Response> {
+  return respond(async () => {
+    const game = JSON.parse(
+      (await cached(`${env.LEAGUE_ID}:game`, ROUTES.game.ttl, env, ctx, () => fetchUpstream("game"))).value.body,
+    ) as GameStatus;
+    if (event < 1 || event > game.current_event + 1) {
+      throw new NotFound("No live data for that gameweek.");
+    }
+    const inPlay = event === game.current_event && !game.current_event_finished;
+    const ttl = inPlay ? MINUTE : event === game.current_event ? 10 * MINUTE : HOUR;
+    return cached(`${env.LEAGUE_ID}:live:${event}`, ttl, env, ctx, async () => {
+      const league = JSON.parse(
+        (await cached(`${env.LEAGUE_ID}:league`, ROUTES.league.ttl, env, ctx, () => fetchUpstream(ROUTES.league.upstream(env)))).value.body,
+      ) as LeagueDetails;
+      const [live, ...picks] = await Promise.all([
+        fetchUpstream(`event/${event}/live`),
+        // Lineups are hidden until the deadline, so a missing one isn't an error.
+        ...league.league_entries.map((e) => fetchUpstream(`entry/${e.entry_id}/event/${event}`).catch(() => null)),
+      ]);
+      const byEntry: Record<number, LivePicks> = {};
+      league.league_entries.forEach((e, i) => {
+        const raw = picks[i];
+        if (!raw) return;
+        const p = JSON.parse(raw) as LivePicks;
+        byEntry[e.entry_id] = { picks: p.picks.map((x) => ({ element: x.element, position: x.position })), subs: p.subs ?? [] };
+      });
+      return JSON.stringify(toLiveGameweek(event, JSON.parse(live) as RawLiveResponse, byEntry));
+    });
   });
 }
 
@@ -241,6 +282,7 @@ export function trimPlayers(raw: string): string {
     name: e.web_name,
     fullName: `${e.first_name} ${e.second_name}`,
     team: teams.get(e.team) ?? "",
+    teamId: e.team,
     position: POSITIONS[e.element_type],
     totalPoints: e.total_points,
     draftRank: e.draft_rank,

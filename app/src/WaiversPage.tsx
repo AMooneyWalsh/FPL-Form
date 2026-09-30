@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
-import { Manager, MineToggle, PlayerName } from "./bits";
+import { Manager, nobody, PlayerName, ShowFilter } from "./bits";
 import type { LeagueData } from "./data";
 
 export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
-  const [justMine, setJustMine] = useState(false);
+  const [who, setWho] = useState<number | null>(null);
   const record = useMemo(() => waiverRecord(data.transactions, data.seasons, [...data.entries.keys()]), [data]);
   const battles = useMemo(() => waiverBattles(data.transactions, data.seasons), [data]);
-  const shown = justMine ? battles.filter((b) => b.claims.some((c) => c.entryId === myTeam)) : battles;
+  const shown = who === null ? battles : battles.filter((b) => b.claims.some((c) => c.entryId === who));
   const byGw = groupBy(shown, (b) => b.event);
 
   return (
@@ -51,10 +51,14 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
       <section>
         <div className="section-head">
           <h2>Waiver battles</h2>
-          <MineToggle on={justMine} set={setJustMine} />
+          <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
         </div>
         <p className="hint">Players more than one manager put a claim in for. Winner first, then in priority order.</p>
-        {shown.length === 0 && <p className="notice">No battles to show.</p>}
+        {shown.length === 0 && (
+          <p className="notice">
+            {who === null ? "No waiver battles yet this season." : nobody(data, who, myTeam, "been in a waiver battle")}
+          </p>
+        )}
         {[...byGw.entries()].map(([gw, list]) => (
           <div key={gw}>
             <h3>Gameweek {gw}</h3>

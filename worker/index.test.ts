@@ -196,3 +196,65 @@ describe("trimPlayers", () => {
     });
   });
 });
+
+describe("live route", () => {
+  const league = { league: { id: 634 }, league_entries: [{ id: 1, entry_id: 11 }, { id: 2, entry_id: 22 }], matches: [] };
+  const live = {
+    elements: { "5": { stats: { minutes: 90, total_points: 7, bonus: 0, bps: 30 } } },
+    fixtures: [
+      {
+        id: 9, kickoff_time: "2026-10-10T11:30:00Z", started: true, finished: false, finished_provisional: false, minutes: 60,
+        team_h: 1, team_a: 2, team_h_score: 1, team_a_score: 0,
+        stats: [{ s: "bps", h: [{ element: 5, value: 30 }], a: [] }, { s: "bonus", h: [], a: [] }],
+      },
+    ],
+  };
+
+  function fakeFpl(game: object, picksFor: (entry: string) => Response) {
+    upstream.mockImplementation(async (input) => {
+      const path = String(input).replace("https://draft.premierleague.com/api/", "");
+      if (path === "game") return new Response(JSON.stringify(game));
+      if (path === "league/634/details") return new Response(JSON.stringify(league));
+      if (/^event\/\d+\/live$/.test(path)) return new Response(JSON.stringify(live));
+      const m = /^entry\/(\d+)\//.exec(path);
+      if (m) return picksFor(m[1]);
+      return new Response("nope", { status: 404 });
+    });
+  }
+
+  it("returns trimmed live data with every manager's lineup", async () => {
+    fakeFpl({ current_event: 6, current_event_finished: false }, () =>
+      new Response(JSON.stringify({ picks: [{ element: 5, position: 1, multiplier: 1 }], subs: [] })),
+    );
+    const body = (await (await get("/api/live/6", makeEnv())).json()) as { data: Record<string, any> };
+    expect(body.data.elements).toEqual({ "5": { minutes: 90, points: 7, bonus: 0, bps: 30 } });
+    expect(body.data.fixtures[0]).toMatchObject({ id: 9, started: true, bonusConfirmed: false, bps: [{ element: 5, value: 30 }] });
+    expect(Object.keys(body.data.picks)).toEqual(["11", "22"]);
+    expect(body.data.picks["11"].picks).toEqual([{ element: 5, position: 1 }]);
+  });
+
+  it("still works before the deadline, when lineups are hidden", async () => {
+    fakeFpl({ current_event: 5, current_event_finished: true }, () => new Response("Not found", { status: 404 }));
+    const res = await get("/api/live/6", makeEnv());
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { picks: object } };
+    expect(body.data.picks).toEqual({});
+  });
+
+  it("refreshes every minute while games are on", async () => {
+    fakeFpl({ current_event: 6, current_event_finished: false }, () =>
+      new Response(JSON.stringify({ picks: [], subs: [] })),
+    );
+    const env = makeEnv();
+    await get("/api/live/6", env);
+    const calls = upstream.mock.calls.length;
+    vi.setSystemTime(new Date("2026-09-30T12:01:30Z"));
+    await get("/api/live/6", env);
+    expect(upstream.mock.calls.length).toBeGreaterThan(calls);
+  });
+
+  it("refuses gameweeks too far ahead", async () => {
+    fakeFpl({ current_event: 5, current_event_finished: true }, () => new Response("{}"));
+    expect((await get("/api/live/9", makeEnv())).status).toBe(404);
+  });
+});

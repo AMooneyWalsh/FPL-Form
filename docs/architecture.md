@@ -1,6 +1,6 @@
 # Architecture (draft for review)
 
-Status: agreed 2026-09-30. Steps 1-4 built.
+Status: agreed 2026-09-30. Steps 1-5 built.
 
 ---
 
@@ -56,7 +56,7 @@ Each step ends with something you can open and use:
 | 2 | Trades and waivers: trade verdicts, trade ledger, waiver battles, player journeys. **Built.** |
 | 3 | Draft: steals and busts, draft-only table, squad origins, hindsight redraft. **Built** (see `docs/draft-analysis.md`). |
 | 4 | Results, form, luck, charts, streaks, records, head-to-head (the old site's features, rebuilt). **Built** as the League tab (`shared/results.ts`). |
-| 5 | Live gameweek page. |
+| 5 | Live gameweek page. **Built** (see `docs/live-scoring.md`). |
 | 6 | Waiver suggestions. |
 
 Once step 4 is done, the new site can replace the old one. Until then the old `index.html` and `data.json` stay exactly where they are, so if friends use a link to it, it keeps working.
@@ -105,6 +105,7 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per
 | `/api/ownership` | `league/{LEAGUE_ID}/element-status` | 2 min |
 | `/api/draft` | `draft/{LEAGUE_ID}/choices` (trimmed to picks) | 6 h |
 | `/api/players` | `bootstrap-static` trimmed to `{ players, rules }` (fields we use + squad rules) | 1 h |
+| `/api/live/{n}` | `event/{n}/live` + lineups for all 14 managers (missing before the deadline), trimmed | 1 min while games are on, else 10 min / 1 h |
 | `/api/gw/{n}` | `event/{n}/live` + `entry/{id}/event/{n}` for all 14 managers, built into points + fielded XIs | finished GWs kept for good (memory + KV); current GW 2 min |
 
 Live-match-aware timings come with the live gameweek page (step 5).
