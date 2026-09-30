@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Player } from "../../shared/types";
+import { isOut } from "../../shared/waivers";
 import type { LeagueData } from "./data";
 
 export function PlayerName({ id, data, detail = true }: { id: number; data: LeagueData; detail?: boolean }) {
@@ -8,6 +9,7 @@ export function PlayerName({ id, data, detail = true }: { id: number; data: Leag
   return (
     <a className="player" href={`#/player/${id}`}>
       {p.name}
+      <InjuryFlag p={p} />
       {detail && (
         <span className="player-meta">
           {" "}
@@ -15,6 +17,18 @@ export function PlayerName({ id, data, detail = true }: { id: number; data: Leag
         </span>
       )}
     </a>
+  );
+}
+
+/** A small "Out" / "75%" tag for injured, suspended or doubtful players. News shows on hover. */
+export function InjuryFlag({ p }: { p: Player }) {
+  if (p.status === "a" || !p.status) return null;
+  const out = isOut(p);
+  const text = out ? (p.status === "s" ? "Ban" : "Out") : p.chanceNext !== null ? `${p.chanceNext}%` : "Doubt";
+  return (
+    <span className={out ? "flag flag-out" : "flag flag-doubt"} title={p.news || undefined}>
+      {text}
+    </span>
   );
 }
 

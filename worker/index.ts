@@ -297,9 +297,21 @@ interface RawBootstrap {
     element_type: 1 | 2 | 3 | 4;
     total_points: number;
     draft_rank: number;
+    status: string;
+    news: string;
+    chance_of_playing_next_round: number | null;
+    form: string;
+    points_per_game: string;
+    ep_next: string | null;
+    minutes: number;
+    starts: number;
+    expected_goals: string;
+    expected_assists: string;
+    penalties_order: number | null;
   }[];
   teams: { id: number; short_name: string; code: number }[];
   settings: { squad: Record<string, number> };
+  fixtures?: Record<string, { event: number; team_h: number; team_a: number; kickoff_time: string | null }[]>;
 }
 
 /** bootstrap-static is ~1 MB; phones only need a few fields per player,
@@ -318,13 +330,28 @@ export function trimPlayers(raw: string): string {
     position: POSITIONS[e.element_type],
     totalPoints: e.total_points,
     draftRank: e.draft_rank,
+    status: e.status,
+    news: e.news ?? "",
+    chanceNext: e.chance_of_playing_next_round ?? null,
+    form: Number(e.form) || 0,
+    pointsPerGame: Number(e.points_per_game) || 0,
+    expectedNext: e.ep_next === null || e.ep_next === undefined ? null : Number(e.ep_next),
+    minutes: e.minutes,
+    starts: e.starts,
+    xg: Number(e.expected_goals) || 0,
+    xa: Number(e.expected_assists) || 0,
+    penaltiesOrder: e.penalties_order ?? null,
   }));
+  const fixtures = Object.values(b.fixtures ?? {})
+    .flat()
+    .map((f) => ({ event: f.event, home: f.team_h, away: f.team_a, kickoff: f.kickoff_time }));
   const sq = b.settings.squad;
   const byPos = (prefix: string) =>
     Object.fromEntries(Object.values(POSITIONS).map((pos) => [pos, sq[`${prefix}${pos}`]])) as SquadRules["select"];
   const payload: PlayersPayload = {
     players,
     rules: { play: sq.play, select: byPos("select_"), minPlay: byPos("min_play_"), maxPlay: byPos("max_play_") },
+    fixtures,
   };
   return JSON.stringify(payload);
 }

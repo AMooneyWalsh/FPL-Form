@@ -6,6 +6,7 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 - Live site: https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main`).
 - Built and live: four tabs, Live / League / Moves / Draft (see `docs/navigation-review.md`). Moves holds Trades, Waivers and Player journeys. Every tab has a sticky chip menu (`SubNav` in `app/src/bits.tsx`) with its own link, e.g. `#/draft/redraft`. With no link the site opens on Live while a gameweek is in progress, else League. Old links (`#/trades`, `#/waivers`, `#/players`, `#/table`) redirect.
+- `/api/players` now carries form, injury news, chance of playing, xG/xA, minutes, starts and penalty order, plus the next ~3 gameweeks of fixtures. `/api/ownership` (element-status) is loaded as `data.owners`. `PlayerName` shows an Out / Ban / 75% flag. Waivers page lists free agent signings. Draft has a "Draft day" view (pick timings, auto picks).
 - Player and manager names are links to `#/player/{id}` (`PlayerPage` in `PlayersPage.tsx`) and `#/manager/{id}` (`ManagerPage.tsx`). The "Show" filter uses `useShownManager` in `bits.tsx`, so it carries across pages. `PlayerName` and `Manager` render links, so don't put them inside a button.
 - Last work (PRs #9-#11): Live tab v2 and lineup fixes.
   - Lineups are one two-column grid so rows line up.
@@ -24,7 +25,7 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 1. Old site (root `index.html` + `data.json`): archive it into an `old-site/` folder or replace it with a redirect? No answer yet.
 2. Optional max-3-per-club switch on the hindsight redraft (not an official Draft rule)?
-3. Step 6, waiver suggestions: the last item on the original plan. Start it?
+3. Step 6, waiver suggestions: built (Moves > Suggestions, `shared/waivers.ts`). Fixture difficulty is our own estimate (clubs ranked by their players' FPL points), because the Draft API has no difficulty ratings and `ep_next` is always null there.
 4. Gameweek 6 (from Sat 10 Oct) is the Live tab's first real in-play run, especially the "Will come on for X" projections. Ask the owner for screenshots.
 
 ## Known limits

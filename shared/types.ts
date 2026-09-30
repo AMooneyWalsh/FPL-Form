@@ -124,6 +124,32 @@ export interface Player {
   totalPoints: number;
   /** FPL's pre-season draft ranking (lower = expected to be better). */
   draftRank: number;
+  /** a available, d doubtful, i injured, s suspended, u unavailable, n not in squad. */
+  status: string;
+  /** Injury or suspension news, "" when there's none. */
+  news: string;
+  /** 0-100, or null when there's no doubt. */
+  chanceNext: number | null;
+  /** FPL's form: average points a game over the last 30 days. */
+  form: number;
+  pointsPerGame: number;
+  /** FPL's expected points for next gameweek (null before it's set). */
+  expectedNext: number | null;
+  minutes: number;
+  starts: number;
+  /** Expected goals and assists this season. */
+  xg: number;
+  xa: number;
+  /** Penalty taker order for his club (1 = first choice), null if not on them. */
+  penaltiesOrder: number | null;
+}
+
+/** An upcoming Premier League match, from bootstrap-static. */
+export interface UpcomingFixture {
+  event: number;
+  home: number;
+  away: number;
+  kickoff: string | null;
 }
 
 /** Squad rules from bootstrap-static settings.squad. */
@@ -139,4 +165,6 @@ export interface SquadRules {
 export interface PlayersPayload {
   players: Player[];
   rules: SquadRules;
+  /** The next few gameweeks' fixtures (FPL sends about three). */
+  fixtures: UpcomingFixture[];
 }

@@ -14,6 +14,7 @@ import type {
   SiteConfig,
   Trade,
   Transaction,
+  UpcomingFixture,
 } from "../../shared/types";
 import { useApi, type Loadable } from "./api";
 
@@ -30,6 +31,10 @@ export interface LeagueData {
   reversals: Reversal[];
   transactions: Transaction[];
   draft: DraftChoice[];
+  /** Who owns each player right now (entry_id), null for free agents. */
+  owners: Map<number, number | null>;
+  /** The next few gameweeks' Premier League fixtures. */
+  fixtures: UpcomingFixture[];
   seasons: Seasons;
   entries: Map<number, LeagueEntry>;
   /** Short manager names keyed by entry_id. */
@@ -53,10 +58,14 @@ export function useLeagueData(): Loadable<LeagueData> {
   const trades = useApi<Envelope<{ trades: Trade[] }>>("/api/trades", REFRESH);
   const transactions = useApi<Envelope<{ transactions: Transaction[] }>>("/api/transactions", REFRESH);
   const draft = useApi<Envelope<{ choices: DraftChoice[] }>>("/api/draft", 3600);
+  const ownership = useApi<Envelope<{ element_status: { element: number; owner: number | null }[] }>>(
+    "/api/ownership",
+    REFRESH,
+  );
   const gameweeks = useGameweeks(game.status === "ready" ? game.value.data.current_event : null);
 
   return useMemo((): Loadable<LeagueData> => {
-    const all = [config, league, game, players, trades, transactions, draft, gameweeks];
+    const all = [config, league, game, players, trades, transactions, draft, ownership, gameweeks];
     const failed = all.find((x) => x.status === "error");
     if (failed?.status === "error") return failed;
     if (
@@ -67,13 +76,14 @@ export function useLeagueData(): Loadable<LeagueData> {
       trades.status !== "ready" ||
       transactions.status !== "ready" ||
       draft.status !== "ready" ||
+      ownership.status !== "ready" ||
       gameweeks.status !== "ready"
     ) {
       return { status: "loading" };
     }
     const envelopes = [league.value, game.value, players.value, trades.value, transactions.value, draft.value];
     // Players and draft picks only refresh hourly, so leave them out of "Updated X ago".
-    const fast = [league.value, game.value, trades.value, transactions.value];
+    const fast = [league.value, game.value, trades.value, transactions.value, ownership.value];
     const entries = league.value.data.league_entries;
     const effective = cancelReversals(trades.value.data.trades);
     return {
@@ -89,6 +99,8 @@ export function useLeagueData(): Loadable<LeagueData> {
         reversals: effective.reversals,
         transactions: transactions.value.data.transactions,
         draft: draft.value.data.choices,
+        owners: new Map(ownership.value.data.element_status.map((s) => [s.element, s.owner])),
+        fixtures: players.value.data.fixtures ?? [],
         seasons: new Seasons(gameweeks.value.loaded),
         entries: new Map(entries.map((e) => [e.entry_id, e])),
         labels: managerLabels(entries),
@@ -98,7 +110,7 @@ export function useLeagueData(): Loadable<LeagueData> {
         missingGameweeks: gameweeks.value.missing,
       },
     };
-  }, [config, league, game, players, trades, transactions, draft, gameweeks]);
+  }, [config, league, game, players, trades, transactions, draft, ownership, gameweeks]);
 }
 
 /**
