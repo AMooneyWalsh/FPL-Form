@@ -1617,3 +1617,16 @@ a.link {
   padding: 6px 0;
   border-bottom: 1px solid var(--line);
 }
+
+.stat-rank {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.stat-row:has(> .stat:nth-child(3):last-child) {
+  grid-template-columns: repeat(3, 1fr);
+}
