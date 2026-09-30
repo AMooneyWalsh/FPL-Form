@@ -56,5 +56,5 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - [x] Get the 2026/27 league ID (634)
 - [x] Confirm league 634 details: "Drafty In Here", 14 managers, H2H, waivers, trades on, 30s draft on 16 Aug
 - [x] Architecture doc agreed (`docs/architecture.md`)
-- [ ] Save real API responses for trades, transactions, draft picks, squads, live points
+- [x] Save real API responses (network access to draft.premierleague.com allowed in the cloud environment, all endpoints verified)
 - [ ] Step 1: skeleton site live on Cloudflare

@@ -1,6 +1,6 @@
 # FPL Draft API notes
 
-Status: `league/{id}/details` verified from a browser on 2026-09-30 (no login needed). The others come from the shape of `data.json` and general knowledge of the unofficial API, and still need checking. The cloud sandbox can't reach `draft.premierleague.com`.
+Status: every endpoint in the table below was verified on 2026-09-30, no login needed. The cloud environment's network policy now allows `draft.premierleague.com`. Real responses for league 634 after GW5 are saved in `fixtures/`.
 
 The API is unofficial and undocumented, so it can change without notice. Base URL: `https://draft.premierleague.com/api/`
 
@@ -12,8 +12,10 @@ The API is unofficial and undocumented, so it can change without notice. Base UR
 | `draft/league/{id}/trades` | Trades. This is `tradeData`. |
 | `event/{gw}/live` | Live per-player stats and points for a gameweek. Needed for live scoring. |
 | `entry/{entry_id}/event/{gw}` | A manager's squad and picks for a gameweek (starting XI, bench, captain-less in draft). |
-| `draft/{gw}/choices` | Draft picks, in order. Would replace the hardcoded `DRAFT_PICKS`. |
-| `league/{id}/element-status` | Which player is owned by which entry. |
+| `draft/{league_id}/choices` | All draft picks in order (`pick`, `round`, `element`, `entry`, `was_auto`, `choice_time`). Note it's the league ID, not a gameweek. |
+| `league/{id}/element-status` | Which player is owned by which entry (`owner` is an `entry_id`, or null). |
+| `game` | Current and next gameweek, whether it's finished, whether waivers have been processed. Small, good for deciding refresh rates. |
+| `entry/{entry_id}/public` | Team name, total points, `league_set` (the leagues the team is in). |
 
 ## Things to know
 
@@ -29,4 +31,13 @@ The API is unofficial and undocumented, so it can change without notice. Base UR
 - Future matches are listed with `started: false` and 0 points, so filter on `finished`.
 - Opening the URL in a browser tab doesn't prove cross-origin `fetch` from our site is allowed (CORS). That doesn't matter because the Worker makes the requests server side.
 - **Two different IDs per manager.** `league_entries[].entry_id` (the team, used by transactions, picks and `entry/{id}/...`) and `league_entries[].id` (the league entry, used by `matches` and `standings`) are equal for some managers and different for others (e.g. 1848 vs 1849). Always map between them via `league_entries`, never assume they match.
-- A sample response for league 634 after GW5 is saved in `fixtures/league-634-details-gw5.json` for tests.
+- A sample response for league 634 after GW5 is saved in `fixtures/league-634-details.json` for tests.
+
+## Shapes worth knowing (from the GW5 fixtures)
+
+- `trades[]`: `offered_entry`, `received_entry` (entry_ids), `event`, `state` (`p` processed; only processed trades appear), `tradeitem_set[]` of `{element_in, element_out}` from the offering side's view.
+- `transactions[]`: `entry`, `event`, `kind` (`w` waiver, `f` free agent), `result` (`a` accepted, `di` and `do` denied), `element_in`, `element_out`, `priority`, `added`. 388 rows by GW5, so waiver battles have plenty of data.
+- `choices[]`: 210 picks (14 managers x 15 rounds, snake order).
+- `entry/{id}/event/{gw}`: `picks[]` with `position` 1 to 15 (12 to 15 is the bench) plus `subs[]` (auto-subs FPL applied) and `entry_history`.
+- `event/{gw}/live`: `elements` keyed by player id with `stats` (incl. `total_points`, `minutes`, `bps`, `bonus`) and `explain`, plus `fixtures`.
+- `game.trades_time_for_approval: true` means trades go through an approval window before processing.
