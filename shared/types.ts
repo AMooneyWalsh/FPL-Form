@@ -142,6 +142,8 @@ export interface Player {
   xa: number;
   /** Penalty taker order for his club (1 = first choice), null if not on them. */
   penaltiesOrder: number | null;
+  /** When FPL added him to the game (ISO), e.g. a late summer signing. */
+  added?: string;
 }
 
 /** An upcoming Premier League match, from bootstrap-static. */

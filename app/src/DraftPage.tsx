@@ -292,7 +292,8 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
       </div>
       <p className="hint">
         The draft run again in the same order, with everyone taking the best scorer still available who fits their squad
-        (2 GKP, 5 DEF, 5 MID, 3 FWD). Anyone in the game counts, including players nobody drafted. Pick one manager with
+        (2 GKP, 5 DEF, 5 MID, 3 FWD). Anyone in the game at the time counts, including players nobody drafted (late signings FPL added after the
+        draft are left out). Pick one manager with
         "Show" to also see the best player still available at each of their real picks.
       </p>
       {who !== null && (
