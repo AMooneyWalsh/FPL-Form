@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
 import { Manager, nobody, PlayerName, Pts, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
+import { TradeNetwork } from "./TradeNetwork";
 
 export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [who, setWho] = useShownManager();
@@ -70,6 +71,8 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
           </p>
         )}
       </section>
+
+      <TradeNetwork ledger={ledger} data={data} myTeam={myTeam} />
 
       <section>
         <div className="section-head">

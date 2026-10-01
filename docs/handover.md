@@ -40,6 +40,10 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Waivers page: "Free agent signings" (`freeAgentSignings`), newest first, with points since, following the Show filter.
 - Draft > Draft day (`draftDay`): average and slowest pick time (gap since the previous pick; pick 1 isn't timed) and auto picks (`was_auto`). This league had a 30-second pick timer; Ben had 8 auto picks.
 
+### Trade network (Moves > Trades)
+
+- `TradeNetwork.tsx`: managers on a circle, dot size = trades made, colour = trade net (green up, red down, grey level, faint = none), line thickness = trades between that pair (from `LedgerRow.partners`). Tap a dot to focus it and list their partners; otherwise shows the top five partnerships. The owner had this on an earlier draft site and asked for it back.
+
 ### Live tab (PRs #9-#11)
 
 - Lineups are one two-column grid. Shirts load via `/api/shirt/{code}`. `lineupAsPicked` in `shared/live.ts` undoes FPL's post-gameweek rewrite. The subbed-off starter is crossed out, the bench is numbered GK/1/2/3, and notes read "Came on for X" (or "Will come on for X" while projected).

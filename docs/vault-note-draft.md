@@ -85,3 +85,4 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Manager page ranks are coloured: green for the top third of the league, red for the bottom third, grey for middle or neutral stats (e.g. number of trades). Wording counts from the nearer end ('3rd best', '2nd worst').
 - Step 6 done: waiver suggestions (Moves > Suggestions) using form, points a game, fixtures and fitness, with a drop suggestion from your squad. Injury flags next to every player name. Free agent signings list on Waivers. Draft day section (average pick time, slowest pick, auto picks).
 - Fixture difficulty now uses FPL's official ratings from the main FPL game's API (the owner spotted the estimate was wrong). The old estimate only kicks in if that API is down.
+- Trade network added to Moves > Trades (who trades with whom, dot size = trades, colour = up or down on trades, tap a manager to focus). Brought back from an earlier draft site.
