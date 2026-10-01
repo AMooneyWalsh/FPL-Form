@@ -144,6 +144,15 @@ describe("hindsight redraft (real data)", () => {
     expect(redraft[0].bestAvailablePoints).toBe(top);
   });
 
+  it("never suggests a player FPL added after the pick was made", () => {
+    const added = new Map(players.map((p) => [p.id, p.added]));
+    const barcola = players.find((p) => p.name === "Barcola")!;
+    expect(barcola.added! > redraft[0].time).toBe(true);
+    for (const r of redraft) {
+      for (const id of [r.hindsight, r.bestAvailable]) expect((added.get(id) ?? "") <= r.time).toBe(true);
+    }
+  });
+
   it("fills all 210 picks with different players", () => {
     expect(redraft).toHaveLength(210);
     expect(new Set(redraft.map((r) => r.hindsight)).size).toBe(210);

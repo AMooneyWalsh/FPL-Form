@@ -199,6 +199,8 @@ export interface RedraftPick {
   entryId: number;
   /** Who they actually took with this pick. */
   actual: number;
+  /** When the pick was made. */
+  time: string;
   /** Who they'd take knowing this season's points so far. */
   hindsight: number;
   hindsightPoints: number;
@@ -213,7 +215,8 @@ export interface RedraftPick {
  * Re-runs the draft in the same snake order, each manager taking the
  * highest-scoring player still available who fits their squad (2 GKP,
  * 5 DEF, 5 MID, 3 FWD). Every player in the game is available, not just the
- * ones who were drafted.
+ * ones who were drafted, as long as they were in the game at the time
+ * (FPL adds late signings during the season).
  */
 export function hindsightRedraft(
   draft: DraftChoice[],
@@ -232,7 +235,7 @@ export function hindsightRedraft(
     .map((c) => {
       const mine = counts.get(c.entry) ?? { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
       counts.set(c.entry, mine);
-      const pick = pool.find((p) => !taken.has(p.id) && mine[p.position] < rules.select[p.position]);
+      const pick = pool.find((p) => !taken.has(p.id) && mine[p.position] < rules.select[p.position] && inGame(p, c.choice_time));
       if (!pick) throw new Error("Ran out of players in the redraft");
       taken.add(pick.id);
       mine[pick.position]++;
@@ -241,6 +244,7 @@ export function hindsightRedraft(
         round: c.round,
         entryId: c.entry,
         actual: c.element,
+        time: c.choice_time,
         hindsight: pick.id,
         hindsightPoints: totals.get(pick.id) ?? 0,
         actualPoints: totals.get(c.element) ?? 0,
@@ -256,13 +260,18 @@ export function hindsightRedraft(
     });
 }
 
+/** Was he in the game when this pick was made? */
+function inGame(p: Player, time: string): boolean {
+  return !p.added || !time || p.added <= time;
+}
+
 /**
  * Only this manager picks with hindsight; everyone else makes their real
  * picks. At each of their turns they take the best scorer still available
  * who fits the squad they've built so far. Returns pick index -> player.
  */
 function soloRedraft(
-  picks: { index: number; entryId: number; actual: number }[],
+  picks: { index: number; entryId: number; actual: number; time: string }[],
   entryId: number,
   pool: Player[],
   totals: Map<number, number>,
@@ -276,7 +285,7 @@ function soloRedraft(
       gone.add(p.actual);
       continue;
     }
-    const pick = pool.find((x) => !gone.has(x.id) && mine[x.position] < rules.select[x.position]);
+    const pick = pool.find((x) => !gone.has(x.id) && mine[x.position] < rules.select[x.position] && inGame(x, p.time));
     if (!pick) throw new Error("Ran out of players in the solo redraft");
     gone.add(pick.id);
     mine[pick.position]++;

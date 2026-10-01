@@ -317,6 +317,7 @@ interface RawBootstrap {
     expected_goals: string;
     expected_assists: string;
     penalties_order: number | null;
+    added?: string;
   }[];
   teams: { id: number; short_name: string; code: number }[];
   settings: { squad: Record<string, number> };
@@ -350,6 +351,7 @@ export function trimPlayers(raw: string): string {
     xg: Number(e.expected_goals) || 0,
     xa: Number(e.expected_assists) || 0,
     penaltiesOrder: e.penalties_order ?? null,
+    added: e.added,
   }));
   const fixtures = Object.values(b.fixtures ?? {})
     .flat()
