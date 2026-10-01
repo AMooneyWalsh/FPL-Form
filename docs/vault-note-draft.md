@@ -87,3 +87,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Fixture difficulty now uses FPL's official ratings from the main FPL game's API (the owner spotted the estimate was wrong). The old estimate only kicks in if that API is down.
 - Trade network added to Moves > Trades (who trades with whom, dot size = trades, colour = up or down on trades, tap a manager to focus). Brought back from an earlier draft site.
 - 1 Oct: made a shareable 'early-season awards' image for the league chat (roast-style, real numbers). Template and steps saved in the repo under scripts/awards/ so it can be redone each gameweek.
+
+## 1 Oct 2026: backlog from market research
+
+Looked at draftfpl.live, Sleeper analysers, trade calculators and main-game FPL tools. Full list in the repo at `docs/backlog.md`. Top picks: trade checker, trade partner finder, power rankings, title odds, current waiver order, trade grades over time. Owner to choose what to build next.
