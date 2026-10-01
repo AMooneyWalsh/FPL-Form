@@ -202,6 +202,11 @@ export interface RedraftPick {
   /** Who they'd take knowing this season's points so far. */
   hindsight: number;
   hindsightPoints: number;
+  actualPoints: number;
+  /** Everyone else's real picks stand and only this manager picks with
+   * hindsight: the best scorer still on the board who fits what they'd built. */
+  bestAvailable: number;
+  bestAvailablePoints: number;
 }
 
 /**
@@ -220,6 +225,8 @@ export function hindsightRedraft(
   const pool = [...players].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0) || a.draftRank - b.draftRank);
   const taken = new Set<number>();
   const counts = new Map<number, Record<Position, number>>();
+  const solos = new Map<number, Map<number, number>>();
+
   return [...draft]
     .sort((a, b) => a.index - b.index)
     .map((c) => {
@@ -236,6 +243,44 @@ export function hindsightRedraft(
         actual: c.element,
         hindsight: pick.id,
         hindsightPoints: totals.get(pick.id) ?? 0,
+        actualPoints: totals.get(c.element) ?? 0,
+        bestAvailable: 0,
+        bestAvailablePoints: 0,
       };
+    })
+    .map((r, _, all) => {
+      const solo = solos.get(r.entryId) ?? soloRedraft(all, r.entryId, pool, totals, rules);
+      solos.set(r.entryId, solo);
+      const best = solo.get(r.index)!;
+      return { ...r, bestAvailable: best, bestAvailablePoints: totals.get(best) ?? 0 };
     });
+}
+
+/**
+ * Only this manager picks with hindsight; everyone else makes their real
+ * picks. At each of their turns they take the best scorer still available
+ * who fits the squad they've built so far. Returns pick index -> player.
+ */
+function soloRedraft(
+  picks: { index: number; entryId: number; actual: number }[],
+  entryId: number,
+  pool: Player[],
+  totals: Map<number, number>,
+  rules: SquadRules,
+): Map<number, number> {
+  const gone = new Set<number>();
+  const mine: Record<Position, number> = { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
+  const out = new Map<number, number>();
+  for (const p of picks) {
+    if (p.entryId !== entryId) {
+      gone.add(p.actual);
+      continue;
+    }
+    const pick = pool.find((x) => !gone.has(x.id) && mine[x.position] < rules.select[x.position]);
+    if (!pick) throw new Error("Ran out of players in the solo redraft");
+    gone.add(pick.id);
+    mine[pick.position]++;
+    out.set(p.index, pick.id);
+  }
+  return out;
 }

@@ -126,6 +126,24 @@ describe("hindsight redraft (real data)", () => {
   const redraft = hindsightRedraft(draft, seasons, players, rules);
   const totals = seasonPoints(seasons);
 
+  it("replays each manager's picks with hindsight against everyone else's real picks", () => {
+    for (const id of entryIds) {
+      const mine = redraft.filter((r) => r.entryId === id);
+      // Fifteen different players, none of them taken by someone else first, in a legal squad.
+      expect(new Set(mine.map((r) => r.bestAvailable)).size).toBe(15);
+      for (const r of mine) {
+        const takenBefore = redraft.filter((o) => o.entryId !== id && o.index < r.index).map((o) => o.actual);
+        expect(takenBefore).not.toContain(r.bestAvailable);
+      }
+      const pos = mine.map((r) => positions.get(r.bestAvailable));
+      expect(pos.filter((p) => p === "GKP")).toHaveLength(2);
+      expect(mine.reduce((a, r) => a + r.bestAvailablePoints, 0)).toBeGreaterThanOrEqual(mine.reduce((a, r) => a + r.actualPoints, 0));
+    }
+    // The very first pick had the whole game to choose from.
+    const top = Math.max(...players.map((p) => totals.get(p.id) ?? 0));
+    expect(redraft[0].bestAvailablePoints).toBe(top);
+  });
+
   it("fills all 210 picks with different players", () => {
     expect(redraft).toHaveLength(210);
     expect(new Set(redraft.map((r) => r.hindsight)).size).toBe(210);
