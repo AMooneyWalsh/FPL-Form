@@ -49,6 +49,7 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Simulates the rest of the season; shows chances for each prize and forfeit (places 1-3 and 11-14, lowest total, two lowest single gameweeks) and who is immune (top of main-game league 2757). The manager page shows their own odds.
 - Prizes and forfeits are listed in `PRIZES` in `app/src/OddsPage.tsx`. Update them each season.
 - Feature ideas live in `docs/backlog.md`.
+- Draft > Redraft "Best then" column (John's idea): see `docs/draft-analysis.md`.
 
 ### Gameweek awards graphic
 

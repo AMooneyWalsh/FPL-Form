@@ -292,28 +292,53 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
       </div>
       <p className="hint">
         The draft run again in the same order, with everyone taking the best scorer still available who fits their squad
-        (2 GKP, 5 DEF, 5 MID, 3 FWD). Anyone in the game counts, including players nobody drafted.
+        (2 GKP, 5 DEF, 5 MID, 3 FWD). Anyone in the game counts, including players nobody drafted. Pick one manager with
+        "Show" to also see the best player still available at each of their real picks.
       </p>
+      {who !== null && (
+        <p className="hint">
+          "Best then" is the draft with only {data.labels.get(who)} knowing what we know now. Everyone else makes
+          their real picks, and at each turn {data.labels.get(who)} takes the top scorer still available who fits.
+          The real picks have scored {shown.reduce((a, r) => a + r.actualPoints, 0)} points; that squad would have
+          scored {shown.reduce((a, r) => a + r.bestAvailablePoints, 0)}.
+        </p>
+      )}
       <div className="table-wrap">
         <table className="data">
           <thead>
             <tr>
               <th className="num">#</th>
-              <th className="left">Manager</th>
+              {who === null && <th className="left">Manager</th>}
               <th className="left">Took</th>
-              <th className="left">Should have taken</th>
+              {who !== null && <th className="left">Best then</th>}
+              <th className="left">{who === null ? "Should have taken" : "Redraft"}</th>
             </tr>
           </thead>
           <tbody>
             {shown.map((r) => (
               <tr key={r.index} className={r.entryId === myTeam ? "mine" : undefined}>
                 <td className="num rank">{r.index}</td>
-                <td className="left">
-                  <Manager id={r.entryId} data={data} />
-                </td>
+                {who === null && (
+                  <td className="left">
+                    <Manager id={r.entryId} data={data} />
+                  </td>
+                )}
                 <td className="left">
                   <PlayerName id={r.actual} data={data} detail={false} />
+                  {who !== null && <> <span className="player-meta">{r.actualPoints}</span></>}
                 </td>
+                {who !== null && (
+                  <td className="left">
+                    {r.bestAvailable === r.actual ? (
+                      <span className="pts-pos">Spot on</span>
+                    ) : (
+                      <>
+                        <PlayerName id={r.bestAvailable} data={data} detail={false} />{" "}
+                        <span className="player-meta">{r.bestAvailablePoints}</span>
+                      </>
+                    )}
+                  </td>
+                )}
                 <td className="left">
                   <PlayerName id={r.hindsight} data={data} detail={false} />{" "}
                   <span className="player-meta">{r.hindsightPoints}</span>

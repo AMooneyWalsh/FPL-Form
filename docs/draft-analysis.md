@@ -43,3 +43,7 @@ It shows who each manager actually took with each pick against who they "should"
 
 - Overall pick number is `choices[].index`, not `pick` (see `docs/fpl-draft-api.md`).
 - Squad rules come from `bootstrap-static.settings.squad`. The Worker trims it into `rules` on `/api/players`, which now returns `{ players, rules }`.
+
+## Best then (one manager's picks, John's idea, 1 Oct 2026)
+
+On Draft > Redraft with "Show" set to one manager, a "Best then" column replays the draft with only that manager using hindsight: everyone else makes their real picks, and at each of their turns they take the top scorer still available who fits the squad they've built so far (`soloRedraft` in `shared/draft.ts`). The intro line compares the real picks' points with that squad's.
