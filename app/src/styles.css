@@ -1705,3 +1705,70 @@ a.link {
   font-size: 12px;
   margin-top: 6px;
 }
+
+/* Trade network */
+.net-card {
+  padding: 4px;
+}
+
+.net {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.net-edge {
+  stroke: var(--brand);
+  stroke-opacity: 0.45;
+  stroke-linecap: round;
+  transition: stroke-opacity 0.15s;
+}
+
+.net-edge.dim {
+  stroke-opacity: 0.06;
+}
+
+.net-node {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.net-node.dim {
+  opacity: 0.25;
+}
+
+.net-node .dot {
+  stroke: var(--surface);
+  stroke-width: 2;
+  fill: var(--draw);
+}
+
+.net-node.up .dot { fill: var(--win); }
+.net-node.down .dot { fill: var(--loss); }
+.net-node.none .dot { fill: var(--line); }
+.net-node.on .dot,
+.net-node.me .dot {
+  stroke: var(--text);
+}
+
+.net-node text {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--text);
+}
+
+.net-node.on text {
+  font-weight: 800;
+}
+
+.net-detail {
+  margin-top: 10px;
+  padding: 12px 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .net-edge {
+    stroke: #c9a3d1;
+  }
+}
