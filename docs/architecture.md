@@ -165,7 +165,7 @@ Hash routes, four tabs, each with a sticky chip sub-menu. See `docs/navigation-r
 
 - `#/live/{matches|bonus|fixtures}`: live H2H matchups with lineups, provisional bonus and auto-subs, table if it ended now, PL fixtures. The landing page while a gameweek is in progress.
 - `#/league/{table|form|luck|h2h|records}`: standings and position chart, form, fixture luck, head to head, streaks and records. The landing page otherwise.
-- `#/moves/{trades|waivers|suggestions|players}`: trade verdicts and ledger; waiver record, free agent signings and waiver battles; waiver suggestions; player journeys search.
+- `#/moves/{trades|waivers|suggestions|players}`: trade verdicts, ledger and trade network; waiver record, free agent signings and waiver battles; waiver suggestions; player journeys search.
 - `#/draft/{grades|picks|no-moves|origins|redraft|day}`: draft grades, steals and busts, draft-only table, points by source, hindsight redraft, draft day (pick times, auto picks).
 - `#/player/{id}`: one player's journey. Every player name links here and carries an Out / Ban / % injury flag.
 - `#/manager/{id}`: one manager's page: standing, form, next opponent, "Season in numbers" with a green/amber/red league rank under every stat, latest trades, waivers, draft grade, squad. Every manager name links here.

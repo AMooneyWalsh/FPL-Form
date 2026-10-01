@@ -86,3 +86,4 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 - Step 6 done: waiver suggestions (Moves > Suggestions) using form, points a game, fixtures and fitness, with a drop suggestion from your squad. Injury flags next to every player name. Free agent signings list on Waivers. Draft day section (average pick time, slowest pick, auto picks).
 - Fixture difficulty now uses FPL's official ratings from the main FPL game's API (the owner spotted the estimate was wrong). The old estimate only kicks in if that API is down.
 - Trade network added to Moves > Trades (who trades with whom, dot size = trades, colour = up or down on trades, tap a manager to focus). Brought back from an earlier draft site.
+- 1 Oct: made a shareable 'early-season awards' image for the league chat (roast-style, real numbers). Template and steps saved in the repo under scripts/awards/ so it can be redone each gameweek.
