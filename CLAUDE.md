@@ -18,6 +18,7 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 - Live league for 2026/27: league ID `634` ("Drafty In Here", 14 managers, H2H, waivers, trades on), owner's entry ID `1412`. The old data.json league (6573) is last season's and that ID has since been reused by another league.
 - New site (steps 1-6 of the original plan built; tabs: Live, League, Moves, Draft, plus player and manager pages): `app/` React, `worker/` Cloudflare Worker, `shared/` league maths, `fixtures/` real API data. Run `npm run check` before every merge, and `npx tsx scripts/regression.ts` (checks every calculation against live FPL data) after anything touching `shared/`. See `docs/setup.md`.
 - **New session? Read `docs/handover.md` first.**
+- Feature ideas live in `docs/backlog.md`.
 - See `docs/architecture.md` (agreed plan), `docs/existing-app.md` and `docs/fpl-draft-api.md`.
 
 - **Live site:** https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main` automatically). Cloudflare's PR preview builds fail instantly for a setup reason we can't see; the GitHub `check` job is the real gate.
