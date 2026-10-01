@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import bootstrap from "../fixtures/bootstrap-static.json";
-import worker, { resetCachesForTests, trimPlayers, type Env } from "./index";
+import classic from "../fixtures/classic-2757.json";
+import worker, { resetCachesForTests, trimClassic, trimPlayers, type Env } from "./index";
 
 class FakeKv {
   store = new Map<string, string>();
@@ -275,5 +276,14 @@ describe("live route", () => {
   it("refuses gameweeks too far ahead", async () => {
     fakeFpl({ current_event: 5, current_event_finished: true }, () => new Response("{}"));
     expect((await get("/api/live/9", makeEnv())).status).toBe(404);
+  });
+});
+
+describe("trimClassic", () => {
+  it("keeps name, rank and total for every manager", () => {
+    const out = JSON.parse(trimClassic(JSON.stringify(classic)));
+    expect(out.standings).toHaveLength(14);
+    expect(Object.keys(out.standings[0]).sort()).toEqual(["name", "rank", "total"]);
+    expect(out.standings[0].rank).toBe(1);
   });
 });

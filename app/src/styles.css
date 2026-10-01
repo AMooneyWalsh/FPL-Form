@@ -1772,3 +1772,13 @@ a.link {
     stroke: #c9a3d1;
   }
 }
+
+/* Season odds: prizes and forfeits */
+.odds-prizes {
+  display: grid;
+  gap: 0.5rem;
+}
+.odds-prizes .card {
+  display: grid;
+  gap: 0.2rem;
+}

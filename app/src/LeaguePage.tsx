@@ -13,6 +13,7 @@ import {
 import { computeStandings } from "../../shared/standings";
 import { Manager, Pts, SubNav } from "./bits";
 import type { LeagueData } from "./data";
+import { OddsView } from "./OddsPage";
 import { StandingsTable } from "./StandingsTable";
 
 export const LEAGUE_VIEWS = [
@@ -21,6 +22,7 @@ export const LEAGUE_VIEWS = [
   { id: "luck", label: "Luck" },
   { id: "h2h", label: "Head to head" },
   { id: "records", label: "Records" },
+  { id: "odds", label: "Odds" },
 ] as const;
 export type LeagueView = (typeof LEAGUE_VIEWS)[number]["id"];
 
@@ -33,6 +35,7 @@ export function LeaguePage({ data, myTeam, view }: { data: LeagueData; myTeam: n
       {view === "luck" && <LuckView data={data} myTeam={myTeam} />}
       {view === "h2h" && <HeadToHeadView data={data} myTeam={myTeam} />}
       {view === "records" && <RecordsView data={data} myTeam={myTeam} />}
+      {view === "odds" && <OddsView data={data} myTeam={myTeam} />}
     </>
   );
 }

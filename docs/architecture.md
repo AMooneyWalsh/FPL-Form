@@ -106,6 +106,7 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per
 | `/api/draft` | `draft/{LEAGUE_ID}/choices` (trimmed to picks) | 6 h |
 | `/api/players` | `bootstrap-static` trimmed to `{ players, rules, fixtures }`: ids, names, club, position, points, draft rank, plus status, news, chance of playing, form, points per game, minutes, starts, xG, xA, penalty order; squad rules; the next ~3 gameweeks of fixtures | 1 h |
 | `/api/fdr` | Main FPL game: `https://fantasy.premierleague.com/api/fixtures/?future=1`, trimmed to event, clubs, kickoff and each side's official 1-5 difficulty (the Draft API has none; club ids match) | 6 h |
+| `/api/classic` | Main FPL game: `leagues-classic/{CLASSIC_LEAGUE_ID}/standings/` trimmed to name, rank, total (who is immune from a forfeit) | 30 min |
 | `/api/shirt/{code}` | FPL shirt image, proxied because FPL's image host failed on phones | long |
 | `/api/live/{n}` | `event/{n}/live` + lineups for all 14 managers (missing before the deadline), trimmed to per-player stats and points breakdown, BPS and match events | 1 min while games are on, else 10 min / 1 h |
 | `/api/gw/{n}` | `event/{n}/live` + `entry/{id}/event/{n}` for all 14 managers, built into points + fielded XIs | finished GWs kept for good (memory + KV); current GW 2 min |
@@ -164,7 +165,7 @@ This is the fiddliest logic, so it gets thorough unit tests using saved real res
 Hash routes, four tabs, each with a sticky chip sub-menu. See `docs/navigation-review.md` for why.
 
 - `#/live/{matches|bonus|fixtures}`: live H2H matchups with lineups, provisional bonus and auto-subs, table if it ended now, PL fixtures. The landing page while a gameweek is in progress.
-- `#/league/{table|form|luck|h2h|records}`: standings and position chart, form, fixture luck, head to head, streaks and records. The landing page otherwise.
+- `#/league/{table|form|luck|h2h|records|odds}`: standings and position chart, form, fixture luck, head to head, streaks and records, season odds for every prize and forfeit (`docs/odds.md`). The landing page otherwise.
 - `#/moves/{trades|waivers|suggestions|players}`: trade verdicts, ledger and trade network; waiver record, free agent signings and waiver battles; waiver suggestions; player journeys search.
 - `#/draft/{grades|picks|no-moves|origins|redraft|day}`: draft grades, steals and busts, draft-only table, points by source, hindsight redraft, draft day (pick times, auto picks).
 - `#/player/{id}`: one player's journey. Every player name links here and carries an Out / Ban / % injury flag.

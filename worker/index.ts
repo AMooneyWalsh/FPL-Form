@@ -9,6 +9,8 @@ import type { GameStatus, LeagueDetails, Player, PlayersPayload, SquadRules, Upc
 export interface Env {
   LEAGUE_ID: string;
   DEFAULT_ENTRY_ID: string;
+  /** The group's main-game FPL league; its leader is immune from a forfeit. */
+  CLASSIC_LEAGUE_ID?: string;
   /** Optional: long-lived copies. The site works without it. */
   LAST_GOOD?: KVNamespace;
   ASSETS: Fetcher;
@@ -45,6 +47,11 @@ export const ROUTES: Record<string, Route> = {
   players: { upstream: () => "bootstrap-static", ttl: HOUR, transform: trimPlayers },
   // Fixture difficulty ratings only exist on the main FPL game's API (same club ids as Draft).
   fdr: { upstream: () => FPL_FIXTURES, ttl: 6 * HOUR, transform: trimFixtures },
+  classic: {
+    upstream: (env) => `https://fantasy.premierleague.com/api/leagues-classic/${env.CLASSIC_LEAGUE_ID ?? "2757"}/standings/`,
+    ttl: 30 * MINUTE,
+    transform: trimClassic,
+  },
 };
 
 interface Cached {
@@ -382,6 +389,14 @@ export function trimFixtures(raw: string): string {
       awayDifficulty: f.team_a_difficulty,
     }));
   return JSON.stringify({ fixtures });
+}
+
+/** The main-game league table, cut down to name, rank and total. */
+export function trimClassic(raw: string): string {
+  const d = JSON.parse(raw) as { standings?: { results?: { player_name: string; rank: number; total: number }[] } };
+  const results = d.standings?.results;
+  if (!Array.isArray(results)) throw new Error("Unexpected classic league shape");
+  return JSON.stringify({ standings: results.map((r) => ({ name: r.player_name, rank: r.rank, total: r.total })) });
 }
 
 /** The choices endpoint also carries every player's status; keep just the picks. */

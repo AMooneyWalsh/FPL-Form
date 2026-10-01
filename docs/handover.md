@@ -44,6 +44,12 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 - `TradeNetwork.tsx`: managers on a circle, dot size = trades made, colour = trade net (green up, red down, grey level, faint = none), line thickness = trades between that pair (from `LedgerRow.partners`). Tap a dot to focus it and list their partners; otherwise shows the top five partnerships. The owner had this on an earlier draft site and asked for it back.
 
+### Season odds (League > Odds, `docs/odds.md`)
+
+- Simulates the rest of the season; shows chances for each prize and forfeit (places 1-3 and 11-14, lowest total, two lowest single gameweeks) and who is immune (top of main-game league 2757). The manager page shows their own odds.
+- Prizes and forfeits are listed in `PRIZES` in `app/src/OddsPage.tsx`. Update them each season.
+- Feature ideas live in `docs/backlog.md`.
+
 ### Gameweek awards graphic
 
 - The owner shares a fun "awards" image in the league chat (first one: after GW5). See `scripts/awards/README.md` for how to remake it each week. Keep it a roast-style roundup, not an ad.

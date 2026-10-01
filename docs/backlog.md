@@ -22,7 +22,7 @@ S = an afternoon, M = a session, L = several sessions or needs new data.
 | 1 | **Trade checker** | Pick players on both sides of a possible trade and see form, fixtures and value for each side before proposing it. | FantasyPros, RotoTrade | M |
 | 2 | **Trade partner finder** | For each manager, show who is short where you are strong (e.g. they lack a fit striker, you have three). | DLF league analyser | M |
 | 3 | **Power rankings** | A weekly ranking mixing recent scores, form and luck, with arrows for movers. Better guide than the H2H table. | Sleeper tools | S |
-| 4 | **Title and top-four odds** | Simulate the rest of the season from scoring averages and the fixture list. | Sleeper tools | M |
+| 4 | **Title and forfeit odds** (BUILT, League > Odds) | Simulate the rest of the season from scoring averages and the fixture list. Follow-up: show week-to-week change. | Sleeper tools | M |
 | 5 | **Current waiver order** | Who is next in line on waivers. Already raised, not built. | draftfpl.live | S |
 | 6 | **Trade grades over time** | Show how each trade's verdict swung week by week, not just the total. | My Fantasy Analyzer | S |
 
