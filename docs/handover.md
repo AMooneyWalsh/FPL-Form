@@ -40,9 +40,13 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Waivers page: "Free agent signings" (`freeAgentSignings`), newest first, with points since, following the Show filter.
 - Draft > Draft day (`draftDay`): average and slowest pick time (gap since the previous pick; pick 1 isn't timed) and auto picks (`was_auto`). This league had a 30-second pick timer; Ben had 8 auto picks.
 
-### Trade network (Moves > Trades)
+### Trade network (Moves > Trades, PR #21)
 
 - `TradeNetwork.tsx`: managers on a circle, dot size = trades made, colour = trade net (green up, red down, grey level, faint = none), line thickness = trades between that pair (from `LedgerRow.partners`). Tap a dot to focus it and list their partners; otherwise shows the top five partnerships. The owner had this on an earlier draft site and asked for it back.
+
+### Gameweek awards graphic
+
+- The owner shares a fun "awards" image in the league chat (first one: after GW5). See `scripts/awards/README.md` for how to remake it each week. Keep it a roast-style roundup, not an ad.
 
 ### Live tab (PRs #9-#11)
 
@@ -73,7 +77,8 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 2. Optional max-3-per-club switch on the hindsight redraft (not an official Draft rule)?
 3. Waiver suggestions are new. Ask whether the ratings and drop picks look sensible against the owner's own judgement.
 4. Gameweek 6 (from Sat 10 Oct) is the Live tab's first real in-play run, especially the "Will come on for X" projections. Ask the owner for screenshots.
-5. Ideas raised but not built: season xG over/under-performance from per-gameweek live stats, showing the current waiver order.
+5. Awards graphic: offer a fresh one after each gameweek (`scripts/awards/`).
+6. Ideas raised but not built: season xG over/under-performance from per-gameweek live stats, showing the current waiver order.
 
 ## Known limits
 
