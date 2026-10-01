@@ -91,3 +91,7 @@ A draft Fantasy Premier League website for friends, similar to draftfpl.live.
 ## 1 Oct 2026: backlog from market research
 
 Looked at draftfpl.live, Sleeper analysers, trade calculators and main-game FPL tools. Full list in the repo at `docs/backlog.md`. Top picks: trade checker, trade partner finder, power rankings, title odds, current waiver order, trade grades over time. Owner to choose what to build next.
+
+## 1 Oct 2026: season odds built
+
+League > Odds plays the rest of the season 10,000 times and shows each manager's chance of every prize and forfeit, plus who is immune (top of regular FPL league 2757). "2 lowest GW scorers" confirmed as the two lowest single-gameweek scores of the whole season. Each manager page shows their own odds.

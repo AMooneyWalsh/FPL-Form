@@ -11,7 +11,8 @@
   },
   "vars": {
     "LEAGUE_ID": "634",
-    "DEFAULT_ENTRY_ID": "1412"
+    "DEFAULT_ENTRY_ID": "1412",
+    "CLASSIC_LEAGUE_ID": "2757"
   },
   // KV (binding LAST_GOOD) is optional and not set up yet: auto-provisioning
   // broke the Workers Builds preview build. Add it back with an explicit

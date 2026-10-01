@@ -5,6 +5,7 @@ import { fixtureLuck, headToHead, scores, streaks, type Score } from "../../shar
 import { computeStandings } from "../../shared/standings";
 import { Manager, PlayerName, Pts, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
+import { ManagerOdds } from "./OddsPage";
 import { TradeCard } from "./TradesPage";
 
 /** One manager's page (#/manager/123): everything about them in one place. */
@@ -83,6 +84,8 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
           </p>
         )}
       </section>
+
+      <ManagerOdds id={id} data={data} />
 
       {season && <SeasonSummary s={season} data={data} myTeam={myTeam} mine={mine} rank={rank} />}
 
