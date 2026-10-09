@@ -120,6 +120,8 @@ export interface Player {
   teamId: number;
   /** FPL's club code, used for shirt images. */
   teamCode: number;
+  /** Opta player code; the Premier League's team sheets use the same id ("p" + code). Optional for old cached copies. */
+  code?: number;
   position: "GKP" | "DEF" | "MID" | "FWD";
   totalPoints: number;
   /** FPL's pre-season draft ranking (lower = expected to be better). */
@@ -182,4 +184,15 @@ export interface Deadlines {
   trades: string;
   waivers: string;
   team: string;
+}
+
+/**
+ * Official team sheets from the Premier League's own data feed, published
+ * about an hour before kick-off (FPL only shows lineups after it).
+ */
+export interface TeamSheets {
+  /** Clubs (FPL short names, e.g. "ARS") whose team sheet is out. */
+  announced: string[];
+  /** Opta player code to where they are on the sheet. Anyone at an announced club who isn't listed is out of the squad. */
+  players: Record<number, "start" | "bench">;
 }

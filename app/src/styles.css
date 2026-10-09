@@ -1815,6 +1815,32 @@ a.link {
   color: var(--warn-text);
 }
 
+/* Official team sheet, shown until kick-off. */
+.ts {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ts-start {
+  background: var(--mine);
+  color: var(--win);
+}
+
+.ts-bench {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.ts-out {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
 /* Fixture difficulty: 1 easy (green) to 5 hard (red). */
 .fdr {
   display: inline-block;
