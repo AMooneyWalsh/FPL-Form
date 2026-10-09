@@ -21,7 +21,7 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 - Feature ideas live in `docs/backlog.md`.
 - See `docs/architecture.md` (agreed plan), `docs/existing-app.md` and `docs/fpl-draft-api.md`.
 
-- **Live site:** https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main` automatically). Cloudflare's PR preview builds fail instantly for a setup reason we can't see; the GitHub `check` job is the real gate.
+- **Live site:** https://draftyinhere.com (bought 9 Oct 2026 via Cloudflare Registrar, auto-renews; set in `wrangler.jsonc` `routes`, www redirects to it). The old https://drafty-in-here.amooneywalsh.workers.dev still works. (Cloudflare Workers Builds deploys `main` automatically). Cloudflare's PR preview builds fail instantly for a setup reason we can't see; the GitHub `check` job is the real gate.
 
 ## Working style
 

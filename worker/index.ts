@@ -78,6 +78,10 @@ export function resetCachesForTests() {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.hostname.startsWith("www.")) {
+      url.hostname = url.hostname.slice(4);
+      return Response.redirect(url.toString(), 301);
+    }
     if (!url.pathname.startsWith("/api/")) {
       return env.ASSETS.fetch(request);
     }
