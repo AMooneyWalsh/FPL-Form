@@ -1410,6 +1410,16 @@ button.small-link {
   padding: 0 14px 12px;
 }
 
+.lv-squad-note {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.lv-row-main.static {
+  cursor: default;
+}
+
 .lv-lineup {
   min-width: 0;
 }

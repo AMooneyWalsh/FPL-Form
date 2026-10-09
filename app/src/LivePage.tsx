@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
   bonusTable,
   gamesOf,
@@ -17,9 +17,9 @@ import {
   type PlayerInfo,
 } from "../../shared/live";
 import { computeStandings, type StandingRow } from "../../shared/standings";
-import type { Envelope } from "../../shared/types";
+import type { Envelope, Player } from "../../shared/types";
 import { useApi } from "./api";
-import { Manager, SubNav } from "./bits";
+import { InjuryFlag, Manager, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { StandingsTable } from "./StandingsTable";
 
@@ -208,9 +208,14 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
             </span>
           </p>
         )}
-        {!hasLineups && <p className="notice">Lineups appear here once the deadline passes.</p>}
+        {!hasLineups && (
+          <p className="notice">
+            Starting XIs appear once the deadline passes. Until then, tap a match to see both squads as they stand now,
+            after this week's waivers and trades.
+          </p>
+        )}
         {ordered.map((m) => (
-          <MatchCard key={`${m.homeEntry}-${m.awayEntry}`} m={m} ctx={ctx} startOpen={mine(m) && phase !== "upcoming"} />
+          <MatchCard key={`${m.homeEntry}-${m.awayEntry}`} m={m} ctx={ctx} startOpen={mine(m)} />
         ))}
       </section>
 
@@ -283,7 +288,14 @@ function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: b
       {open && m.home && m.away && (
 <Lineups home={m.home} away={m.away} ctx={ctx} />
       )}
-      {open && !(m.home && m.away) && <p className="hint lv-pad">Lineups appear once the deadline passes.</p>}
+      {open && !(m.home && m.away) && (
+        // Before the deadline: the squads as they stand now (FPL only reveals who starts at the deadline).
+        ctx.gw.event >= ctx.data.game.current_event ? (
+          <SquadPreview home={m.homeEntry} away={m.awayEntry} ctx={ctx} />
+        ) : (
+          <p className="hint lv-pad">Lineups appear once the deadline passes.</p>
+        )
+      )}
       {!open && <span className="sr-only">Tap for lineups</span>}
     </article>
   );
@@ -365,6 +377,53 @@ function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: C
       </div>
       {rows(h.bench, a.bench, true)}
     </div>
+  );
+}
+
+const POSITION_ORDER: Record<Player["position"], number> = { GKP: 0, DEF: 1, MID: 2, FWD: 3 };
+
+/** Both current squads by position, for before the deadline when the XIs aren't known yet. */
+function SquadPreview({ home, away, ctx }: { home: number; away: number; ctx: Ctx }) {
+  const squad = (entry: number) =>
+    ctx.data.playerList
+      .filter((p) => ctx.data.owners.get(p.id) === entry)
+      .sort((a, b) => POSITION_ORDER[a.position] - POSITION_ORDER[b.position] || b.totalPoints - a.totalPoints);
+  const h = squad(home);
+  const a = squad(away);
+  if (h.length === 0 && a.length === 0) return <p className="hint lv-pad">Squads appear once the deadline passes.</p>;
+  const cell = (list: Player[], i: number) => {
+    const p = list[i];
+    if (!p) return <div className="lv-row empty" />;
+    const groupEnd = i < list.length - 1 && p.position !== list[i + 1].position;
+    return (
+      <div className={`lv-row ${groupEnd ? "group-end" : ""}`} role="cell">
+        <div className="lv-row-main static">
+          <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
+          <span className="lv-row-body">
+            <span className="lv-row-name">
+              {p.name} <InjuryFlag p={p} />
+            </span>
+            {fixtureLines(p.teamId, ctx).map((line) => (
+              <span key={line} className="lv-row-fix">
+                {line}
+              </span>
+            ))}
+          </span>
+          <span />
+        </div>
+      </div>
+    );
+  };
+  return (
+    <>
+      <p className="hint lv-pad lv-squad-note">Squads as they stand now. Who starts is only known at the deadline.</p>
+      <div className="lv-lineups" role="table" aria-label="Squads">
+        {Array.from({ length: Math.max(h.length, a.length) }, (_, i) => [
+          <Fragment key={`h${i}`}>{cell(h, i)}</Fragment>,
+          <Fragment key={`a${i}`}>{cell(a, i)}</Fragment>,
+        ])}
+      </div>
+    </>
   );
 }
 
