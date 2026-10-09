@@ -3,6 +3,7 @@ import type { Gameweek } from "../../shared/gameweek";
 import { cancelReversals, Seasons, type Reversal } from "../../shared/moves";
 import { managerLabels } from "../../shared/standings";
 import type {
+  Deadlines,
   DraftChoice,
   Envelope,
   GameStatus,
@@ -35,6 +36,8 @@ export interface LeagueData {
   owners: Map<number, number | null>;
   /** Upcoming Premier League fixtures. */
   fixtures: UpcomingFixture[];
+  /** Trade, waiver and team deadlines for the gameweeks still to come. */
+  deadlines: Deadlines[];
   /** The fixtures carry FPL's own difficulty ratings (not our fallback estimate). */
   officialDifficulty: boolean;
   seasons: Seasons;
@@ -108,6 +111,7 @@ export function useLeagueData(): Loadable<LeagueData> {
           fdr.status === "ready" && fdr.value.data.fixtures.length > 0
             ? fdr.value.data.fixtures
             : (players.value.data.fixtures ?? []),
+        deadlines: players.value.data.deadlines ?? [],
         officialDifficulty: fdr.status === "ready" && fdr.value.data.fixtures.length > 0,
         seasons: new Seasons(gameweeks.value.loaded),
         entries: new Map(entries.map((e) => [e.entry_id, e])),

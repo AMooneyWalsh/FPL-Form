@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { countdown, upcomingDeadlines, type DeadlineKind } from "../../shared/deadlines";
 import { useLeagueData, type LeagueData } from "./data";
 import { DRAFT_VIEWS, DraftPage } from "./DraftPage";
 import { timeAgo } from "./format";
@@ -71,6 +72,7 @@ export function App() {
           </div>
           {ready && decided && <TeamPicker data={ready} value={myTeam} onChange={setMyTeam} compact />}
         </div>
+        {ready && <DeadlineBanner data={ready} />}
       </header>
       <nav className="tabs" aria-label="Pages">
         {PAGES.map((p) => (
@@ -144,6 +146,43 @@ export function App() {
       </main>
     </div>
   );
+}
+
+const DEADLINE_LABELS: Record<DeadlineKind, string> = { trades: "Trades", waivers: "Waivers", team: "Team deadline" };
+
+/** The next gameweek's trade, waiver and team deadlines, in the viewer's own time zone. */
+function DeadlineBanner({ data }: { data: LeagueData }) {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const up = upcomingDeadlines(data.deadlines, now);
+  if (!up) return null;
+  return (
+    <section className="deadlines" aria-label={`Gameweek ${up.event} deadlines`}>
+      <span className="dl-gw">GW{up.event}</span>
+      {up.items.map((d) => (
+        <div key={d.kind} className={`dl${d.passed ? " passed" : ""}${d.kind === up.next ? " next" : ""}`}>
+          <span className="dl-label">{DEADLINE_LABELS[d.kind]}</span>
+          <span className="dl-time">{d.passed ? "Closed" : deadlineTime(d.at, now)}</span>
+          {d.kind === up.next && <span className="dl-in">{countdown(d.at, now)}</span>}
+        </div>
+      ))}
+    </section>
+  );
+}
+
+/** "Sat 11:00", with the date added when it's more than a few days off. */
+function deadlineTime(iso: string, now: number): string {
+  const d = new Date(iso);
+  const far = d.getTime() - now > 5 * 24 * 3600_000;
+  return d.toLocaleString("en-GB", {
+    weekday: "short",
+    ...(far ? { day: "numeric", month: "short" } : {}),
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 /** Back to wherever they tapped the name, or the home page if they arrived by a shared link. */
