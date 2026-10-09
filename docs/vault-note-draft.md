@@ -95,3 +95,10 @@ Looked at draftfpl.live, Sleeper analysers, trade calculators and main-game FPL 
 ## 1 Oct 2026: season odds built
 
 League > Odds plays the rest of the season 10,000 times and shows each manager's chance of every prize and forfeit, plus who is immune (top of regular FPL league 2757). "2 lowest GW scorers" confirmed as the two lowest single-gameweek scores of the whole season. Each manager page shows their own odds.
+
+## 9 Oct 2026: own domain, faster live scores, deadline banner
+
+- The site now lives at **draftyinhere.com** (bought through Cloudflare, about $10 a year, renews automatically in October). www.draftyinhere.com goes to the same place, and the old workers.dev link still works.
+- Live scores refresh every 30 seconds during games (was every minute, and could lag up to 3 minutes). Coming back to the tab fetches fresh scores straight away.
+- The Live tab has a gameweek picker (‹ Gameweek 6 ›) to look back at any past week or ahead to the next one. It follows FPL's current gameweek, which moves on at each deadline.
+- Every page has a banner in the header with the next trade, waiver and team deadlines, shown in each person's own time zone, with a countdown.
