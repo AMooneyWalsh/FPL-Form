@@ -1,47 +1,48 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Drafty In Here GW5 awards</title>
+<!doctype html><html><head><meta charset="utf-8"><title>Drafty In Here GW6 preview</title>
 <style>
 @font-face{font-family:Inter;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2)}
 @font-face{font-family:Inter;font-weight:600;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2)}
 @font-face{font-family:Inter;font-weight:800;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-800-normal.woff2)}
 @font-face{font-family:Inter;font-weight:900;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-900-normal.woff2)}
-:root{--brand:#37003c;--green:#00a86b;--red:#e0474c;--ink:#1c1523;--muted:#6b6474;--bg:#f6f5f8}
+/* Dark scheme, matching the site's dark mode (app/src/styles.css). */
+:root{
+  --bg:#121015;--surface:#1c1921;--line:#2d2934;--brand:#2a0a2f;
+  --text:#efedf2;--body:#cfc9d6;--muted:#a39cab;--accent:#00d084;
+  --win:#00a86b;--loss:#e0474c;--draw:#6f6878;
+  --good:#2fd08f;--bad:#ff6b6f;--bar:#b98ccc;--chip:#2d2934;--chip-text:#e4d2ea;
+}
 *{box-sizing:border-box;margin:0}
-body{width:1080px;height:1480px;font-family:Inter,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
-.top{background:var(--brand);color:#fff;padding:34px 56px 28px}
-.kicker{font-weight:800;letter-spacing:.14em;font-size:18px;color:#00d084}
-h1{font-weight:900;font-size:54px;line-height:1.05;letter-spacing:-.02em;margin-top:10px}
-.sub{font-size:22px;opacity:.8;margin-top:10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:20px 40px}
-.card{background:#fff;border-radius:22px;padding:18px 24px;display:flex;flex-direction:column}
+body{width:1080px;height:1460px;font-family:Inter,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;position:relative}
+.top{background:var(--brand);padding:28px 56px 22px;border-bottom:1px solid var(--line)}
+.kicker{font-weight:800;letter-spacing:.14em;font-size:18px;color:var(--accent)}
+h1{font-weight:900;font-size:48px;line-height:1.05;letter-spacing:-.02em;margin-top:10px}
+.sub{font-size:22px;color:var(--body);margin-top:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 40px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px 24px;display:flex;flex-direction:column}
+.wide{grid-column:1/3;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
 .award{font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
 .who{font-size:36px;font-weight:900;letter-spacing:-.02em;margin:6px 0 4px;line-height:1.05}
 .stat{font-size:21px;font-weight:800;margin-bottom:6px}
-.card p{font-size:18.5px;line-height:1.38;color:#3a3342}
-.g{color:var(--green)}.r{color:var(--red)}
-.wide{grid-column:1/3;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
-.foot{position:absolute;left:0;right:0;bottom:0;padding:18px 56px;font-size:17px;color:var(--muted);display:flex;justify-content:space-between;border-top:1px solid #e6e3ea;background:#fff}
-.foot b{color:var(--brand)}
-
-.vs{font-size:30px;font-weight:900;letter-spacing:-.02em;margin:6px 0 2px;line-height:1.1}
+.vs{font-size:30px;font-weight:900;letter-spacing:-.02em;margin:4px 0 2px;line-height:1.1}
 .vs span{color:var(--muted);font-weight:600;font-size:22px;margin:0 6px}
-.odds{display:flex;height:8px;border-radius:99px;overflow:hidden;margin:6px 0 4px;background:#e6e3ea}
-.odds i{display:block;background:var(--brand)}
-.oddsl{display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:var(--muted);margin-bottom:6px}
-.card p{font-size:17.5px}
-.grid{gap:12px;padding:16px 40px}.card{padding:16px 24px}.vs{margin:4px 0 2px}
 .chips{display:flex;justify-content:space-between;margin:4px 0 8px}
 .side{display:flex;gap:5px;align-items:center}
-.pos{font-size:14px;font-weight:800;padding:3px 9px;border-radius:99px;background:#efeaf2;color:var(--brand);margin-right:4px}
+.pos{font-size:14px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--chip);color:var(--chip-text);margin-right:4px}
 .f{font-size:13px;font-weight:800;width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#fff}
-.f.W{background:var(--green)}.f.L{background:var(--red)}.f.D{background:#9a93a3}
-.top{padding:28px 56px 22px}h1{font-size:48px}
-.oddsrow{display:flex;align-items:center;gap:12px;margin:2px 0 10px;font-size:15px;font-weight:800;color:var(--muted)}.oddsrow .odds{flex:1;margin:0}
-.note{padding:0 44px;font-size:14px;color:var(--muted)}
+.f.W{background:var(--win)}.f.L{background:var(--loss)}.f.D{background:var(--draw)}
+.oddsrow{display:flex;align-items:center;gap:12px;margin:2px 0 10px;font-size:15px;font-weight:800;color:var(--muted)}
+.odds{flex:1;display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--line)}
+.odds i{display:block;background:var(--bar)}
+.card p{font-size:17.5px;line-height:1.38;color:var(--body)}
+.card p b{color:var(--text)}
+.card p b.g{color:var(--good)}.card p b.r{color:var(--bad)}
+.foot{position:absolute;left:0;right:0;bottom:0;padding:18px 56px;font-size:17px;color:var(--muted);border-top:1px solid var(--line);background:var(--surface)}
+.foot b{color:var(--accent)}
 </style></head><body>
 <div class="top">
   <div class="kicker">DRAFTY IN HERE · GAMEWEEK 6 PREVIEW</div>
   <h1>The weekend ahead</h1>
-  <p class="sub">Seven matches, nine trades, and some very brave signings. Deadline Saturday 11:00.</p>
+  <p class="sub">Seven matches, nine trades and some very brave signings. Deadline Saturday 11:00.</p>
 </div>
 <div class="grid">
   <div class="card wide">
@@ -50,35 +51,35 @@ h1{font-weight:900;font-size:54px;line-height:1.05;letter-spacing:-.02em;margin-
       <div class="who">Daire</div>
       <div class="stat">12 of 15 players new</div>
     </div>
-    <p>Eight trades this week, each with a different manager, plus four signings. Only three of last week's players are left, and two of the new arrivals are already injured.</p>
+    <p>Eight trades this week, each with a different manager, plus four signings. Only <b>three</b> of last week's players are left, and two of the new arrivals are already injured.</p>
   </div>
   <div class="card">
     <div class="award">Stick v twist</div>
     <div class="vs">Adam<span>v</span>Daire</div>
     <div class="chips"><span class="side"><span class="pos">1st</span><span class="f W">W</span><span class="f L">L</span><span class="f W">W</span></span><span class="side"><span class="pos">5th</span><span class="f W">W</span><span class="f L">L</span><span class="f L">L</span></span></div>
     <div class="oddsrow"><b>72%</b><div class="odds"><i style="width:72%"></i></div><b>28%</b></div>
-    <p>Adam still has 13 of the 15 players drafted and has never made a trade. Daire had the best draft in the league, has kept three of it, and has made <b>19 trades</b>. Those trades were <b class="r">57 points down</b> before this week.</p>
+    <p>Adam still has 13 of the 15 players from draft day and has never made a trade. Daire had the league's best draft but has kept only three of those players. Daire's <b>19 trades</b> were <b class="r">57 points down</b> before this week.</p>
   </div>
   <div class="card">
     <div class="award">Medical bay derby</div>
     <div class="vs">Jack<span>v</span>Mark</div>
     <div class="chips"><span class="side"><span class="pos">4th</span><span class="f D">D</span><span class="f W">W</span><span class="f W">W</span></span><span class="side"><span class="pos">11th</span><span class="f L">L</span><span class="f W">W</span><span class="f W">W</span></span></div>
     <div class="oddsrow"><b>67%</b><div class="odds"><i style="width:67%"></i></div><b>33%</b></div>
-    <p>Jack has never made a trade, but this week signed Saliba and Ekitiké, who are both out injured. Mark has three players out too. Against the same three opponents, Jack took <b>7 points</b> and Mark took none.</p>
+    <p>Jack has never made a trade, but this week signed Saliba and Ekitiké, who are <b class="r">both out injured</b>. Mark has three players out too. Against the same three opponents, Jack took <b>7 points</b> and Mark took none.</p>
   </div>
   <div class="card">
     <div class="award">Rock bottom</div>
     <div class="vs">Joe<span>v</span>Michael</div>
     <div class="chips"><span class="side"><span class="pos">14th</span><span class="f L">L</span><span class="f L">L</span><span class="f L">L</span></span><span class="side"><span class="pos">8th</span><span class="f D">D</span><span class="f W">W</span><span class="f L">L</span></span></div>
     <div class="oddsrow"><b>33%</b><div class="odds"><i style="width:33%"></i></div><b>67%</b></div>
-    <p>Joe has lost all five, but on points scored should have won two. Michael is the league's waiver addict, with <b>77 claims</b> to Joe's 16. Both have played Mark: Michael won, Joe lost.</p>
+    <p>Joe has lost all five games, but on points scored should have won two. Michael is the league's waiver addict, with <b>77 claims</b> to Joe's 16. Both have played Mark: Michael won, Joe lost.</p>
   </div>
   <div class="card">
     <div class="award">Coin toss</div>
     <div class="vs">John<span>v</span>Ross</div>
     <div class="chips"><span class="side"><span class="pos">2nd</span><span class="f L">L</span><span class="f W">W</span><span class="f W">W</span></span><span class="side"><span class="pos">6th</span><span class="f W">W</span><span class="f L">L</span><span class="f W">W</span></span></div>
     <div class="oddsrow"><b>47%</b><div class="odds"><i style="width:47%"></i></div><b>53%</b></div>
-    <p>John is 2nd, though four teams below have scored more. John's first trade of the season came this week, and two of the five players are injured. Ross is the league's best trader, <b class="g">59 points up</b>.</p>
+    <p>John is 2nd, though four teams below have scored more. John's first trade of the season, a 5-for-5 with Daire, brought in <b class="r">two injured players</b>. Ross is the league's best trader, <b class="g">59 points up</b>.</p>
   </div>
   <div class="card">
     <div class="award">Asleep at the wheel</div>
@@ -88,24 +89,24 @@ h1{font-weight:900;font-size:54px;line-height:1.05;letter-spacing:-.02em;margin-
     <p>Ben scored <b class="r">23</b> last week, the lowest score in the league. Ben's response was to make no changes at all. Darragh has Haaland.</p>
   </div>
   <div class="card">
-    <div class="award">Lucky v steady</div>
+    <div class="award">Lucky v solid</div>
     <div class="vs">Peter<span>v</span>Ruairi M</div>
     <div class="chips"><span class="side"><span class="pos">7th</span><span class="f W">W</span><span class="f L">L</span><span class="f W">W</span></span><span class="side"><span class="pos">3rd</span><span class="f W">W</span><span class="f L">L</span><span class="f W">W</span></span></div>
     <div class="oddsrow"><b>31%</b><div class="odds"><i style="width:31%"></i></div><b>69%</b></div>
-    <p>Peter has three wins from the fewest points in the league, the luckiest record going. Ruairi M has never scored below 35 and is 24 points up on trades. Peter's new squad includes six of Daire's old players.</p>
+    <p>Peter has three wins from the <b>fewest points</b> in the league, the luckiest record going. Ruairi M has never scored below 35 and is <b class="g">24 points up</b> on trades. This week Peter took six players off Daire in one trade.</p>
   </div>
   <div class="card">
     <div class="award">Steady v streaky</div>
     <div class="vs">Ruairi G<span>v</span>Conor</div>
     <div class="chips"><span class="side"><span class="pos">10th</span><span class="f L">L</span><span class="f W">W</span><span class="f L">L</span></span><span class="side"><span class="pos">12th</span><span class="f L">L</span><span class="f L">L</span><span class="f L">L</span></span></div>
     <div class="oddsrow"><b>60%</b><div class="odds"><i style="width:60%"></i></div><b>40%</b></div>
-    <p>Ruairi G has scored between <b>34 and 42</b> every week and has never made a trade. Conor has swung from 18 to 54, and on points should have three wins, not one. Both lost to Adam and John.</p>
+    <p>Ruairi G has scored between <b>34 and 42</b> every week and has never made a trade. Conor has swung from 18 to 54, and on points should have three wins, not one. Both have lost to Adam and John.</p>
   </div>
   <div class="card">
     <div class="award">Most wanted</div>
     <div class="who">Davis</div>
     <div class="stat">6 managers claimed him</div>
-    <p>Ruairi M got him. Joe, Ross, Michael, John and Mark missed out. 66 waiver claims went in this week, and 18 succeeded.</p>
+    <p>Ruairi M got him. Joe, Ross, Michael, John and Mark missed out. Across the league, 66 waiver claims went in this week and 18 succeeded.</p>
   </div>
 </div>
 <div class="foot"><span>Form: last three results, latest on the right. Bar: rough win chance. Follow it live: <b>draftyinhere.com</b></span></div>
