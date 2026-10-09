@@ -24,3 +24,5 @@ A matching "weekend ahead" graphic, posted before the deadline (first one: GW6).
 ## Writing the cards (owner feedback, 9 Oct)
 
 Every card names two or more managers, so "he" and "his" get confusing fast. Use names instead of pronouns, give each sentence one idea, and don't string clauses together with "and" or "which" when it's unclear who they refer to. Short sentences fit the cards better anyway.
+
+Each match card should contrast the two managers: how they play the game (trades, waiver claims, how much of their draft they've kept), their season so far (position against points scored, luck, steady or streaky scores), and any shared opponents or past meetings. The owner's favourite GW6 card was Ben v Darragh: one sharp fact, then the other manager in four words. `scripts/awards/preview.mts` has most of the numbers. For the rest, use `tradeLedger`, `waiverRecord`, `fixtureLuck` and `draftGrades` from `shared/`, as `insights.mts` does.
