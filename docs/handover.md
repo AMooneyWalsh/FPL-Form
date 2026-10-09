@@ -4,7 +4,7 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 ## Where things stand
 
-- Live site: https://drafty-in-here.amooneywalsh.workers.dev (Cloudflare Workers Builds deploys `main`).
+- Live site: https://draftyinhere.com (Cloudflare Workers Builds deploys `main`). Domain bought 9 Oct 2026 in the same Cloudflare account, auto-renews; attached via `routes` in `wrangler.jsonc`; www redirects to the bare name. The old workers.dev address still works.
 - All six steps of the original plan are built. Page map: `docs/architecture.md` > "Frontend pages". Worker routes: same doc > "Worker routes and caching".
 
 ### Layout (PRs #13-#14, `docs/navigation-review.md`)

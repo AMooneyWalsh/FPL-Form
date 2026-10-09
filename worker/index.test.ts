@@ -203,6 +203,16 @@ describe("trimPlayers", () => {
   });
 });
 
+describe("www", () => {
+  it("redirects to the bare domain, keeping the path", async () => {
+    const res = await worker.fetch(new Request("https://www.draftyinhere.com/"), makeEnv(), ctx);
+    expect(res.status).toBe(301);
+    expect(res.headers.get("Location")).toBe("https://draftyinhere.com/");
+    const api = await worker.fetch(new Request("https://www.draftyinhere.com/api/game"), makeEnv(), ctx);
+    expect(api.headers.get("Location")).toBe("https://draftyinhere.com/api/game");
+  });
+});
+
 describe("live route", () => {
   const league = { league: { id: 634 }, league_entries: [{ id: 1, entry_id: 11 }, { id: 2, entry_id: 22 }], matches: [] };
   const live = {

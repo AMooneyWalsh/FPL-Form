@@ -17,5 +17,12 @@
   // KV (binding LAST_GOOD) is optional and not set up yet: auto-provisioning
   // broke the Workers Builds preview build. Add it back with an explicit
   // namespace id once one exists. See docs/setup.md.
+  // draftyinhere.com is registered in the same Cloudflare account. Deploys
+  // keep both names attached; www redirects to the bare name (worker/index.ts).
+  // The old workers.dev address keeps working too.
+  "routes": [
+    { "pattern": "draftyinhere.com", "custom_domain": true },
+    { "pattern": "www.draftyinhere.com", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
