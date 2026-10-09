@@ -1370,6 +1370,11 @@ button.small-link {
   min-width: 0;
 }
 
+/* Last player in a position group (GK, DEF, MID, FWD): a heavier line. */
+.lv-row.group-end {
+  border-bottom: 3px solid color-mix(in srgb, var(--muted) 45%, transparent);
+}
+
 /* Greyed: bench players who don't count, and starters who were subbed off. */
 .lv-row.benched .lv-row-main,
 .lv-row.off .lv-row-main {

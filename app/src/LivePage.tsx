@@ -341,10 +341,14 @@ function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: C
   });
   const h = split(home);
   const a = split(away);
+  // A heavier line where one position group ends and the next begins (GK |
+  // DEF | MID | FWD). Each side has its own, as formations differ.
+  const groupEnd = (list: LivePlayer[], i: number, bench: boolean) =>
+    !bench && i < list.length - 1 && list[i].position !== list[i + 1].position;
   const rows = (left: LivePlayer[], right: LivePlayer[], bench: boolean) =>
     Array.from({ length: Math.max(left.length, right.length) }, (_, i) => [
-      <Cell key={`h${i}`} p={left[i]} squad={home} bench={bench} ctx={ctx} />,
-      <Cell key={`a${i}`} p={right[i]} squad={away} bench={bench} ctx={ctx} />,
+      <Cell key={`h${i}`} p={left[i]} squad={home} bench={bench} groupEnd={groupEnd(left, i, bench)} ctx={ctx} />,
+      <Cell key={`a${i}`} p={right[i]} squad={away} bench={bench} groupEnd={groupEnd(right, i, bench)} ctx={ctx} />,
     ]);
   return (
     <div className="lv-lineups" role="table" aria-label="Lineups">
@@ -360,9 +364,9 @@ function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: C
   );
 }
 
-function Cell({ p, squad, bench, ctx }: { p?: LivePlayer; squad: LiveSquad; bench: boolean; ctx: Ctx }) {
+function Cell({ p, squad, bench, groupEnd, ctx }: { p?: LivePlayer; squad: LiveSquad; bench: boolean; groupEnd: boolean; ctx: Ctx }) {
   if (!p) return <div className="lv-row empty" />;
-  return <PlayerRow p={p} squad={squad} bench={bench} ctx={ctx} />;
+  return <PlayerRow p={p} squad={squad} bench={bench} groupEnd={groupEnd} ctx={ctx} />;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -434,7 +438,7 @@ function Shirt({ teamId, gk, ctx }: { teamId: number; gk: boolean; ctx: Ctx }) {
   );
 }
 
-function PlayerRow({ p, squad, bench, ctx }: { p: LivePlayer; squad: LiveSquad; bench: boolean; ctx: Ctx }) {
+function PlayerRow({ p, squad, bench, groupEnd, ctx }: { p: LivePlayer; squad: LiveSquad; bench: boolean; groupEnd: boolean; ctx: Ctx }) {
   const [open, setOpen] = useState(false);
   const player = ctx.data.players.get(p.element);
   const parts = statParts(p);
@@ -451,7 +455,7 @@ function PlayerRow({ p, squad, bench, ctx }: { p: LivePlayer; squad: LiveSquad; 
         : null;
   const benchNo = bench ? (p.position === "GKP" ? "GK" : String(p.slot - ctx.data.rules.play - 1)) : null;
   return (
-    <div className={`lv-row ${!p.counts ? (bench ? "benched" : "off") : ""} ${p.status}`} role="cell">
+    <div className={`lv-row ${!p.counts ? (bench ? "benched" : "off") : ""} ${p.status} ${groupEnd ? "group-end" : ""}`} role="cell">
       <button className="lv-row-main" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
         <span className="lv-row-body">
