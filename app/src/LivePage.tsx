@@ -441,11 +441,7 @@ function SquadPreview({ home, away, ctx }: { home: number; away: number; ctx: Ct
             <span className="lv-row-name">
               {p.name} <InjuryFlag p={p} />
             </span>
-            {fixtureLines(p.teamId, ctx).map((line) => (
-              <span key={line} className="lv-row-fix">
-                {line}
-              </span>
-            ))}
+            <FixtureLines teamId={p.teamId} ctx={ctx} />
           </span>
           <span />
         </div>
@@ -510,16 +506,29 @@ function statParts(p: LivePlayer): string[] {
   return out;
 }
 
-/** "NFO 0 - 1 COV | FT", "BHA 1 - 0 ARS | 67'", or "LEE v CRY | Sun 13:00". */
-function fixtureLines(teamId: number, ctx: Ctx): string[] {
+/** ["NFO 0 - 1 COV", "FT"], ["BHA 1 - 0 ARS", "67'"] or ["LEE v CRY", "Sun 13:00"]: the match, then when. */
+function fixtureLines(teamId: number, ctx: Ctx): [string, string][] {
   const games = gamesOf(teamId, ctx.gw);
-  if (games.length === 0) return ["No game this week"];
+  if (games.length === 0) return [["No game this week", ""]];
   return games.map((f) => {
     const h = ctx.clubs.get(f.teamH)?.short ?? "?";
     const a = ctx.clubs.get(f.teamA)?.short ?? "?";
-    if (!f.started) return `${h} v ${a} | ${f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"}`;
-    return `${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a} | ${f.finishedProvisional ? "FT" : `${f.minutes}'`}`;
+    if (!f.started) return [`${h} v ${a}`, f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"];
+    return [`${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}`, f.finishedProvisional ? "FT" : `${f.minutes}'`];
   });
+}
+
+/** One line per fixture. In a narrow column it breaks cleanly between the match and the time. */
+function FixtureLines({ teamId, ctx }: { teamId: number; ctx: Ctx }) {
+  return (
+    <>
+      {fixtureLines(teamId, ctx).map(([match, when]) => (
+        <span key={match} className="lv-row-fix">
+          <span>{match}</span> {when && <span>{when}</span>}
+        </span>
+      ))}
+    </>
+  );
 }
 
 function Shirt({ teamId, gk, ctx }: { teamId: number; gk: boolean; ctx: Ctx }) {
@@ -562,15 +571,12 @@ function PlayerRow({ p, squad, bench, groupEnd, ctx }: { p: LivePlayer; squad: L
         <span className="lv-row-body">
           <span className="lv-row-name">
             {benchNo && <span className="lv-bench-no">{benchNo}</span>}
-            {player?.name ?? `Player ${p.element}`} <SheetTag p={player} ctx={ctx} />
+            {player?.name ?? `Player ${p.element}`}
           </span>
+          <SheetTag p={player} ctx={ctx} />
           {note && <span className={`lv-note ${note.cls}`}>{note.text}</span>}
           {parts.length > 0 && <span className="lv-row-stats">{parts.join(", ")}</span>}
-          {fixtureLines(p.teamId, ctx).map((line) => (
-            <span key={line} className="lv-row-fix">
-              {line}
-            </span>
-          ))}
+          <FixtureLines teamId={p.teamId} ctx={ctx} />
         </span>
         <span className="lv-row-pts">{p.points}</span>
       </button>

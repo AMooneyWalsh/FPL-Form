@@ -1506,9 +1506,16 @@ button.small-link {
 }
 
 .lv-row-fix {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 6px;
   font-size: 10.5px;
   color: var(--muted);
   line-height: 1.3;
+}
+
+.lv-row-fix > span {
+  white-space: nowrap;
 }
 
 .lv-row-pts {
@@ -1815,7 +1822,13 @@ a.link {
   color: var(--warn-text);
 }
 
-/* Official team sheet, shown until kick-off. */
+/* Official team sheet, shown until kick-off. In a lineup it gets its own
+   line under the name, so long names never push it about. */
+.lv-row-body > .ts {
+  align-self: flex-start;
+  margin: 1px 0 1px;
+}
+
 .ts {
   display: inline-block;
   margin-left: 4px;
