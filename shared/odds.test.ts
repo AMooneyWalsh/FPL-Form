@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import leagueJson from "../fixtures/league-634-details.json";
-import { seasonOdds, squadStrength } from "./odds";
+import { seasonOdds, squadStrength, steadyPointsPerGame } from "./odds";
 import type { LeagueDetails, Player } from "./types";
 
 const league = leagueJson as unknown as LeagueDetails;
@@ -60,8 +60,11 @@ describe("seasonOdds (made-up league)", () => {
 });
 
 describe("squadStrength", () => {
+  // Every player has played 9 games, so the steadying barely moves them and
+  // the ordering is the same as raw points per game.
   const p = (id: number, position: Player["position"], ppg: number, status = "a") =>
-    ({ id, position, pointsPerGame: ppg, status, chanceNext: null }) as Player;
+    ({ id, position, pointsPerGame: ppg, totalPoints: ppg * 9, minutes: 810, status, chanceNext: null }) as Player;
+  const steady = (ppg: number) => (ppg * 9 + 2 * 3) / 12;
 
   it("adds up the best valid eleven and skips injured players", () => {
     const squad = [
@@ -71,6 +74,25 @@ describe("squadStrength", () => {
       p(13, "FWD", 7), p(14, "FWD", 7), p(15, "FWD", 7),
     ];
     // One keeper (the 9), three defenders, four fit midfielders, three forwards.
-    expect(squadStrength(squad)).toBe(9 + 12 + 24 + 21);
+    expect(squadStrength(squad)).toBeCloseTo(steady(9) + 3 * steady(4) + 4 * steady(6) + 3 * steady(7), 9);
+  });
+});
+
+describe("steadyPointsPerGame", () => {
+  const p = (pointsPerGame: number, totalPoints: number, minutes = 90) => ({ pointsPerGame, totalPoints, minutes }) as Player;
+
+  it("doesn't trust one big game", () => {
+    // Hinshelwood after GW5: 16 points from a single appearance.
+    expect(steadyPointsPerGame(p(16, 16, 63))).toBeCloseTo(5.5, 9);
+  });
+
+  it("barely moves a player with a run of games", () => {
+    expect(steadyPointsPerGame(p(6.8, 34, 450))).toBeCloseTo(5, 9);
+    // 20 games at 6: (120 + 6) / 23.
+    expect(steadyPointsPerGame(p(6, 120, 1800))).toBeCloseTo(126 / 23, 9);
+  });
+
+  it("treats a player who hasn't played as typical", () => {
+    expect(steadyPointsPerGame(p(0, 0, 0))).toBe(2);
   });
 });
