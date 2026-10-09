@@ -23,6 +23,9 @@
   // draftyinhere.com is registered in the same Cloudflare account. Deploys
   // keep both names attached; www redirects to the bare name (worker/index.ts).
   // The old workers.dev address keeps working too.
+  // Setting routes turns the workers.dev address off unless this is set.
+  // Keep it: old links shared in the group chat point there.
+  "workers_dev": true,
   "routes": [
     { "pattern": "draftyinhere.com", "custom_domain": true },
     { "pattern": "www.draftyinhere.com", "custom_domain": true }
