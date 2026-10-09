@@ -25,6 +25,7 @@ import { StandingsTable } from "./StandingsTable";
 
 export const LIVE_VIEWS = [
   { id: "matches", label: "Matches" },
+  { id: "table", label: "Table" },
   { id: "bonus", label: "Bonus" },
   { id: "fixtures", label: "Fixtures" },
 ] as const;
@@ -165,6 +166,7 @@ function LiveView({
   return (
     <>
       {view === "matches" && <MatchesView ctx={ctx} next={next} />}
+      {view === "table" && <TableView ctx={ctx} />}
       {view === "bonus" && <BonusView ctx={ctx} />}
       {view === "fixtures" && <FixturesView ctx={ctx} />}
     </>
@@ -217,11 +219,13 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
         ))}
       </section>
 
-      {phase === "live" && (
-        <section>
-          <h2>Table if it ended now</h2>
-          <StandingsTable rows={ctx.table} myTeam={myTeam} />
-        </section>
+      {phase !== "upcoming" && (
+        <a className="card link-card" href="#/live/table">
+          <strong>{phase === "live" ? "Live table" : `Table after gameweek ${gw.event}`}</strong>
+          <span className="muted">
+            {phase === "live" ? "Where everyone would be if it ended now" : "With this week's places gained and lost"} →
+          </span>
+        </a>
       )}
 
       {phase !== "upcoming" && <Performers ctx={ctx} />}
@@ -610,6 +614,38 @@ function PerformerList({ title, rows, ctx, empty }: { title: string; rows: Perfo
 }
 
 // ---------------------------------------------------------------- bonus
+
+// ---------------------------------------------------------------- table
+
+function TableView({ ctx }: { ctx: Ctx }) {
+  const { gw, phase, data, myTeam } = ctx;
+  const before = new Map(computeStandings(data.league, gw.event - 1).map((r) => [r.entryId, r.rank]));
+  const moves = new Map(ctx.table.map((r) => [r.entryId, (before.get(r.entryId) ?? r.rank) - r.rank]));
+  const week = new Map<number, { score: number; against: number }>();
+  if (phase !== "upcoming") {
+    for (const m of ctx.matches) {
+      if (!m.home || !m.away) continue;
+      week.set(m.homeEntry, { score: m.home.score, against: m.away.score });
+      week.set(m.awayEntry, { score: m.away.score, against: m.home.score });
+    }
+  }
+  return (
+    <section>
+      <div className="section-head">
+        <h2>{phase === "upcoming" ? `Table before gameweek ${gw.event}` : phase === "live" ? "Live table" : `Table after gameweek ${gw.event}`}</h2>
+        {phase === "live" && <span className="phase phase-live">Live</span>}
+      </div>
+      <p className="hint">
+        {phase === "upcoming"
+          ? "Nothing played yet. Once games start, this shows where everyone would finish if it ended there."
+          : phase === "live"
+            ? "Where everyone would be if every match ended now. Arrows show places gained or lost since the start of the week."
+            : "Arrows show places gained or lost this week."}
+      </p>
+      <StandingsTable rows={ctx.table} myTeam={myTeam} live={phase === "upcoming" ? undefined : { moves, week }} />
+    </section>
+  );
+}
 
 function BonusView({ ctx }: { ctx: Ctx }) {
   const table = useMemo(() => bonusTable(ctx.gw), [ctx.gw]);
