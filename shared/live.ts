@@ -443,6 +443,7 @@ export function liveMatches(
 }
 
 /** The league table as it would stand if this gameweek finished now. */
+/** The table as it stands at the end of `event`, with that gameweek's live scores counted as results. */
 export function liveTable(details: LeagueDetails, event: number, matches: LiveMatch[]): StandingRow[] {
   const toLeague = new Map(details.league_entries.map((e) => [e.entry_id, e.id]));
   const scores = new Map<number, number>();
@@ -462,7 +463,7 @@ export function liveTable(details: LeagueDetails, event: number, matches: LiveMa
           }
         : m,
     ),
-  });
+  }, event);
 }
 
 // ---------------------------------------------------------------- league-wide views

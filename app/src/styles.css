@@ -183,6 +183,58 @@ table.standings {
   font-weight: 700;
 }
 
+/* Live table: places moved this week and this week's score. */
+.standings.live th,
+.standings.live td {
+  padding: 9px 5px;
+}
+
+.standings .move {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.standings .move.up {
+  color: var(--win);
+}
+
+.standings .move.down {
+  color: var(--loss);
+}
+
+.standings .move.same {
+  color: var(--muted);
+}
+
+.standings .week {
+  white-space: nowrap;
+}
+
+.standings .week .chip {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+
+.standings .week-score,
+.standings .rec {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.card.link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 12px 0 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
 .standings .team {
   font-weight: 600;
 }
