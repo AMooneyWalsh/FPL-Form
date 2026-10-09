@@ -108,12 +108,14 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per
 | `/api/fdr` | Main FPL game: `https://fantasy.premierleague.com/api/fixtures/?future=1`, trimmed to event, clubs, kickoff and each side's official 1-5 difficulty (the Draft API has none; club ids match) | 6 h |
 | `/api/classic` | Main FPL game: `leagues-classic/{CLASSIC_LEAGUE_ID}/standings/` trimmed to name, rank, total (who is immune from a forfeit) | 30 min |
 | `/api/shirt/{code}` | FPL shirt image, proxied because FPL's image host failed on phones | long |
-| `/api/live/{n}` | `event/{n}/live` + lineups for all 14 managers (missing before the deadline), trimmed to per-player stats and points breakdown, BPS and match events | 1 min while games are on, else 10 min / 1 h |
+| `/api/live/{n}` | `event/{n}/live` + lineups for all 14 managers (missing before the deadline), trimmed to per-player stats and points breakdown, BPS and match events | 30 s while games are on (lineups cached separately for 15 min then, as they are locked), else 10 min; next GW 1 h; past GWs 6 h |
 | `/api/gw/{n}` | `event/{n}/live` + `entry/{id}/event/{n}` for all 14 managers, built into points + fielded XIs | finished GWs kept for good (memory + KV); current GW 2 min |
 
 Live-match-aware timings come with the live gameweek page (step 5).
 
 "Match live" = current event started and not `data_checked`, and a fixture kicked off in the last ~2.5 h. Worth checking: the exact live flags in `bootstrap-static.events` and `fixtures`.
+
+Browsers are told to keep a copy only for the time left on the server copy (`max-age` = remaining TTL, capped at 60 s), so the waits don't stack. The app also refetches when someone returns to the tab (`onReturn` in `app/src/api.ts`).
 
 If upstream fails or returns something that doesn't parse, serve the KV copy with a `stale: true` flag and `fetchedAt`; the UI shows "last updated X ago". `/api/status` reports last successful fetch per route for debugging.
 
@@ -164,7 +166,7 @@ This is the fiddliest logic, so it gets thorough unit tests using saved real res
 
 Hash routes, four tabs, each with a sticky chip sub-menu. See `docs/navigation-review.md` for why.
 
-- `#/live/{matches|bonus|fixtures}`: live H2H matchups with lineups, provisional bonus and auto-subs, table if it ended now, PL fixtures. The landing page while a gameweek is in progress.
+- `#/live/{matches|bonus|fixtures}`: a "‹ Gameweek n ›" picker (GW 1 to next GW, held in page state, resets on leaving Live), then live H2H matchups with lineups, provisional bonus and auto-subs, table if it ended now, PL fixtures. The landing page while a gameweek is in progress.
 - `#/league/{table|form|luck|h2h|records|odds}`: standings and position chart, form, fixture luck, head to head, streaks and records, season odds for every prize and forfeit (`docs/odds.md`). The landing page otherwise.
 - `#/moves/{trades|waivers|suggestions|players}`: trade verdicts, ledger and trade network; waiver record, free agent signings and waiver battles; waiver suggestions; player journeys search.
 - `#/draft/{grades|picks|no-moves|origins|redraft|day}`: draft grades, steals and busts, draft-only table, points by source, hindsight redraft, draft day (pick times, auto picks).
