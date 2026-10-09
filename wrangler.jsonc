@@ -6,6 +6,7 @@
   "compatibility_date": "2026-09-01",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     // Every request goes through the Worker so www.draftyinhere.com can be
     // redirected before the page loads (it then hands pages to ASSETS).
