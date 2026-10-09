@@ -24,6 +24,10 @@ const KV_WRITE_INTERVAL_MS = 30 * 60_000;
 
 const MINUTE = 60;
 const HOUR = 60 * MINUTE;
+/** Live scores while games are on. FPL itself updates about once a minute. */
+const LIVE_TTL = 30;
+/** Lineups don't change once the deadline passes, apart from FPL's auto-subs at the end. */
+const LINEUP_TTL = 15 * MINUTE;
 /** Gameweeks that are over never change, so keep them for good. */
 const FOREVER = Number.POSITIVE_INFINITY;
 
@@ -144,7 +148,7 @@ async function serveGameweek(event: number, env: Env, ctx: ExecutionContext): Pr
 /**
  * Live scoring data for one gameweek: every player's live points and BPS,
  * the Premier League fixtures, and each manager's lineup (once the deadline
- * has passed). Refreshes every minute while games are on.
+ * has passed). Refreshes every 30 seconds while games are on.
  */
 async function serveLive(event: number, env: Env, ctx: ExecutionContext): Promise<Response> {
   return respond(async () => {
@@ -155,23 +159,36 @@ async function serveLive(event: number, env: Env, ctx: ExecutionContext): Promis
       throw new NotFound("No live data for that gameweek.");
     }
     const inPlay = event === game.current_event && !game.current_event_finished;
-    const ttl = inPlay ? MINUTE : event === game.current_event ? 10 * MINUTE : HOUR;
+    // Older gameweeks are over, so their points won't move.
+    const ttl = inPlay ? LIVE_TTL : event === game.current_event ? 10 * MINUTE : event < game.current_event ? 6 * HOUR : HOUR;
     return cached(`${env.LEAGUE_ID}:live:${event}`, ttl, env, ctx, async () => {
       const league = JSON.parse(
         (await cached(`${env.LEAGUE_ID}:league`, ROUTES.league.ttl, env, ctx, () => fetchUpstream(ROUTES.league.upstream(env)))).value.body,
       ) as LeagueDetails;
-      const [live, ...picks] = await Promise.all([
+      const entries = league.league_entries.map((e) => e.entry_id);
+      // Lineups are locked once the deadline passes, so while games are on
+      // there's no need to ask for all of them every time the scores refresh.
+      // A missing one (a failed request) is retried with the scores.
+      const lineupTtl = (body: string) =>
+        inPlay && entries.every((id) => id in (JSON.parse(body) as Record<number, LivePicks>)) ? LINEUP_TTL : 0;
+      const [live, picks] = await Promise.all([
         fetchUpstream(`event/${event}/live`),
-        // Lineups are hidden until the deadline, so a missing one isn't an error.
-        ...league.league_entries.map((e) => fetchUpstream(`entry/${e.entry_id}/event/${event}`).catch(() => null)),
+        cached(`${env.LEAGUE_ID}:lineups:${event}`, lineupTtl, env, ctx, async () => {
+          const raw = await Promise.all(
+            // Lineups are hidden until the deadline, so a missing one isn't an error.
+            entries.map((id) => fetchUpstream(`entry/${id}/event/${event}`).catch(() => null)),
+          );
+          const byEntry: Record<number, LivePicks> = {};
+          entries.forEach((id, i) => {
+            const r = raw[i];
+            if (!r) return;
+            const p = JSON.parse(r) as LivePicks;
+            byEntry[id] = { picks: p.picks.map((x) => ({ element: x.element, position: x.position })), subs: p.subs ?? [] };
+          });
+          return JSON.stringify(byEntry);
+        }),
       ]);
-      const byEntry: Record<number, LivePicks> = {};
-      league.league_entries.forEach((e, i) => {
-        const raw = picks[i];
-        if (!raw) return;
-        const p = JSON.parse(raw) as LivePicks;
-        byEntry[e.entry_id] = { picks: p.picks.map((x) => ({ element: x.element, position: x.position })), subs: p.subs ?? [] };
-      });
+      const byEntry = JSON.parse(picks.value.body) as Record<number, LivePicks>;
       return JSON.stringify(toLiveGameweek(event, JSON.parse(live) as RawLiveResponse, byEntry));
     });
   });
@@ -191,7 +208,8 @@ interface Result {
  */
 async function cached(
   key: string,
-  ttl: number,
+  /** Seconds to keep it, or a function of the body (e.g. shorter while incomplete). */
+  ttl: number | ((body: string) => number),
   env: Env,
   ctx: ExecutionContext,
   load: () => Promise<string>,
@@ -199,8 +217,9 @@ async function cached(
 ): Promise<Result> {
   const now = Date.now();
   const hit = memory.get(key);
-  if (hit && now - hit.fetchedAt < ttl * 1000) {
-    return { value: hit, stale: false, ttl };
+  const life = (c: Cached) => (typeof ttl === "number" ? ttl : ttl(c.body));
+  if (hit && now - hit.fetchedAt < life(hit) * 1000) {
+    return { value: hit, stale: false, ttl: life(hit) };
   }
   try {
     const fresh: Cached = permanent ? { body: await load(), fetchedAt: now, final: true } : { body: await load(), fetchedAt: now };
@@ -209,7 +228,7 @@ async function cached(
       lastKvWrite.set(key, now);
       ctx.waitUntil(env.LAST_GOOD.put(key, JSON.stringify(fresh)).catch(() => {}));
     }
-    return { value: fresh, stale: false, ttl };
+    return { value: fresh, stale: false, ttl: life(fresh) };
   } catch (err) {
     console.error(`Loading ${key} failed:`, err);
     const fallback = hit ?? (await readKv(env, key));
@@ -221,7 +240,10 @@ async function cached(
 async function respond(get: () => Promise<Result>): Promise<Response> {
   try {
     const { value, stale, ttl } = await get();
-    return envelope(value, stale, ttl);
+    // Let the browser keep it only for as long as we would, so a phone never
+    // holds on to a copy that's older than the one we'd serve.
+    const left = Math.ceil(ttl - (Date.now() - value.fetchedAt) / 1000);
+    return envelope(value, stale, Math.max(0, left));
   } catch (err) {
     if (err instanceof NotFound) return json({ error: err.message }, 404);
     return json({ error: "FPL is not responding and there is no saved copy yet." }, 502);

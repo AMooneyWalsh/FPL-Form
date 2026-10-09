@@ -938,6 +938,45 @@ button.more {
 
 /* ---- live page ---- */
 
+.gw-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.gw-picker-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 17px;
+}
+
+.gw-picker-mid button.link {
+  padding: 0;
+  font-size: 13px;
+}
+
+.gw-step {
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: inherit;
+  cursor: pointer;
+}
+
+.gw-step:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
 .phase {
   font-size: 12px;
   font-weight: 700;

@@ -21,6 +21,8 @@ export function useApi<T>(path: string | null, refreshSeconds = 120): Loadable<T
   const [state, setState] = useState<Loadable<T>>({ status: "loading" });
   useEffect(() => {
     if (path === null) return;
+    // A new path (e.g. another gameweek) shouldn't show the old one's data.
+    setState((s) => (s.status === "loading" ? s : { status: "loading" }));
     let cancelled = false;
     const load = () =>
       getJson<T>(path)
@@ -31,12 +33,22 @@ export function useApi<T>(path: string | null, refreshSeconds = 120): Loadable<T
         });
     load();
     const timer = window.setInterval(load, refreshSeconds * 1000);
+    const stopWatching = onReturn(load);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
+      stopWatching();
     };
   }, [path, refreshSeconds]);
   return state;
+}
+
+/** Runs `fn` when someone comes back to the tab (e.g. from WhatsApp), so they
+ * don't sit looking at old scores until the next timed refresh. */
+export function onReturn(fn: () => void): () => void {
+  const check = () => document.visibilityState === "visible" && fn();
+  document.addEventListener("visibilitychange", check);
+  return () => document.removeEventListener("visibilitychange", check);
 }
 
 export type { Envelope };

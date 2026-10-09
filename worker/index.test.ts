@@ -261,16 +261,46 @@ describe("live route", () => {
     expect(body.data.picks).toEqual({});
   });
 
-  it("refreshes every minute while games are on", async () => {
+  const paths = () => upstream.mock.calls.map(([input]) => String(input).replace("https://draft.premierleague.com/api/", ""));
+
+  it("refreshes scores every 30 seconds while games are on, but not the locked lineups", async () => {
     fakeFpl({ current_event: 6, current_event_finished: false }, () =>
       new Response(JSON.stringify({ picks: [], subs: [] })),
     );
     const env = makeEnv();
     await get("/api/live/6", env);
-    const calls = upstream.mock.calls.length;
-    vi.setSystemTime(new Date("2026-09-30T12:01:30Z"));
+    vi.setSystemTime(new Date("2026-09-30T12:00:20Z"));
     await get("/api/live/6", env);
-    expect(upstream.mock.calls.length).toBeGreaterThan(calls);
+    expect(paths().filter((p) => p === "event/6/live")).toHaveLength(1);
+    upstream.mockClear();
+    vi.setSystemTime(new Date("2026-09-30T12:00:40Z"));
+    await get("/api/live/6", env);
+    expect(paths()).toEqual(["event/6/live"]);
+  });
+
+  it("keeps asking for a lineup that failed to load", async () => {
+    let failing = true;
+    fakeFpl({ current_event: 6, current_event_finished: false }, (entry) =>
+      entry === "22" && failing
+        ? new Response("busy", { status: 503 })
+        : new Response(JSON.stringify({ picks: [{ element: 5, position: 1 }], subs: [] })),
+    );
+    const env = makeEnv();
+    await get("/api/live/6", env);
+    failing = false;
+    vi.setSystemTime(new Date("2026-09-30T12:00:40Z"));
+    const body = (await (await get("/api/live/6", env)).json()) as { data: { picks: object } };
+    expect(Object.keys(body.data.picks)).toEqual(["11", "22"]);
+  });
+
+  it("tells the browser to keep a copy only as long as the server would", async () => {
+    fakeFpl({ current_event: 6, current_event_finished: false }, () =>
+      new Response(JSON.stringify({ picks: [], subs: [] })),
+    );
+    const env = makeEnv();
+    expect((await get("/api/live/6", env)).headers.get("Cache-Control")).toBe("public, max-age=30");
+    vi.setSystemTime(new Date("2026-09-30T12:00:20Z"));
+    expect((await get("/api/live/6", env)).headers.get("Cache-Control")).toBe("public, max-age=10");
   });
 
   it("refuses gameweeks too far ahead", async () => {
