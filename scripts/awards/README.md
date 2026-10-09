@@ -12,3 +12,11 @@ A shareable image for the league WhatsApp: tongue-in-cheek "awards" built from r
 4. Send the PNG to the owner with `SendUserFile`. They post it themselves.
 
 Include the owner (Adam) when there's something to tease, so it isn't him roasting everyone else.
+
+## Gameweek preview
+
+A matching "weekend ahead" graphic, posted before the deadline (first one: GW6).
+
+1. `npx tsx scripts/awards/preview.mts [gw]` prints every head-to-head: table position, form, a rough win chance (half season average, half squad strength on paper), injuries, in-form players with fixtures, this week's signings and trades. It reads the live site's API.
+2. Squad turnover since last week is a good angle: compare `/api/gw/{last}` squads with `/api/ownership`.
+3. Copy `gw6-preview.html`: one wide card for the week's main story, one card per match with the win-chance bar, plus one extra card so the grid has no gap. Render with `render.mjs` as above.
