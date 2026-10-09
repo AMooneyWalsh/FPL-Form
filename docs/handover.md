@@ -71,6 +71,10 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Every API response's browser `max-age` is the time left on the server copy, so delays don't stack. Pages refresh when you come back to the tab.
 - Live tab has a "‹ Gameweek n ›" picker (any past GW, or the next one). It follows FPL's `current_event`, which moves at each deadline, unless someone picks a week.
 
+### Deadline banner (9 Oct)
+
+- The purple header shows the next gameweek's trade, waiver and team deadlines (`DeadlineBanner` in `App.tsx`, logic in `shared/deadlines.ts`), in the viewer's own time zone, with a countdown to the next one. Times come from bootstrap-static `events` via `/api/players` (`deadlines`).
+
 ## Checks before merging
 
 - `npm run check` (typecheck, 112 tests, build).

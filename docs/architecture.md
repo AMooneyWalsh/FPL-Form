@@ -104,7 +104,7 @@ Worker fetches from `https://draft.premierleague.com/api/`, caches in memory per
 | `/api/transactions` | `draft/league/{LEAGUE_ID}/transactions` | 2 min, all week |
 | `/api/ownership` | `league/{LEAGUE_ID}/element-status` | 2 min |
 | `/api/draft` | `draft/{LEAGUE_ID}/choices` (trimmed to picks) | 6 h |
-| `/api/players` | `bootstrap-static` trimmed to `{ players, rules, fixtures }`: ids, names, club, position, points, draft rank, plus status, news, chance of playing, form, points per game, minutes, starts, xG, xA, penalty order; squad rules; the next ~3 gameweeks of fixtures | 1 h |
+| `/api/players` | `bootstrap-static` trimmed to `{ players, rules, fixtures }`: ids, names, club, position, points, draft rank, plus status, news, chance of playing, form, points per game, minutes, starts, xG, xA, penalty order; squad rules; the next ~3 gameweeks of fixtures; trade, waiver and team deadlines for unfinished gameweeks | 1 h |
 | `/api/fdr` | Main FPL game: `https://fantasy.premierleague.com/api/fixtures/?future=1`, trimmed to event, clubs, kickoff and each side's official 1-5 difficulty (the Draft API has none; club ids match) | 6 h |
 | `/api/classic` | Main FPL game: `leagues-classic/{CLASSIC_LEAGUE_ID}/standings/` trimmed to name, rank, total (who is immune from a forfeit) | 30 min |
 | `/api/shirt/{code}` | FPL shirt image, proxied because FPL's image host failed on phones | long |

@@ -172,4 +172,14 @@ export interface PlayersPayload {
   rules: SquadRules;
   /** The next few gameweeks' fixtures (FPL sends about three). */
   fixtures: UpcomingFixture[];
+  /** Trade, waiver and team deadlines for every gameweek not yet finished. */
+  deadlines?: Deadlines[];
+}
+
+/** One gameweek's deadlines (ISO times, from bootstrap-static events). */
+export interface Deadlines {
+  event: number;
+  trades: string;
+  waivers: string;
+  team: string;
 }

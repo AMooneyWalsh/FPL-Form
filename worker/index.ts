@@ -344,6 +344,7 @@ interface RawBootstrap {
   teams: { id: number; short_name: string; code: number }[];
   settings: { squad: Record<string, number> };
   fixtures?: Record<string, { event: number; team_h: number; team_a: number; kickoff_time: string | null }[]>;
+  events?: { data: { id: number; finished: boolean; deadline_time: string; trades_time: string; waivers_time: string }[] };
 }
 
 /** bootstrap-static is ~1 MB; phones only need a few fields per player,
@@ -385,6 +386,9 @@ export function trimPlayers(raw: string): string {
     players,
     rules: { play: sq.play, select: byPos("select_"), minPlay: byPos("min_play_"), maxPlay: byPos("max_play_") },
     fixtures,
+    deadlines: (b.events?.data ?? [])
+      .filter((e) => !e.finished)
+      .map((e) => ({ event: e.id, trades: e.trades_time, waivers: e.waivers_time, team: e.deadline_time })),
   };
   return JSON.stringify(payload);
 }
