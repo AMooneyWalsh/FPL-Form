@@ -135,15 +135,31 @@ function pickLowest(values: number[], tie: number[]): number {
   return best;
 }
 
+/** A typical squad player's points per game, assumed until a player has shown otherwise. */
+const PRIOR_PPG = 2;
+/** How many appearances that assumption is worth. */
+const PRIOR_GAMES = 3;
+
+/**
+ * Points per game, pulled towards a typical player's until there are enough
+ * appearances to trust it. One 16-point cameo shouldn't make a player look
+ * like the best in the league.
+ */
+export function steadyPointsPerGame(p: Player): number {
+  const apps =
+    p.pointsPerGame > 0 ? Math.round(p.totalPoints / p.pointsPerGame) : p.minutes > 0 ? Math.max(1, Math.round(p.minutes / 90)) : 0;
+  return (p.pointsPerGame * apps + PRIOR_PPG * PRIOR_GAMES) / (apps + PRIOR_GAMES);
+}
+
 /**
  * Rough weekly points a squad should bring in: the best valid XI picked on
- * points per game, scaled down for injury doubts. Only used relative to the
- * rest of the league, so the exact scale doesn't matter.
+ * steadied points per game, scaled down for injury doubts. Only used relative
+ * to the rest of the league, so the exact scale doesn't matter.
  */
 export function squadStrength(squad: Player[]): number {
   const value = (p: Player) => {
     if (["i", "s", "u", "n"].includes(p.status)) return 0;
-    return p.pointsPerGame * (p.chanceNext ?? 100) / 100;
+    return steadyPointsPerGame(p) * (p.chanceNext ?? 100) / 100;
   };
   const sorted = [...squad].sort((a, b) => value(b) - value(a));
   const xi: Player[] = [];
