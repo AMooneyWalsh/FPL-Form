@@ -75,6 +75,11 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 - The purple header shows the next gameweek's trade, waiver and team deadlines (`DeadlineBanner` in `App.tsx`, logic in `shared/deadlines.ts`), in the viewer's own time zone, with a countdown to the next one. Times come from bootstrap-static `events` via `/api/players` (`deadlines`).
 
+### Live tab additions (9 Oct, later)
+
+- Position dividers in lineups (`group-end`), a Live > Table view with places moved and this week's score, and both squads shown before the deadline (`SquadPreview`, from ownership).
+- Team sheets: `/api/teamsheets/{n}` reads the Premier League's own feed, since FPL only shows lineups after kick-off. Every player at a club whose sheet is out gets a Starting / Bench / Not in squad tag until his match kicks off. First real run: GW6, Sat 10 Oct (sheets about 75 min before 12:30). Check it worked; the feed is unofficial, so if it changes the tags just don't appear.
+
 ## Checks before merging
 
 - `npm run check` (typecheck, 112 tests, build).

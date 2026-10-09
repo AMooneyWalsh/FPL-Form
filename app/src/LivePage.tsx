@@ -17,7 +17,7 @@ import {
   type PlayerInfo,
 } from "../../shared/live";
 import { computeStandings, type StandingRow } from "../../shared/standings";
-import type { Envelope, Player } from "../../shared/types";
+import type { Envelope, Player, TeamSheets } from "../../shared/types";
 import { useApi } from "./api";
 import { InjuryFlag, Manager, SubNav } from "./bits";
 import type { LeagueData } from "./data";
@@ -48,6 +48,8 @@ interface Ctx {
   matches: LiveMatch[];
   owners: Map<number, Owner>;
   table: StandingRow[];
+  /** Official team sheets, once out (about an hour before each kick-off). */
+  sheets: TeamSheets | null;
 }
 
 export function LivePage({ data, myTeam, view }: { data: LeagueData; myTeam: number | null; view: LiveView }) {
@@ -60,6 +62,9 @@ export function LivePage({ data, myTeam, view }: { data: LeagueData; myTeam: num
   const isCurrent = event === current;
   const live = useApi<Envelope<LiveGameweek>>(event >= 1 ? `/api/live/${event}` : null, isCurrent ? 30 : 3600);
   const showNext = isCurrent && data.game.current_event_finished && hasNext;
+  // Team sheets only matter for matches still to start: this week's or next.
+  const wantSheets = event > current || (isCurrent && !data.game.current_event_finished);
+  const sheets = useApi<Envelope<TeamSheets>>(wantSheets ? `/api/teamsheets/${event}` : null, 60);
   const next = useApi<Envelope<LiveGameweek>>(showNext ? `/api/live/${event + 1}` : null, 3600);
 
   if (current < 1) return <p className="notice">The season hasn't started yet. Live scores appear here from gameweek 1.</p>;
@@ -73,6 +78,7 @@ export function LivePage({ data, myTeam, view }: { data: LeagueData; myTeam: num
         <LiveView
           gw={live.value.data}
           next={showNext && next.status === "ready" ? next.value.data : null}
+          sheets={wantSheets && sheets.status === "ready" ? sheets.value.data : null}
           data={data}
           myTeam={myTeam}
           view={view}
@@ -135,12 +141,14 @@ function phaseOf(gw: LiveGameweek): Phase {
 function LiveView({
   gw,
   next,
+  sheets,
   data,
   myTeam,
   view,
 }: {
   gw: LiveGameweek;
   next: LiveGameweek | null;
+  sheets: TeamSheets | null;
   data: LeagueData;
   myTeam: number | null;
   view: LiveView;
@@ -160,8 +168,9 @@ function LiveView({
       matches,
       owners: leagueOwners(matches),
       table: phase === "upcoming" ? computeStandings(data.league) : liveTable(data.league, gw.event, matches),
+      sheets,
     };
-  }, [data, gw, myTeam]);
+  }, [data, gw, myTeam, sheets]);
 
   return (
     <>
@@ -206,6 +215,12 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
             <span className="lv-key">
               <Dot status="played" /> played <Dot status="playing" /> playing <Dot status="to-play" /> still to play
             </span>
+          </p>
+        )}
+        {ctx.sheets && ctx.sheets.announced.length > 0 && (
+          <p className="hint">
+            Team sheets are out for some matches: <span className="ts ts-start">Starting</span>{" "}
+            <span className="ts ts-bench">Bench</span> <span className="ts ts-out">Not in squad</span> show until kick-off.
           </p>
         )}
         {!hasLineups && (
@@ -380,6 +395,25 @@ function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: C
   );
 }
 
+type SheetStatus = "start" | "bench" | "out";
+
+/** Where a player is on his club's official team sheet, until his match kicks off. */
+function sheetStatus(p: Player | undefined, ctx: Ctx): SheetStatus | null {
+  if (!ctx.sheets || !p?.code) return null;
+  const games = gamesOf(p.teamId, ctx.gw);
+  if (games.length === 0 || games.some((f) => f.started)) return null;
+  if (!ctx.sheets.announced.includes(p.team)) return null;
+  return ctx.sheets.players[p.code] ?? "out";
+}
+
+const SHEET_LABELS: Record<SheetStatus, string> = { start: "Starting", bench: "Bench", out: "Not in squad" };
+
+function SheetTag({ p, ctx }: { p: Player | undefined; ctx: Ctx }) {
+  const status = sheetStatus(p, ctx);
+  if (!status) return null;
+  return <span className={`ts ts-${status}`}>{SHEET_LABELS[status]}</span>;
+}
+
 const POSITION_ORDER: Record<Player["position"], number> = { GKP: 0, DEF: 1, MID: 2, FWD: 3 };
 
 /** Both current squads by position, for before the deadline when the XIs aren't known yet. */
@@ -401,7 +435,7 @@ function SquadPreview({ home, away, ctx }: { home: number; away: number; ctx: Ct
           <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
           <span className="lv-row-body">
             <span className="lv-row-name">
-              {p.name} <InjuryFlag p={p} />
+              {p.name} <SheetTag p={p} ctx={ctx} /> <InjuryFlag p={p} />
             </span>
             {fixtureLines(p.teamId, ctx).map((line) => (
               <span key={line} className="lv-row-fix">
@@ -524,7 +558,7 @@ function PlayerRow({ p, squad, bench, groupEnd, ctx }: { p: LivePlayer; squad: L
         <span className="lv-row-body">
           <span className="lv-row-name">
             {benchNo && <span className="lv-bench-no">{benchNo}</span>}
-            {player?.name ?? `Player ${p.element}`}
+            {player?.name ?? `Player ${p.element}`} <SheetTag p={player} ctx={ctx} />
           </span>
           {note && <span className={`lv-note ${note.cls}`}>{note.text}</span>}
           {parts.length > 0 && <span className="lv-row-stats">{parts.join(", ")}</span>}

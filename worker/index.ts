@@ -4,7 +4,7 @@
 
 import { buildGameweek, type RawLive, type RawPicks } from "../shared/gameweek";
 import { toLiveGameweek, type LivePicks, type RawLiveResponse } from "../shared/live";
-import type { GameStatus, LeagueDetails, Player, PlayersPayload, SquadRules, UpcomingFixture } from "../shared/types";
+import type { GameStatus, TeamSheets, LeagueDetails, Player, PlayersPayload, SquadRules, UpcomingFixture } from "../shared/types";
 
 export interface Env {
   LEAGUE_ID: string;
@@ -100,6 +100,10 @@ export default {
     if (liveMatch) {
       return serveLive(Number(liveMatch[1]), env, ctx);
     }
+    const sheetsMatch = /^teamsheets\/(\d{1,2})$/.exec(name);
+    if (sheetsMatch) {
+      return serveTeamSheets(Number(sheetsMatch[1]), env, ctx);
+    }
     const shirtMatch = /^shirt\/(\d{1,3})(_1)?$/.exec(name);
     if (shirtMatch) {
       return serveShirt(shirtMatch[1], !!shirtMatch[2], ctx);
@@ -194,6 +198,82 @@ async function serveLive(event: number, env: Env, ctx: ExecutionContext): Promis
       ]);
       const byEntry = JSON.parse(picks.value.body) as Record<number, LivePicks>;
       return JSON.stringify(toLiveGameweek(event, JSON.parse(live) as RawLiveResponse, byEntry));
+    });
+  });
+}
+
+// ---------------------------------------------------------------- team sheets
+
+const PULSE = "https://footballapi.pulselive.com/football/";
+/** Start asking for a match's team sheet this long before kick-off (they come out about an hour before). */
+const SHEET_WINDOW_MS = 100 * 60_000;
+
+async function fetchPulse(path: string): Promise<string> {
+  // The feed answers only requests that look like they come from premierleague.com.
+  const res = await fetch(PULSE + path, {
+    headers: { "User-Agent": USER_AGENT, Accept: "application/json", Origin: "https://www.premierleague.com" },
+    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+  return res.text();
+}
+
+interface PulseFixture {
+  id: number;
+  status: string;
+  kickoff?: { millis?: number };
+  teams: { team: { id: number; club: { abbr: string } } }[];
+  teamLists?: { teamId: number; lineup?: { altIds?: { opta?: string } }[]; substitutes?: { altIds?: { opta?: string } }[] }[];
+}
+
+/** Turns the Premier League's fixture details into who's starting and who's on the bench. */
+export function toTeamSheets(details: PulseFixture[]): TeamSheets {
+  const out: TeamSheets = { announced: [], players: {} };
+  const code = (p: { altIds?: { opta?: string } }) => Number(p.altIds?.opta?.replace(/^p/, ""));
+  for (const f of details) {
+    const clubs = new Map(f.teams.map((t) => [t.team.id, t.team.club.abbr]));
+    for (const list of f.teamLists ?? []) {
+      if (!list.lineup?.length) continue;
+      const club = clubs.get(list.teamId);
+      if (club) out.announced.push(club);
+      for (const p of list.lineup) if (code(p)) out.players[code(p)] = "start";
+      for (const p of list.substitutes ?? []) if (code(p)) out.players[code(p)] = "bench";
+    }
+  }
+  return out;
+}
+
+/**
+ * Official team sheets for one gameweek. Only matches kicking off soon, or
+ * already under way, are asked about, so most of the week this is one small
+ * request. Refreshes every minute.
+ */
+async function serveTeamSheets(event: number, env: Env, ctx: ExecutionContext): Promise<Response> {
+  return respond(async () => {
+    const season = JSON.parse(
+      (await cached("pulse:season", 12 * HOUR, env, ctx, () => fetchPulse("competitions/1/compseasons?page=0&pageSize=1"))).value.body,
+    ) as { content: { id: number }[] };
+    const seasonId = season.content[0]?.id;
+    const weeks = JSON.parse(
+      (await cached(`pulse:weeks:${seasonId}`, 12 * HOUR, env, ctx, () => fetchPulse(`compseasons/${seasonId}/gameweeks`))).value.body,
+    ) as { gameweeks: { gameweek: number; id: number }[] };
+    const week = weeks.gameweeks.find((w) => w.gameweek === event);
+    if (!week) throw new NotFound("No such gameweek.");
+    return cached(`pulse:sheets:${week.id}`, MINUTE, env, ctx, async () => {
+      const list = JSON.parse(
+        await fetchPulse(`fixtures?comps=1&compSeasons=${seasonId}&gameweeks=${week.id}&pageSize=40&altIds=true`),
+      ) as { content: PulseFixture[] };
+      const now = Date.now();
+      const soon = list.content.filter((f) => f.status !== "U" || (f.kickoff?.millis ?? Infinity) - now < SHEET_WINDOW_MS);
+      const details = await Promise.all(
+        soon.map(async (f) => {
+          // A finished match's sheet never changes.
+          const key = `pulse:fixture:${f.id}`;
+          const ttl = f.status === "C" ? FOREVER : MINUTE;
+          return JSON.parse((await cached(key, ttl, env, ctx, () => fetchPulse(`fixtures/${f.id}?altIds=true`))).value.body) as PulseFixture;
+        }),
+      );
+      return JSON.stringify(toTeamSheets(details));
     });
   });
 }
@@ -329,6 +409,7 @@ interface RawBootstrap {
     first_name: string;
     second_name: string;
     team: number;
+    code: number;
     element_type: 1 | 2 | 3 | 4;
     total_points: number;
     draft_rank: number;
@@ -364,6 +445,7 @@ export function trimPlayers(raw: string): string {
     team: teams.get(e.team) ?? "",
     teamId: e.team,
     teamCode: codes.get(e.team) ?? 0,
+    code: e.code,
     position: POSITIONS[e.element_type],
     totalPoints: e.total_points,
     draftRank: e.draft_rank,

@@ -327,3 +327,56 @@ describe("trimClassic", () => {
     expect(out.standings[0].rank).toBe(1);
   });
 });
+
+describe("team sheets route", () => {
+  const player = (code: number) => ({ altIds: { opta: `p${code}` } });
+  const fixture = (id: number, status: string, kickoff: string, withLists: boolean) => ({
+    id,
+    status,
+    kickoff: { millis: Date.parse(kickoff) },
+    teams: [{ team: { id: 1, club: { abbr: "ARS" } } }, { team: { id: 2, club: { abbr: "LEE" } } }],
+    ...(withLists
+      ? {
+          teamLists: [
+            { teamId: 1, lineup: [player(101), player(102)], substitutes: [player(103)] },
+            { teamId: 2, lineup: [player(201)], substitutes: [] },
+          ],
+        }
+      : {}),
+  });
+
+  function fakePulse(fixtures: object[], details: Record<number, object>) {
+    upstream.mockImplementation(async (input) => {
+      const url = String(input).replace("https://footballapi.pulselive.com/football/", "");
+      if (url.startsWith("competitions/1/compseasons")) return new Response(JSON.stringify({ content: [{ id: 841 }] }));
+      if (url === "compseasons/841/gameweeks") return new Response(JSON.stringify({ gameweeks: [{ gameweek: 6, id: 19766 }] }));
+      if (url.startsWith("fixtures?")) return new Response(JSON.stringify({ content: fixtures }));
+      const m = /^fixtures\/(\d+)/.exec(url);
+      if (m) return new Response(JSON.stringify(details[Number(m[1])]));
+      return new Response("nope", { status: 404 });
+    });
+  }
+
+  it("lists who starts and who's on the bench once a sheet is out", async () => {
+    const f = fixture(9, "U", "2026-09-30T13:00:00Z", true);
+    fakePulse([f], { 9: f });
+    const body = (await (await get("/api/teamsheets/6", makeEnv())).json()) as { data: Record<string, any> };
+    expect(body.data.announced).toEqual(["ARS", "LEE"]);
+    expect(body.data.players).toEqual({ 101: "start", 102: "start", 103: "bench", 201: "start" });
+  });
+
+  it("doesn't ask about matches that are hours away", async () => {
+    const f = fixture(9, "U", "2026-09-30T18:00:00Z", true);
+    fakePulse([f], { 9: f });
+    const body = (await (await get("/api/teamsheets/6", makeEnv())).json()) as { data: Record<string, any> };
+    expect(body.data).toEqual({ announced: [], players: {} });
+    expect(upstream.mock.calls.some(([u]) => /fixtures\/9/.test(String(u)))).toBe(false);
+  });
+
+  it("shows nothing for a match whose sheet isn't out yet", async () => {
+    const f = fixture(9, "U", "2026-09-30T12:30:00Z", false);
+    fakePulse([f], { 9: f });
+    const body = (await (await get("/api/teamsheets/6", makeEnv())).json()) as { data: Record<string, any> };
+    expect(body.data).toEqual({ announced: [], players: {} });
+  });
+});
