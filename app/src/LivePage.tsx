@@ -397,7 +397,11 @@ function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: C
 
 type SheetStatus = "start" | "bench" | "out";
 
-/** Where a player is on his club's official team sheet, until his match kicks off. */
+/**
+ * Where a player is on his club's official team sheet, until his match kicks
+ * off. Sheets always come out after the FPL deadline, so this only ever shows
+ * on the real lineups, never on the pre-deadline squads.
+ */
 function sheetStatus(p: Player | undefined, ctx: Ctx): SheetStatus | null {
   if (!ctx.sheets || !p?.code) return null;
   const games = gamesOf(p.teamId, ctx.gw);
@@ -435,7 +439,7 @@ function SquadPreview({ home, away, ctx }: { home: number; away: number; ctx: Ct
           <Shirt teamId={p.teamId} gk={p.position === "GKP"} ctx={ctx} />
           <span className="lv-row-body">
             <span className="lv-row-name">
-              {p.name} <SheetTag p={p} ctx={ctx} /> <InjuryFlag p={p} />
+              {p.name} <InjuryFlag p={p} />
             </span>
             {fixtureLines(p.teamId, ctx).map((line) => (
               <span key={line} className="lv-row-fix">
