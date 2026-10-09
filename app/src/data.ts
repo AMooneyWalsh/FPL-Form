@@ -16,7 +16,7 @@ import type {
   Transaction,
   UpcomingFixture,
 } from "../../shared/types";
-import { useApi, type Loadable } from "./api";
+import { onReturn, useApi, type Loadable } from "./api";
 
 /** Everything the pages need, loaded together and kept fresh. */
 export interface LeagueData {
@@ -158,9 +158,11 @@ function useGameweeks(current: number | null): Loadable<{ loaded: Gameweek[]; mi
     };
     load(false);
     const timer = window.setInterval(() => load(true), REFRESH * 1000);
+    const stopWatching = onReturn(() => load(true));
     return () => {
       cancelled = true;
       window.clearInterval(timer);
+      stopWatching();
     };
   }, [current]);
   return state;

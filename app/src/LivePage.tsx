@@ -50,22 +50,78 @@ interface Ctx {
 }
 
 export function LivePage({ data, myTeam, view }: { data: LeagueData; myTeam: number | null; view: LiveView }) {
-  const event = data.game.current_event;
-  const live = useApi<Envelope<LiveGameweek>>(event >= 1 ? `/api/live/${event}` : null, 60);
-  const hasNext = data.game.current_event_finished && data.league.matches.some((m) => m.event === event + 1);
-  const next = useApi<Envelope<LiveGameweek>>(hasNext ? `/api/live/${event + 1}` : null, 3600);
+  const current = data.game.current_event;
+  const hasNext = data.league.matches.some((m) => m.event === current + 1);
+  const last = hasNext ? current + 1 : current;
+  // null = follow FPL's current gameweek, which moves on at each deadline.
+  const [picked, setPicked] = useState<number | null>(null);
+  const event = picked !== null && picked >= 1 && picked <= last ? picked : current;
+  const isCurrent = event === current;
+  const live = useApi<Envelope<LiveGameweek>>(event >= 1 ? `/api/live/${event}` : null, isCurrent ? 30 : 3600);
+  const showNext = isCurrent && data.game.current_event_finished && hasNext;
+  const next = useApi<Envelope<LiveGameweek>>(showNext ? `/api/live/${event + 1}` : null, 3600);
 
-  if (event < 1) return <p className="notice">The season hasn't started yet. Live scores appear here from gameweek 1.</p>;
-  if (live.status === "loading") return <p className="notice">Loading gameweek {event}…</p>;
-  if (live.status === "error") return <p className="notice error">Couldn't load the live scores. {live.message}</p>;
+  if (current < 1) return <p className="notice">The season hasn't started yet. Live scores appear here from gameweek 1.</p>;
   return (
-    <LiveView
-      gw={live.value.data}
-      next={hasNext && next.status === "ready" ? next.value.data : null}
-      data={data}
-      myTeam={myTeam}
-      view={view}
-    />
+    <>
+      <SubNav page="live" views={LIVE_VIEWS} current={view} label="Live sections" />
+      <GameweekPicker event={event} current={current} last={last} onPick={(n) => setPicked(n === current ? null : n)} />
+      {live.status === "loading" && <p className="notice">Loading gameweek {event}…</p>}
+      {live.status === "error" && <p className="notice error">Couldn't load the live scores. {live.message}</p>}
+      {live.status === "ready" && (
+        <LiveView
+          gw={live.value.data}
+          next={showNext && next.status === "ready" ? next.value.data : null}
+          data={data}
+          myTeam={myTeam}
+          view={view}
+        />
+      )}
+    </>
+  );
+}
+
+/** "‹ Gameweek 6 ›": step back through earlier weeks or on to the next one. */
+function GameweekPicker({
+  event,
+  current,
+  last,
+  onPick,
+}: {
+  event: number;
+  current: number;
+  last: number;
+  onPick: (n: number) => void;
+}) {
+  return (
+    <div className="gw-picker">
+      <button
+        type="button"
+        className="gw-step"
+        onClick={() => onPick(event - 1)}
+        disabled={event <= 1}
+        aria-label="Previous gameweek"
+      >
+        ‹
+      </button>
+      <div className="gw-picker-mid">
+        <strong>Gameweek {event}</strong>
+        {event !== current && (
+          <button type="button" className="link" onClick={() => onPick(current)}>
+            Back to gameweek {current}
+          </button>
+        )}
+      </div>
+      <button
+        type="button"
+        className="gw-step"
+        onClick={() => onPick(event + 1)}
+        disabled={event >= last}
+        aria-label="Next gameweek"
+      >
+        ›
+      </button>
+    </div>
   );
 }
 
@@ -108,7 +164,6 @@ function LiveView({
 
   return (
     <>
-      <SubNav page="live" views={LIVE_VIEWS} current={view} label="Live sections" />
       {view === "matches" && <MatchesView ctx={ctx} next={next} />}
       {view === "bonus" && <BonusView ctx={ctx} />}
       {view === "fixtures" && <FixturesView ctx={ctx} />}
@@ -129,14 +184,14 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
     <>
       <section>
         <div className="section-head">
-          <h2>Gameweek {gw.event}</h2>
+          <h2>Matches</h2>
           <span className={`phase phase-${phase}`}>
             {phase === "live" ? "Live" : phase === "done" ? "Finished" : "Not started"}
           </span>
         </div>
         <p className="hint">
           {phase === "live" &&
-            `${played} of ${gw.fixtures.length} matches finished. Updates every minute. Bonus is provisional (*) until FPL confirms it, and auto-subs are FPL's likely ones.`}
+            `${played} of ${gw.fixtures.length} matches finished. Updates every 30 seconds. Bonus is provisional (*) until FPL confirms it, and auto-subs are FPL's likely ones.`}
           {phase === "done" &&
             (gw.fixtures.every((f) => f.finished)
               ? "All matches finished and FPL has confirmed the points."

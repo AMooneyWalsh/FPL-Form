@@ -65,6 +65,12 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
   The owner pushed hard on this, so be careful here.
 
+### Live refresh and gameweek picker (9 Oct)
+
+- Live scores refresh every 30 s while games are on (server and phones). Lineups are cached for 15 min during play, so a refresh is 1 call to FPL, not 15. A lineup that failed to load is retried next time.
+- Every API response's browser `max-age` is the time left on the server copy, so delays don't stack. Pages refresh when you come back to the tab.
+- Live tab has a "‹ Gameweek n ›" picker (any past GW, or the next one). It follows FPL's `current_event`, which moves at each deadline, unless someone picks a week.
+
 ## Checks before merging
 
 - `npm run check` (typecheck, 112 tests, build).
