@@ -291,7 +291,8 @@ function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: b
             <span className="muted">–</span>
             <span>{a ?? "–"}</span>
           </span>
-          {phase !== "upcoming" && m.home && m.away && (
+          {/* Once it's over, W/L next to the score. While it's live the score says it all. */}
+          {phase === "done" && m.home && m.away && (
             <span className="lv-chips">
               <span className={`lv-res ${result(h, a)} ${phase}`}>{result(h, a)}</span>
               <span className={`lv-res ${result(a, h)} ${phase}`}>{result(a, h)}</span>
@@ -506,6 +507,11 @@ function statParts(p: LivePlayer): string[] {
   return out;
 }
 
+/** The match minute, or "Live": FPL's Draft API often reports 0 minutes for a match under way. */
+function clock(f: LiveFixture): string {
+  return f.minutes > 0 ? `${f.minutes}'` : "Live";
+}
+
 /** ["NFO 0 - 1 COV", "FT"], ["BHA 1 - 0 ARS", "67'"] or ["LEE v CRY", "Sun 13:00"]: the match, then when. */
 function fixtureLines(teamId: number, ctx: Ctx): [string, string][] {
   const games = gamesOf(teamId, ctx.gw);
@@ -514,7 +520,7 @@ function fixtureLines(teamId: number, ctx: Ctx): [string, string][] {
     const h = ctx.clubs.get(f.teamH)?.short ?? "?";
     const a = ctx.clubs.get(f.teamA)?.short ?? "?";
     if (!f.started) return [`${h} v ${a}`, f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"];
-    return [`${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}`, f.finishedProvisional ? "FT" : `${f.minutes}'`];
+    return [`${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}`, f.finishedProvisional ? "FT" : clock(f)];
   });
 }
 
@@ -777,7 +783,7 @@ function FixturesView({ ctx }: { ctx: Ctx }) {
 function FixtureCard({ f, ctx }: { f: LiveFixture; ctx: Ctx }) {
   const h = ctx.clubs.get(f.teamH)?.short;
   const a = ctx.clubs.get(f.teamA)?.short;
-  const status = f.finishedProvisional ? "FT" : f.started ? `${f.minutes}'` : f.kickoff ? formatKickoff(f.kickoff, true) : "TBC";
+  const status = f.finishedProvisional ? "FT" : f.started ? clock(f) : f.kickoff ? formatKickoff(f.kickoff, true) : "TBC";
   return (
     <article className="card lv-fx">
       <div className="lv-fx-row">
@@ -822,7 +828,7 @@ function fixtureTitle(f: LiveFixture, ctx: Ctx): string {
   const h = ctx.clubs.get(f.teamH)?.short ?? "?";
   const a = ctx.clubs.get(f.teamA)?.short ?? "?";
   if (!f.started) return `${h} v ${a} (${f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"})`;
-  return `${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}${f.finishedProvisional ? " · FT" : ` · ${f.minutes}'`}`;
+  return `${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}${f.finishedProvisional ? " · FT" : ` · ${clock(f)}`}`;
 }
 
 function firstKickoff(gw: LiveGameweek): string | null {
