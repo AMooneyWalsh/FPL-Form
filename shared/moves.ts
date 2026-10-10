@@ -434,7 +434,13 @@ export interface Stint {
   how: HowAcquired;
   /** Overall pick number. */
   draftPick?: number;
+  /** How the spell ended, if it has: dropped for someone else, or traded away. */
+  ended?: StintEnd;
 }
+
+export type StintEnd =
+  | { how: "dropped"; event: number; kind: "waiver" | "free agent"; for: number }
+  | { how: "traded"; event: number; to: number };
 
 /** Every manager who has owned this player, in order, with what he scored for each. */
 export function playerJourney(
@@ -463,7 +469,36 @@ export function playerJourney(
       ...howAcquired(element, owner.entryId, gw.event, moves),
     });
   }
+  stints.forEach((s, i) => {
+    const ended = howReleased(element, s, stints[i + 1]?.from ?? Infinity, moves);
+    if (ended) s.ended = ended;
+  });
   return stints;
+}
+
+/** The first drop or trade that took him off this manager after the spell's last gameweek. */
+function howReleased(
+  element: number,
+  stint: Stint,
+  before: number,
+  { transactions, trades }: { transactions: Transaction[]; trades: Trade[] },
+): StintEnd | undefined {
+  const within = (event: number) => event > stint.to && event <= before;
+  const drop = transactions
+    .filter((t) => t.result === "a" && t.entry === stint.entryId && t.element_out === element && within(t.event))
+    .sort((a, b) => a.event - b.event)[0];
+  let trade: StintEnd | undefined;
+  for (const t of trades) {
+    if (t.state !== "p" || !within(t.event) || (trade && trade.event <= t.event)) continue;
+    for (const item of t.tradeitem_set) {
+      if (t.offered_entry === stint.entryId && item.element_out === element) trade = { how: "traded", event: t.event, to: t.received_entry };
+      if (t.received_entry === stint.entryId && item.element_in === element) trade = { how: "traded", event: t.event, to: t.offered_entry };
+    }
+  }
+  if (drop && (!trade || drop.event <= trade.event)) {
+    return { how: "dropped", event: drop.event, kind: drop.kind === "w" ? "waiver" : "free agent", for: drop.element_in };
+  }
+  return trade;
 }
 
 function howAcquired(

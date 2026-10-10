@@ -98,7 +98,13 @@ const moves = { transactions, trades: effective, draft };
 const owned = new Set(gws.flatMap((g) => Object.values(g.squads).flatMap((s) => [...s.played, ...s.bench])));
 check([...owned].every((el) => playerJourney(el, seasons, moves).every((s) => s.how !== "unknown")), `All ${owned.size} players ever owned have a known origin`);
 const origins = squadOrigins(entries, seasons, moves);
-check(origins.every((o) => Object.values(o.points).reduce((a, b) => a + b, 0) === table.find((r) => r.entryId === o.entryId)!.pointsFor), "Squad origins add up to every manager's points-for");
+// The table only counts finished gameweeks, while the squads include the one
+// being played, so this can only match between gameweeks.
+if (game.current_event_finished) {
+  check(origins.every((o) => Object.values(o.points).reduce((a, b) => a + b, 0) === table.find((r) => r.entryId === o.entryId)!.pointsFor), "Squad origins add up to every manager's points-for");
+} else {
+  console.log("SKIP  Squad origins add up to points-for (a gameweek is in progress)");
+}
 
 // Draft.
 const picks = pickReports(draft, seasons);
