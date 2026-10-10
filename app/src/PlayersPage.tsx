@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { passedThrough, playerJourney, type Stint, type StintEnd } from "../../shared/moves";
-import { Manager, PlayerName, playerSearchText } from "./bits";
+import { foldText, Manager, PlayerName, playerSearchText } from "./bits";
 import type { LeagueData } from "./data";
 
 const HOW: Record<Stint["how"], string> = {
@@ -24,7 +24,7 @@ export function PlayersPage({ data, myTeam }: { data: LeagueData; myTeam: number
     return [...ids].map((id) => ({ id, stints: playerJourney(id, data.seasons, moves) }));
   }, [data, moves]);
 
-  const q = query.trim().normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  const q = foldText(query.trim());
   const results = q
     ? everOwned.filter(({ id }) => {
         const p = data.players.get(id);

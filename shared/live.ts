@@ -541,3 +541,40 @@ export function bonusTable(gw: LiveGameweek, top = 8): FixtureBonus[] {
       };
     });
 }
+
+// ---------------------------------------------------------------- defensive contributions
+
+export interface DefconRow {
+  element: number;
+  /** Defensive contributions so far (clearances, blocks, interceptions and tackles; recoveries too for midfielders and forwards). */
+  value: number;
+  /** What he needs to earn the points: 10 for defenders, 12 for midfielders and forwards. */
+  limit: number;
+  earned: boolean;
+}
+
+/**
+ * Per started match: everyone who has earned DefCon points, plus anyone
+ * within `near` of the line, most first. Keepers can't earn them.
+ */
+export function defconTable(
+  gw: LiveGameweek,
+  info: Map<number, PlayerInfo>,
+  limits: Record<Position, number>,
+  near = 3,
+): Map<number, DefconRow[]> {
+  const out = new Map<number, DefconRow[]>();
+  for (const f of gw.fixtures) if (f.started) out.set(f.id, []);
+  for (const [id, el] of Object.entries(gw.elements)) {
+    const element = Number(id);
+    const p = info.get(element);
+    const limit = p ? limits[p.position] : 0;
+    const value = el.stats.defensive_contribution ?? 0;
+    if (!p || !limit || value < limit - near) continue;
+    // In a double gameweek the count covers both matches; it's shown under the first.
+    const f = gw.fixtures.find((x) => x.started && (x.teamH === p.teamId || x.teamA === p.teamId));
+    if (f) out.get(f.id)!.push({ element, value, limit, earned: value >= limit });
+  }
+  for (const rows of out.values()) rows.sort((a, b) => Number(b.earned) - Number(a.earned) || b.value - b.limit - (a.value - a.limit) || a.element - b.element);
+  return out;
+}

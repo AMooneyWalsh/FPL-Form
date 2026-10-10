@@ -7,6 +7,7 @@ import { useMyTeam } from "./myTeam";
 import { LEAGUE_VIEWS, LeaguePage } from "./LeaguePage";
 import { LIVE_VIEWS, LivePage } from "./LivePage";
 import { ManagerPage } from "./ManagerPage";
+import { SearchButton } from "./Search";
 import { PlayerPage } from "./PlayersPage";
 import { MOVES_VIEWS, MovesPage } from "./MovesPage";
 
@@ -70,7 +71,12 @@ export function App() {
             <h1>{ready?.league.league.name ?? "Drafty In Here"}</h1>
             {ready && <p className="sub">{headline(ready)}</p>}
           </div>
-          {ready && decided && <TeamPicker data={ready} value={myTeam} onChange={setMyTeam} compact />}
+          {ready && (
+            <div className="masthead-tools">
+              <SearchButton data={ready} />
+              {decided && <TeamPicker data={ready} value={myTeam} onChange={setMyTeam} compact />}
+            </div>
+          )}
         </div>
         {ready && <DeadlineBanner data={ready} />}
       </header>

@@ -167,6 +167,12 @@ export interface SquadRules {
   select: Record<Player["position"], number>;
   minPlay: Record<Player["position"], number>;
   maxPlay: Record<Player["position"], number>;
+  /**
+   * Defensive contribution ("DefCon") points: reach `limit` in a match and
+   * get `points`. A limit of 0 means that position can't earn them (keepers).
+   * Optional for old cached copies.
+   */
+  defcon?: { limit: Record<Player["position"], number>; points: Record<Player["position"], number> };
 }
 
 export interface PlayersPayload {

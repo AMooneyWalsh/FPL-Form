@@ -7,6 +7,7 @@ import { trimPlayers } from "../worker/index";
 import {
   bonusFromBps,
   bonusTable,
+  defconTable,
   leagueOwners,
   liveMatches,
   liveSquad,
@@ -271,5 +272,35 @@ describe("lineups as the manager set them", () => {
       }
       expect(squad.players.filter((x) => x.counts)).toHaveLength(rules.play);
     }
+  });
+});
+
+describe("defconTable", () => {
+  const fixture = { id: 1, kickoff: null, started: true, finished: false, finishedProvisional: false, minutes: 50, teamH: 1, teamA: 2, scoreH: 0, scoreA: 0, bonusConfirmed: false, bps: [], events: {} };
+  const el = (dc: number) => ({ minutes: 50, points: 2, bonus: 0, bps: 10, starts: 1, stats: { defensive_contribution: dc }, breakdown: [] });
+  const gw = {
+    event: 6,
+    fixtures: [fixture, { ...fixture, id: 2, teamH: 3, teamA: 4, started: false }],
+    elements: { 10: el(11), 11: el(8), 12: el(6), 13: el(12), 14: el(9), 15: el(14) },
+    picks: {},
+  } as unknown as Parameters<typeof defconTable>[0];
+  const info = new Map([
+    [10, { position: "DEF", teamId: 1 }], // earned (11/10)
+    [11, { position: "DEF", teamId: 2 }], // close (8/10)
+    [12, { position: "DEF", teamId: 1 }], // too far (6/10)
+    [13, { position: "MID", teamId: 2 }], // earned (12/12)
+    [14, { position: "FWD", teamId: 1 }], // close (9/12)
+    [15, { position: "GKP", teamId: 1 }], // keepers can't earn it
+  ] as const) as unknown as Map<number, { position: "GKP" | "DEF" | "MID" | "FWD"; teamId: number }>;
+
+  it("lists who has earned it, then who is close, per started match", () => {
+    const t = defconTable(gw, info, { GKP: 0, DEF: 10, MID: 12, FWD: 12 });
+    expect([...t.keys()]).toEqual([1]);
+    expect(t.get(1)!.map((r) => [r.element, r.value, r.limit, r.earned])).toEqual([
+      [10, 11, 10, true],
+      [13, 12, 12, true],
+      [11, 8, 10, false],
+      [14, 9, 12, false],
+    ]);
   });
 });

@@ -80,6 +80,11 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Position dividers in lineups (`group-end`), a Live > Table view with places moved and this week's score, and both squads shown before the deadline (`SquadPreview`, from ownership).
 - Team sheets: `/api/teamsheets/{n}` reads the Premier League's own feed, since FPL only shows lineups after kick-off. Every player at a club whose sheet is out gets a Starting / Bench / Not in squad tag until his match kicks off. First real run: GW6, Sat 10 Oct (sheets about 75 min before 12:30). Check it worked; the feed is unofficial, so if it changes the tags just don't appear.
 
+### DefCon and search (10 Oct)
+
+- Live > Bonus lists defensive contributions per match: who has earned the 2 points and who is within 3 (`defconTable` in `shared/live.ts`). Thresholds come from FPL's `settings.scoring` (DEF 10, MID/FWD 12, GK none). Checked against FPL's own breakdown on GW6.
+- Header search (`app/src/Search.tsx`): a magnifier opens a full-screen sheet (rendered into `document.body` so it covers the sticky tabs) that finds managers and any player and links to their pages. `foldText` in `bits.tsx` handles Ø/æ/ß/ł as well as accents, so "odegaard" finds Ødegaard (the Moves > Players search had the same gap).
+
 ## Checks before merging
 
 - `npm run check` (typecheck, 112 tests, build).
