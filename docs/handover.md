@@ -85,6 +85,10 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Live > Bonus lists defensive contributions per match: who has earned the 2 points and who is within 3 (`defconTable` in `shared/live.ts`). Thresholds come from FPL's `settings.scoring` (DEF 10, MID/FWD 12, GK none). Checked against FPL's own breakdown on GW6.
 - Header search (`app/src/Search.tsx`): a magnifier opens a full-screen sheet (rendered into `document.body` so it covers the sticky tabs) that finds managers and any player and links to their pages. `foldText` in `bits.tsx` handles Ø/æ/ß/ł as well as accents, so "odegaard" finds Ødegaard (the Moves > Players search had the same gap).
 
+## UX review (10 Oct)
+
+- Findings and the agreed plan: `docs/ux-review-2026-10-10.md`. The two live-gameweek wording bugs are fixed. Next: a small design system, then usability fixes. Regroup with the owner before starting either.
+
 ## Checks before merging
 
 - `npm run check` (typecheck, 112 tests, build).
