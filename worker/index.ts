@@ -179,7 +179,7 @@ async function serveLive(event: number, env: Env, ctx: ExecutionContext): Promis
       // A missing one (a failed request) is retried with the scores.
       const lineupTtl = (body: string) =>
         inPlay && entries.every((id) => id in (JSON.parse(body) as Record<number, LivePicks>)) ? LINEUP_TTL : 0;
-      const [live, picks] = await Promise.all([
+      const [live, picks, mainFixtures] = await Promise.all([
         fetchUpstream(`event/${event}/live`),
         cached(`${env.LEAGUE_ID}:lineups:${event}`, lineupTtl, env, ctx, async () => {
           const raw = await Promise.all(
@@ -195,9 +195,17 @@ async function serveLive(event: number, env: Env, ctx: ExecutionContext): Promis
           });
           return JSON.stringify(byEntry);
         }),
+        // The Draft API reports 0 minutes for matches under way; the main
+        // game's fixtures (same ids) have the real minute. Optional extra.
+        inPlay ? fetchUpstream(`${FPL_MAIN}fixtures/?event=${event}`).catch(() => null) : null,
       ]);
       const byEntry = JSON.parse(picks.value.body) as Record<number, LivePicks>;
-      return JSON.stringify(toLiveGameweek(event, JSON.parse(live) as RawLiveResponse, byEntry));
+      const gw = toLiveGameweek(event, JSON.parse(live) as RawLiveResponse, byEntry);
+      if (mainFixtures) {
+        const minutes = new Map((JSON.parse(mainFixtures) as { id: number; minutes: number }[]).map((f) => [f.id, f.minutes]));
+        for (const f of gw.fixtures) if (!f.minutes && minutes.get(f.id)) f.minutes = minutes.get(f.id)!;
+      }
+      return JSON.stringify(gw);
     });
   });
 }
@@ -479,7 +487,8 @@ export function trimPlayers(raw: string): string {
   return JSON.stringify(payload);
 }
 
-const FPL_FIXTURES = "https://fantasy.premierleague.com/api/fixtures/?future=1";
+const FPL_MAIN = "https://fantasy.premierleague.com/api/";
+const FPL_FIXTURES = `${FPL_MAIN}fixtures/?future=1`;
 
 /** Main-game fixtures still to be played, with FPL's 1-5 difficulty for each side. */
 export function trimFixtures(raw: string): string {
