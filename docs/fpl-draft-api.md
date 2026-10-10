@@ -40,6 +40,7 @@ The API is unofficial and undocumented, so it can change without notice. Base UR
 - `choices[]`: 210 picks (14 managers x 15 rounds, snake order). **`index` is the overall pick (1 to 210); `pick` is the pick within the round (1 to 14).** Easy to mix up.
 - `entry/{id}/event/{gw}`: `picks[]` with `position` 1 to 15 (12 to 15 is the bench) plus `subs[]` (auto-subs FPL applied) and `entry_history`.
 - `event/{gw}/live`: `elements` keyed by player id with `stats` (incl. `total_points`, `minutes`, `bps`, `bonus`) and `explain`, plus `fixtures`.
+  - Since 2026/27 FPL fills in `bonus` (in the fixture stats and in `total_points`) live, during the match. It is only final once the fixture has `finished: true` (about an hour after `finished_provisional`).
 - `game.trades_time_for_approval: true` means trades go through an approval window before processing.
 - Working out every H2H score from squads (starting XI after `subs`, summing `event/{gw}/live` `total_points`) reproduces all 70 GW1-5 scores exactly. No captains in Draft.
 - `bootstrap-static.elements[].draft_rank` is FPL's pre-season draft ranking, useful for draft analysis.
