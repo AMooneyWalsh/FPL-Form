@@ -173,16 +173,18 @@ function DeadlineBanner({ data }: { data: LeagueData }) {
   );
 }
 
-/** "Sat 11:00", with the date added when it's more than a few days off. */
-function deadlineTime(iso: string, now: number): string {
+/**
+ * "Sat 11:00" when it's less than a week away (so the weekday can't be
+ * mistaken), "Fri 23 Oct" further out. Kept short so three deadlines fit
+ * side by side on a phone.
+ */
+export function deadlineTime(iso: string, now: number): string {
   const d = new Date(iso);
-  const far = d.getTime() - now > 5 * 24 * 3600_000;
-  return d.toLocaleString("en-GB", {
-    weekday: "short",
-    ...(far ? { day: "numeric", month: "short" } : {}),
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const weekday = d.toLocaleDateString("en-GB", { weekday: "short" });
+  if (d.getTime() - now >= 7 * 24 * 3600_000) {
+    return `${weekday} ${d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`;
+  }
+  return `${weekday} ${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 /** Back to wherever they tapped the name, or the home page if they arrived by a shared link. */
