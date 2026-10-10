@@ -578,3 +578,77 @@ export function defconTable(
   for (const rows of out.values()) rows.sort((a, b) => Number(b.earned) - Number(a.earned) || b.value - b.limit - (a.value - a.limit) || a.element - b.element);
   return out;
 }
+
+// ---------------------------------------------------------------- match reports
+
+/** Everything one player did in one match that changed his points. */
+export interface Impact {
+  element: number;
+  goals: number;
+  assists: number;
+  ownGoals: number;
+  pensSaved: number;
+  pensMissed: number;
+  yellow: number;
+  red: number;
+  /** Bonus he has (once confirmed) or is on course for (until then). */
+  bonus: number;
+  bonusProvisional: boolean;
+  /** Earned his defensive contribution points. */
+  defcon: boolean;
+  /** His points this gameweek, with provisional bonus added until FPL confirms it. */
+  points: number;
+}
+
+/**
+ * Per side of a match, every player who scored, assisted, was carded, got
+ * bonus or earned DefCon, highest points first. For a match report.
+ */
+export function fixtureImpacts(
+  f: LiveFixture,
+  gw: LiveGameweek,
+  info: Map<number, PlayerInfo>,
+  defconLimits: Record<Position, number>,
+): { home: Impact[]; away: Impact[] } {
+  const byId = new Map<number, Impact & { home: boolean }>();
+  const get = (element: number, home: boolean) => {
+    let i = byId.get(element);
+    if (!i) {
+      const el = gw.elements[element];
+      i = {
+        element, home, goals: 0, assists: 0, ownGoals: 0, pensSaved: 0, pensMissed: 0, yellow: 0, red: 0,
+        bonus: 0, bonusProvisional: false, defcon: false, points: el?.points ?? 0,
+      };
+      byId.set(element, i);
+    }
+    return i;
+  };
+  const field: Record<EventKey, keyof Impact> = {
+    goals_scored: "goals", assists: "assists", own_goals: "ownGoals", penalties_saved: "pensSaved",
+    penalties_missed: "pensMissed", yellow_cards: "yellow", red_cards: "red",
+  };
+  for (const key of EVENT_KEYS) {
+    for (const e of f.events[key] ?? []) (get(e.element, e.home)[field[key]] as number) += e.value;
+  }
+  if (f.started) {
+    const isHome = (el: number) => info.get(el)?.teamId === f.teamH;
+    const provisional = f.bonusConfirmed ? null : bonusFromBps(f.bps);
+    for (const { element } of f.bps) {
+      const b = provisional ? provisional.get(element) ?? 0 : gw.elements[element]?.bonus ?? 0;
+      if (!b) continue;
+      const i = get(element, isHome(element));
+      i.bonus = b;
+      i.bonusProvisional = !!provisional;
+      if (provisional) i.points += b;
+    }
+    for (const [id, el] of Object.entries(gw.elements)) {
+      const p = info.get(Number(id));
+      if (!p || (p.teamId !== f.teamH && p.teamId !== f.teamA)) continue;
+      const limit = defconLimits[p.position];
+      if (limit && (el.stats.defensive_contribution ?? 0) >= limit) get(Number(id), p.teamId === f.teamH).defcon = true;
+    }
+  }
+  const all = [...byId.values()].sort((a, b) => b.points - a.points || a.element - b.element);
+  const strip = ({ home: _h, ...rest }: Impact & { home: boolean }): Impact => rest;
+  return { home: all.filter((i) => i.home).map(strip), away: all.filter((i) => !i.home).map(strip) };
+}
