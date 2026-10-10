@@ -435,9 +435,13 @@ interface RawBootstrap {
     added?: string;
   }[];
   teams: { id: number; short_name: string; code: number }[];
-  settings: { squad: Record<string, number> };
+  settings: { squad: Record<string, number>; scoring?: Record<string, number> };
   fixtures?: Record<string, { event: number; team_h: number; team_a: number; kickoff_time: string | null }[]>;
   events?: { data: { id: number; finished: boolean; deadline_time: string; trades_time: string; waivers_time: string }[] };
+}
+
+function scoringByPos(scoring: Record<string, number>, prefix: string): Record<Player["position"], number> {
+  return Object.fromEntries(Object.values(POSITIONS).map((pos) => [pos, scoring[`${prefix}${pos}`] ?? 0])) as Record<Player["position"], number>;
 }
 
 /** bootstrap-static is ~1 MB; phones only need a few fields per player,
@@ -478,7 +482,20 @@ export function trimPlayers(raw: string): string {
     Object.fromEntries(Object.values(POSITIONS).map((pos) => [pos, sq[`${prefix}${pos}`]])) as SquadRules["select"];
   const payload: PlayersPayload = {
     players,
-    rules: { play: sq.play, select: byPos("select_"), minPlay: byPos("min_play_"), maxPlay: byPos("max_play_") },
+    rules: {
+      play: sq.play,
+      select: byPos("select_"),
+      minPlay: byPos("min_play_"),
+      maxPlay: byPos("max_play_"),
+      ...(b.settings.scoring && "defensive_contribution_limit_DEF" in b.settings.scoring
+        ? {
+            defcon: {
+              limit: scoringByPos(b.settings.scoring, "defensive_contribution_limit_"),
+              points: scoringByPos(b.settings.scoring, "defensive_contribution_"),
+            },
+          }
+        : {}),
+    },
     fixtures,
     deadlines: (b.events?.data ?? [])
       .filter((e) => !e.finished)

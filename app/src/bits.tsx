@@ -45,11 +45,20 @@ export function Pts({ n, signed = false }: { n: number; signed?: boolean }) {
   return <span className={signed ? (n > 0 ? "pts-pos" : n < 0 ? "pts-neg" : "") : undefined}>{text}</span>;
 }
 
-export function playerSearchText(p: Player): string {
-  return `${p.name} ${p.fullName} ${p.team}`
+/** Lower case without accents, so "odegaard" finds Ødegaard and "gyokeres" finds Gyökeres. */
+export function foldText(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/ø/g, "o")
+    .replace(/æ/g, "ae")
+    .replace(/ß/g, "ss")
+    .replace(/[łđ]/g, (c) => (c === "ł" ? "l" : "d"))
     .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase();
+    .replace(/\p{Diacritic}/gu, "");
+}
+
+export function playerSearchText(p: Player): string {
+  return foldText(`${p.name} ${p.fullName} ${p.team}`);
 }
 
 const SHOW_KEY = "showManager";

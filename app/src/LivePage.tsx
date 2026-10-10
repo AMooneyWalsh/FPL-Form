@@ -1,11 +1,13 @@
 import { Fragment, useMemo, useState } from "react";
 import {
   bonusTable,
+  defconTable,
   gamesOf,
   leagueOwners,
   liveMatches,
   liveTable,
   topPerformers,
+  type DefconRow,
   type EventKey,
   type LiveFixture,
   type LiveGameweek,
@@ -697,8 +699,15 @@ function TableView({ ctx }: { ctx: Ctx }) {
   );
 }
 
+const DEFAULT_DEFCON = { limit: { GKP: 0, DEF: 10, MID: 12, FWD: 12 }, points: { GKP: 0, DEF: 2, MID: 2, FWD: 2 } };
+
 function BonusView({ ctx }: { ctx: Ctx }) {
   const table = useMemo(() => bonusTable(ctx.gw), [ctx.gw]);
+  const defcon = ctx.data.rules.defcon ?? DEFAULT_DEFCON;
+  const defcons = useMemo(() => {
+    const info = new Map<number, PlayerInfo>(ctx.data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }]));
+    return defconTable(ctx.gw, info, defcon.limit);
+  }, [ctx.gw, ctx.data.playerList, defcon]);
   const started = table.filter((t) => t.rows.length > 0);
   const waiting = table.filter((t) => t.rows.length === 0);
   return (
@@ -708,6 +717,11 @@ function BonusView({ ctx }: { ctx: Ctx }) {
         The three best BPS in each match get 3, 2 and 1 bonus points (ties share). Until FPL confirms it, this is our
         working-out from the live BPS, so it can change while a match is on. A manager's name shows who in the league owns
         the player.
+      </p>
+      <p className="hint">
+        Defensive contributions (DefCon): a defender gets {defcon.points.DEF} points for {defcon.limit.DEF} clearances,
+        blocks, interceptions and tackles in a match; a midfielder or forward needs {defcon.limit.MID}, and ball recoveries
+        count too. Each match lists who has got there and who is close.
       </p>
       {started.length === 0 && <p className="notice">Bonus appears once matches start.</p>}
       {started.map(({ fixture, rows }) => (
@@ -744,6 +758,7 @@ function BonusView({ ctx }: { ctx: Ctx }) {
             </tbody>
           </table>
           <p className="hint lv-bps-note">Last column is BPS.</p>
+          <DefconList rows={defcons.get(fixture.id) ?? []} points={defcon.points} ctx={ctx} />
         </article>
       ))}
       {waiting.length > 0 && (
@@ -752,6 +767,47 @@ function BonusView({ ctx }: { ctx: Ctx }) {
         </p>
       )}
     </section>
+  );
+}
+
+function DefconList({ rows, points, ctx }: { rows: DefconRow[]; points: Record<Player["position"], number>; ctx: Ctx }) {
+  return (
+    <>
+      <div className="lv-dc-head">Defensive contributions</div>
+      {rows.length === 0 ? (
+        <p className="hint lv-bps-note">Nobody close yet.</p>
+      ) : (
+        <table className="data lv-bonus">
+          <tbody>
+            {rows.map((r) => {
+              const player = ctx.data.players.get(r.element);
+              const owner = ctx.owners.get(r.element);
+              return (
+                <tr key={r.element} className={owner?.entryId === ctx.myTeam ? "mine" : undefined}>
+                  <td className="lv-bonus-pts">
+                    {r.earned ? <span className="lv-b dc">+{player ? points[player.position] : 2}</span> : null}
+                  </td>
+                  <td className="left">
+                    {player?.name ?? r.element} <span className="player-meta">{player?.team}</span>
+                  </td>
+                  <td className="left lv-bonus-owner">
+                    {owner ? (
+                      <>
+                        <Manager id={owner.entryId} data={ctx.data} />
+                        {!owner.counts && <span className="player-meta"> bench</span>}
+                      </>
+                    ) : null}
+                  </td>
+                  <td className={`num lv-dc-count ${r.earned ? "earned" : ""}`}>
+                    {r.value}/{r.limit}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </>
   );
 }
 

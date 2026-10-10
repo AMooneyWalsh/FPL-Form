@@ -199,6 +199,10 @@ describe("trimPlayers", () => {
       select: { GKP: 2, DEF: 5, MID: 5, FWD: 3 },
       minPlay: { GKP: 1, DEF: 3, MID: 2, FWD: 1 },
       maxPlay: { GKP: 1, DEF: 5, MID: 5, FWD: 3 },
+      defcon: {
+        limit: { GKP: 0, DEF: 10, MID: 12, FWD: 12 },
+        points: { GKP: 0, DEF: 2, MID: 2, FWD: 2 },
+      },
     });
   });
 });
