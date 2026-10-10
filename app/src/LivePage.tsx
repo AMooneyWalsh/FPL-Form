@@ -909,47 +909,55 @@ function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: {
         {side(f.teamA, true)}
       </header>
       {(impacts.home.length > 0 || impacts.away.length > 0) && (
+        // One grid for both teams, so the owned rows and the unowned lines sit level across the card.
         <div className="lv-fx-cols">
-          <ImpactList list={impacts.home} ctx={ctx} />
-          <ImpactList list={impacts.away} ctx={ctx} />
+          <OwnedList list={impacts.home} ctx={ctx} />
+          <OwnedList list={impacts.away} ctx={ctx} />
+          <UnownedLine list={impacts.home} ctx={ctx} />
+          <UnownedLine list={impacts.away} ctx={ctx} />
         </div>
       )}
     </article>
   );
 }
 
-/** Owned players get a row each; players nobody owns share one quiet line at the bottom. */
-function ImpactList({ list, ctx }: { list: Impact[]; ctx: Ctx }) {
-  const owned = list.filter((i) => ctx.data.owners.get(i.element));
-  const others = list.filter((i) => !ctx.data.owners.get(i.element));
+/** Owned players get a row each: name and points on top, what they did and who owns them below. */
+function OwnedList({ list, ctx }: { list: Impact[]; ctx: Ctx }) {
   return (
     <div className="lv-imp-list">
-      {owned.map((i) => {
-        const owner = ctx.data.owners.get(i.element)!;
-        const mine = owner === ctx.myTeam;
-        return (
-          <div key={i.element} className={`lv-imp ${mine ? "mine" : ""}`}>
-            <span className="lv-imp-name">{ctx.data.players.get(i.element)?.name ?? i.element}</span>
-            <span className="lv-imp-pts">{i.points}</span>
-            <span className="lv-imp-badges">
-              <Badges i={i} />
-            </span>
-            <span className={`lv-owner ${mine ? "mine" : ""}`}>{ctx.data.labels.get(owner)}</span>
-          </div>
-        );
-      })}
-      {others.length > 0 && (
-        <p className="lv-imp-others">
-          <span className="lv-imp-others-label">Unowned:</span>{" "}
-          {others.map((i, n) => (
-            <span key={i.element} className="lv-imp-other">
-              {ctx.data.players.get(i.element)?.name ?? i.element} <Badges i={i} />
-              {n < others.length - 1 ? " " : ""}
-            </span>
-          ))}
-        </p>
-      )}
+      {list
+        .filter((i) => ctx.data.owners.get(i.element))
+        .map((i) => {
+          const owner = ctx.data.owners.get(i.element)!;
+          const mine = owner === ctx.myTeam;
+          return (
+            <div key={i.element} className={`lv-imp ${mine ? "mine" : ""}`}>
+              <span className="lv-imp-name">{ctx.data.players.get(i.element)?.name ?? i.element}</span>
+              <span className="lv-imp-pts">{i.points}</span>
+              <span className="lv-imp-badges">
+                <Badges i={i} />
+              </span>
+              <span className={`lv-owner ${mine ? "mine" : ""}`}>{ctx.data.labels.get(owner)}</span>
+            </div>
+          );
+        })}
     </div>
+  );
+}
+
+/** Players nobody owns share one quiet line under their team's rows. */
+function UnownedLine({ list, ctx }: { list: Impact[]; ctx: Ctx }) {
+  const others = list.filter((i) => !ctx.data.owners.get(i.element));
+  if (others.length === 0) return <span />;
+  return (
+    <p className="lv-imp-others">
+      <span className="lv-imp-others-label">Unowned</span>
+      {others.map((i) => (
+        <span key={i.element} className="lv-imp-other">
+          {ctx.data.players.get(i.element)?.name ?? i.element} <Badges i={i} />
+        </span>
+      ))}
+    </p>
   );
 }
 
