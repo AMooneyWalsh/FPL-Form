@@ -120,7 +120,7 @@ describe("live scoring on GW5 (finished)", () => {
       elements: Object.fromEntries(
         Object.entries(gw.elements).map(([id, el]) => [id, { ...el, points: el.points - el.bonus, bonus: 0 }]),
       ),
-      fixtures: gw.fixtures.map((f) => ({ ...f, bonusConfirmed: false })),
+      fixtures: gw.fixtures.map((f) => ({ ...f, bonusInPoints: false, bonusConfirmed: false })),
     };
     expect(provisionalBonus(gw).size).toBe(0);
     expect(provisionalBonus(unconfirmed).size).toBeGreaterThan(0);
@@ -277,7 +277,7 @@ describe("lineups as the manager set them", () => {
 });
 
 describe("defconTable", () => {
-  const fixture = { id: 1, kickoff: null, started: true, finished: false, finishedProvisional: false, minutes: 50, teamH: 1, teamA: 2, scoreH: 0, scoreA: 0, bonusConfirmed: false, bps: [], events: {} };
+  const fixture = { id: 1, kickoff: null, started: true, finished: false, finishedProvisional: false, minutes: 50, teamH: 1, teamA: 2, scoreH: 0, scoreA: 0, bonusInPoints: false, bonusConfirmed: false, bps: [], events: {} };
   const el = (dc: number) => ({ minutes: 50, points: 2, bonus: 0, bps: 10, starts: 1, stats: { defensive_contribution: dc }, breakdown: [] });
   const gw = {
     event: 6,
@@ -309,7 +309,7 @@ describe("defconTable", () => {
 describe("fixtureImpacts", () => {
   const f = {
     id: 1, kickoff: null, started: true, finished: false, finishedProvisional: false, minutes: 60, teamH: 1, teamA: 2,
-    scoreH: 1, scoreA: 1, bonusConfirmed: false,
+    scoreH: 1, scoreA: 1, bonusInPoints: false, bonusConfirmed: false,
     bps: [{ element: 10, value: 40 }, { element: 20, value: 30 }, { element: 11, value: 20 }, { element: 21, value: 5 }],
     events: {
       goals_scored: [{ element: 10, value: 1, home: true }, { element: 20, value: 1, home: false }],
@@ -336,5 +336,21 @@ describe("fixtureImpacts", () => {
       [21, 0, 1, 0, false, 1],
     ]);
     expect(r.home[0].bonusProvisional).toBe(true);
+  });
+});
+
+describe("bonus status", () => {
+  it("calls bonus provisional while FPL shows it live, and confirmed only once the match is checked", () => {
+    const raw = structuredClone(live5) as unknown as RawLiveResponse;
+    const f = raw.fixtures[0];
+    f.finished = false;
+    const gw = toLiveGameweek(5, raw, {});
+    const fixture = gw.fixtures.find((x) => x.id === f.id)!;
+    expect(fixture.bonusInPoints).toBe(true);
+    expect(fixture.bonusConfirmed).toBe(false);
+    // FPL already counts it, so we mustn't add it again.
+    expect(provisionalBonus(gw).size).toBe(0);
+    const impacts = fixtureImpacts(fixture, gw, info, { GKP: 0, DEF: 10, MID: 12, FWD: 12 });
+    expect([...impacts.home, ...impacts.away].some((i) => i.bonus > 0 && i.bonusProvisional)).toBe(true);
   });
 });
