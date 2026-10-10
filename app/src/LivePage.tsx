@@ -203,8 +203,7 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
           </span>
         </div>
         <p className="hint">
-          {phase === "live" &&
-            `${played} of ${gw.fixtures.length} matches finished. Updates every 30 seconds. Bonus is provisional (*) until FPL confirms it, and auto-subs are FPL's likely ones.`}
+          {phase === "live" && `${played} of ${gw.fixtures.length} matches finished · updates every 30 seconds.`}
           {phase === "done" &&
             (gw.fixtures.every((f) => f.finished)
               ? "All matches finished and FPL has confirmed the points."
@@ -213,16 +212,16 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
         </p>
         {hasLineups && (
           <p className="hint">
-            Tap a match for both lineups, then a player for where his points came from.{" "}
             <span className="lv-key">
-              <Dot status="played" /> played <Dot status="playing" /> playing <Dot status="to-play" /> still to play
-            </span>
+              <Dot status="playing" /> playing now <Dot status="played" /> played <Dot status="to-play" /> to play
+            </span>{" "}
+            · tap a match for lineups, a player for his points.
           </p>
         )}
         {ctx.sheets && ctx.sheets.announced.length > 0 && (
           <p className="hint">
-            Team sheets are out for some matches: <span className="ts ts-start">Starting</span>{" "}
-            <span className="ts ts-bench">Bench</span> <span className="ts ts-out">Not in squad</span> show until kick-off.
+            Team news is in for some matches: <span className="ts ts-start">Starting</span>{" "}
+            <span className="ts ts-bench">Bench</span> <span className="ts ts-out">Not in squad</span> until kick-off.
           </p>
         )}
         {!hasLineups && (
@@ -515,14 +514,16 @@ function clock(f: LiveFixture): string {
 }
 
 /** ["NFO 0 - 1 COV", "FT"], ["BHA 1 - 0 ARS", "67'"] or ["LEE v CRY", "Sun 13:00"]: the match, then when. */
-function fixtureLines(teamId: number, ctx: Ctx): [string, string][] {
+/** [match, when, under way now] per fixture. */
+function fixtureLines(teamId: number, ctx: Ctx): [string, string, boolean][] {
   const games = gamesOf(teamId, ctx.gw);
-  if (games.length === 0) return [["No game this week", ""]];
+  if (games.length === 0) return [["No game this week", "", false]];
   return games.map((f) => {
     const h = ctx.clubs.get(f.teamH)?.short ?? "?";
     const a = ctx.clubs.get(f.teamA)?.short ?? "?";
-    if (!f.started) return [`${h} v ${a}`, f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"];
-    return [`${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}`, f.finishedProvisional ? "FT" : clock(f)];
+    if (!f.started) return [`${h} v ${a}`, f.kickoff ? formatKickoff(f.kickoff, true) : "TBC", false];
+    if (f.finishedProvisional) return [`${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}`, "FT", false];
+    return [`${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}`, clock(f), true];
   });
 }
 
@@ -530,9 +531,9 @@ function fixtureLines(teamId: number, ctx: Ctx): [string, string][] {
 function FixtureLines({ teamId, ctx }: { teamId: number; ctx: Ctx }) {
   return (
     <>
-      {fixtureLines(teamId, ctx).map(([match, when]) => (
+      {fixtureLines(teamId, ctx).map(([match, when, live]) => (
         <span key={match} className="lv-row-fix">
-          <span>{match}</span> {when && <span>{when}</span>}
+          <span>{match}</span> {when && <span className={live ? "lv-clock" : undefined}>{when}</span>}
         </span>
       ))}
     </>
@@ -586,7 +587,8 @@ function PlayerRow({ p, squad, bench, groupEnd, ctx }: { p: LivePlayer; squad: L
           {parts.length > 0 && <span className="lv-row-stats">{parts.join(", ")}</span>}
           <FixtureLines teamId={p.teamId} ctx={ctx} />
         </span>
-        <span className="lv-row-pts">{p.points}</span>
+        {/* A dash, not 0, for someone whose match hasn't started: he hasn't blanked yet. */}
+        <span className="lv-row-pts">{p.status === "to-play" && p.points === 0 ? "–" : p.points}</span>
       </button>
       {open && <Breakdown p={p} />}
     </div>
