@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
-import { Explainer, Manager, nobody, PlayerName, Pts, SectionHead, ShowFilter, useShownManager } from "./bits";
+import { Explainer, Manager, nobody, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 import { TradeNetwork } from "./TradeNetwork";
 
@@ -23,16 +23,16 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
             got in a trade themselves isn't counted again when they pass him on.
           </p>
         </Explainer>
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
                 <th className="left">Manager</th>
+                <th className="num">Net</th>
                 <th className="num">Trades</th>
                 <th className="num">Won</th>
                 <th className="num">Lost</th>
-                <th className="num">Net</th>
-                <th className="left hide-narrow">Trades most with</th>
+                <th className="left">Trades most with</th>
               </tr>
             </thead>
             <tbody>
@@ -45,13 +45,13 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
                       <td className="left">
                         <Manager id={r.entryId} data={data} />
                       </td>
-                      <td className="num">{r.trades}</td>
-                      <td className="num">{r.won}</td>
-                      <td className="num">{r.lost}</td>
                       <td className="num strong">
                         <Pts n={r.net} signed />
                       </td>
-                      <td className="left hide-narrow">
+                      <td className="num">{r.trades}</td>
+                      <td className="num">{r.won}</td>
+                      <td className="num">{r.lost}</td>
+                      <td className="left">
                         {partner && (
                           <>
                             <Manager id={partner[0]} data={data} /> ({partner[1]})
@@ -63,7 +63,7 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
                 })}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
         {ledger.some((r) => r.trades === 0) && (
           <p className="hint">
             No trades yet:{" "}

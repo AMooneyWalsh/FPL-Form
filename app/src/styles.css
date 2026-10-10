@@ -257,6 +257,93 @@ body {
   color: var(--bad-text);
 }
 
+/* ---- tables: every one sits in a ScrollTable ----
+   On a phone a wide table scrolls sideways with its first column frozen.
+   Nothing wraps inside a table and no column is hidden. */
+
+.scroll-table {
+  position: relative;
+}
+
+.scroll-table .table-wrap {
+  scrollbar-width: thin;
+}
+
+.scroll-table table th,
+.scroll-table table td {
+  white-space: nowrap;
+}
+
+.scroll-table table :is(th, td):first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
+.scroll-table table tr.mine td:first-child {
+  background: var(--mine);
+}
+
+/* Once scrolled, a soft shadow on the frozen column's edge. */
+.scroll-table.more-left table :is(th, td):first-child::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -6px;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(to right, color-mix(in srgb, var(--text) 10%, transparent), transparent);
+  pointer-events: none;
+}
+
+/* While there's more to the right, the right edge fades out. */
+.scroll-table::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 24px;
+  border-radius: 0 var(--r-lg) var(--r-lg) 0;
+  background: linear-gradient(to right, transparent, var(--surface));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.scroll-table.more-right::after {
+  opacity: 1;
+}
+
+/* A place or pick number at the start of a frozen first cell. */
+.row-no {
+  display: inline-block;
+  min-width: 26px;
+  margin-right: var(--sp-1);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  vertical-align: top;
+}
+
+.standings .form-col {
+  width: 1%;
+}
+
+/* League table: team over manager, trimmed with "…" so points and form stay on screen. */
+.standings .team-names {
+  display: inline-block;
+  max-width: 36vw;
+  vertical-align: top;
+}
+
+.standings .team-names .team,
+.standings .team-names .manager {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .table-wrap {
   background: var(--surface);
   border-radius: var(--r-lg);
@@ -264,43 +351,12 @@ body {
   border: 1px solid var(--line);
 }
 
-table.standings {
-  width: 100%;
-  border-collapse: collapse;
-}
 
-.standings th,
-.standings td {
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--line);
-}
 
-.standings tr:last-child td {
-  border-bottom: 0;
-}
 
-.standings th {
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
 
-.standings .num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  width: 1%;
-  white-space: nowrap;
-}
 
-.standings .left {
-  text-align: left;
-}
 
-.standings .rank {
-  color: var(--muted);
-}
 
 .standings .pts {
   font-weight: 700;
@@ -368,43 +424,22 @@ table.standings {
 }
 
 /* Team and manager names stay on one line each and trim with "…" on small phones. */
-.standings .team-cell {
-  width: 100%;
-  max-width: 0;
-}
 
-.standings .team-cell .team,
-.standings .team-cell .manager {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 @media (max-width: 480px) {
   .standings .form .chip {
     width: 14px;
     height: 16px;
-    border-radius: var(--r-sm);
     font-size: var(--fs-xs);
   }
 
   .standings .form {
     gap: 2px;
   }
-
-  .standings th,
-  .standings td {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
 }
 
-.standings tr.mine td {
-  background: var(--mine);
-}
 
 /* "You" is always a purple tint with a purple edge on the left. */
-.standings tr.mine td:first-child,
 .data tr.mine td:first-child {
   box-shadow: inset 3px 0 0 var(--mine-edge);
 }
@@ -460,11 +495,6 @@ table.standings {
   max-width: 220px;
 }
 
-@media (max-width: 480px) {
-  .hide-narrow {
-    display: none;
-  }
-}
 
 /* ---- tabs, sections, tables and cards ---- */
 

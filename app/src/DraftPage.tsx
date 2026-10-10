@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
 import { draftDay } from "../../shared/waivers";
-import { Explainer, Manager, PlayerName, Pts, SectionHead, ShowFilter, SubNav, useShownManager } from "./bits";
+import { Explainer, Manager, PlayerName, Pts, RowNo, ScrollTable, SectionHead, ShowFilter, SubNav, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export const DRAFT_VIEWS = [
@@ -66,15 +66,15 @@ function Grades({ grades, data, myTeam }: { grades: ReturnType<typeof draftGrade
           manager's picks are doing 10 places better than where they went, on average.
         </p>
       </Explainer>
-      <div className="table-wrap">
+      <ScrollTable>
         <table className="data">
           <thead>
             <tr>
               <th className="left">Manager</th>
               <th className="num">Pts</th>
               <th className="num">Vs draft spot</th>
-              <th className="num hide-narrow">Kept</th>
-              <th className="left hide-narrow">Best pick</th>
+              <th className="num">Kept</th>
+              <th className="left">Best pick</th>
             </tr>
           </thead>
           <tbody>
@@ -87,11 +87,11 @@ function Grades({ grades, data, myTeam }: { grades: ReturnType<typeof draftGrade
                 <td className="num">
                   <Pts n={Math.round(g.value / 15)} signed />
                 </td>
-                <td className="num hide-narrow">
+                <td className="num">
                   {g.kept}
                   <span className="of">/15</span>
                 </td>
-                <td className="left hide-narrow">
+                <td className="left">
                   <PlayerName id={g.best.element} data={data} detail={false} />{" "}
                   <span className="player-meta">#{g.best.index}</span>
                 </td>
@@ -99,7 +99,7 @@ function Grades({ grades, data, myTeam }: { grades: ReturnType<typeof draftGrade
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollTable>
     </section>
   );
 }
@@ -173,20 +173,15 @@ function DraftOnlyTable({
           scores higher than real ones, but it's the same for everyone.
         </p>
       </Explainer>
-      <div className="table-wrap">
+      <ScrollTable>
         <table className="data">
           <thead>
             <tr>
-              <th className="num">
-                Draft
-                <br />
-                only
-              </th>
-              <th className="left">Manager</th>
-              <th className="num hide-narrow">W-D-L</th>
-              <th className="num hide-narrow">Pts</th>
+              <th className="left">Draft-only place</th>
               <th className="num">Actual</th>
               <th className="left">Moves</th>
+              <th className="num">W-D-L</th>
+              <th className="num">Pts</th>
             </tr>
           </thead>
           <tbody>
@@ -195,14 +190,10 @@ function DraftOnlyTable({
               const better = r.rank - actual; // positive: higher in the real table
               return (
                 <tr key={r.leagueEntryId} className={r.entryId === myTeam ? "mine" : undefined}>
-                  <td className="num rank">{ordinal(r.rank)}</td>
                   <td className="left">
+                    <RowNo>{ordinal(r.rank)}</RowNo>
                     <Manager id={r.entryId} data={data} />
                   </td>
-                  <td className="num hide-narrow">
-                    {r.won}-{r.drawn}-{r.lost}
-                  </td>
-                  <td className="num hide-narrow">{r.total}</td>
                   <td className="num strong">{ordinal(actual)}</td>
                   <td className="left">
                     {better === 0 ? (
@@ -213,12 +204,16 @@ function DraftOnlyTable({
                       </span>
                     )}
                   </td>
+                  <td className="num">
+                    {r.won}-{r.drawn}-{r.lost}
+                  </td>
+                  <td className="num">{r.total}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-      </div>
+      </ScrollTable>
     </section>
   );
 }
@@ -309,12 +304,11 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
           scored {shown.reduce((a, r) => a + r.bestAvailablePoints, 0)}.
         </p>
       )}
-      <div className="table-wrap">
+      <ScrollTable>
         <table className="data">
           <thead>
             <tr>
-              <th className="num">#</th>
-              {who === null && <th className="left">Manager</th>}
+              <th className="left">{who === null ? "Pick" : "#"}</th>
               <th className="left">Took</th>
               {who !== null && <th className="left">Best then</th>}
               <th className="left">{who === null ? "Should have taken" : "Redraft"}</th>
@@ -323,12 +317,10 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
           <tbody>
             {shown.map((r) => (
               <tr key={r.index} className={r.entryId === myTeam ? "mine" : undefined}>
-                <td className="num rank">{r.index}</td>
-                {who === null && (
-                  <td className="left">
-                    <Manager id={r.entryId} data={data} />
-                  </td>
-                )}
+                <td className="left">
+                  <RowNo>{r.index}</RowNo>
+                  {who === null && <Manager id={r.entryId} data={data} />}
+                </td>
                 <td className="left">
                   <PlayerName id={r.actual} data={data} detail={false} />
                   {who !== null && <> <span className="player-meta">{r.actualPoints}</span></>}
@@ -353,7 +345,7 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollTable>
       {who === null && rounds < 15 && (
         <button className="link more" onClick={() => setRounds((n) => Math.min(15, n + 3))}>
           Show more rounds
@@ -382,7 +374,7 @@ function DraftDay({ data, myTeam }: { data: LeagueData; myTeam: number | null })
           How long everyone took over their picks (the time since the pick before), slowest first, and who left FPL to
           pick for them.
         </p>
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
@@ -414,7 +406,7 @@ function DraftDay({ data, myTeam }: { data: LeagueData; myTeam: number | null })
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
       </section>
       <section>
         <h2>Auto picks</h2>
