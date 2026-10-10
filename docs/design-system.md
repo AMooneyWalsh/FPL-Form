@@ -68,11 +68,20 @@ Weights: 400 body, 600 names and labels, 700 numbers that matter and headings, 8
 | `Tag` | Small status label. Tones: `good`, `warn`, `bad`, `neutral`, `mine`, `live`. |
 | `InjuryFlag` | Out / Ban / 75% next to a player's name (a `Tag`). |
 | `StatTile` | One number with a label and optional league rank. Put 2 to 4 in a `.stat-row`. |
+| `ScrollTable` | Every data table goes in one. On a phone it scrolls sideways with the first column frozen and fades the edge that has more. |
+| `RowNo` | A place or pick number at the start of a frozen first cell ("1", "3rd"). |
 | `ShowFilter` | "Show: Everyone / Me / any manager" for long lists. Shared across pages. |
 | `PlayerName`, `Manager` | Every player and manager name, always a link to their page. Never inside a button. |
 | `Pts` | A points number; `signed` shows +/- in good/bad colours. |
 
 CSS-only patterns: `.card` (and `.mine-card`), `.table-wrap` + `table.data` (with `tr.mine`), `.notice` / `.notice.warn` / `.notice.error`, `.chips` + `.chip-btn`, `.form` + `.chip.W/D/L`, `.fdr-1..5`, `.hint`, `a.link`.
+
+## Tables
+
+- Every table is a `ScrollTable` around a `table.data`. Never hide columns on small screens (the old `hide-narrow` is gone); a table that's too wide scrolls.
+- Column order: first, who the row is about, with their place or number as a `RowNo` (this column is frozen). Next, the one number that matters most (points, net, pick-up points), so it's always on screen. Then the rest, most useful first.
+- Nothing wraps inside a table. Long names trim with "…" (see `.standings .team-names`).
+- Your row: `tr.mine`.
 
 ## Long lists
 

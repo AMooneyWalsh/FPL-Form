@@ -11,7 +11,7 @@ import {
   type Score,
 } from "../../shared/results";
 import { computeStandings } from "../../shared/standings";
-import { Explainer, Manager, Pts, SectionHead, SubNav } from "./bits";
+import { Explainer, Manager, Pts, ScrollTable, SectionHead, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { OddsView } from "./OddsPage";
 import { StandingsTable } from "./StandingsTable";
@@ -206,7 +206,7 @@ function LuckView({ data, myTeam }: { data: LeagueData; myTeam: number | null })
             </div>
           </div>
         </div>
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
@@ -233,7 +233,7 @@ function LuckView({ data, myTeam }: { data: LeagueData; myTeam: number | null })
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
         <p className="hint">"Avg vs" is the average score of their opponents each week.</p>
       </section>
       <section>
@@ -322,7 +322,7 @@ function HeadToHeadView({ data, myTeam }: { data: LeagueData; myTeam: number | n
         </div>
       </div>
       {h.matches.length > 0 && (
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
@@ -345,7 +345,7 @@ function HeadToHeadView({ data, myTeam }: { data: LeagueData; myTeam: number | n
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
       )}
     </section>
   );
@@ -362,7 +362,7 @@ function RecordsView({ data, myTeam }: { data: LeagueData; myTeam: number | null
     <>
       <section>
         <h2>Streaks</h2>
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
@@ -402,7 +402,7 @@ function RecordsView({ data, myTeam }: { data: LeagueData; myTeam: number | null
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
       </section>
       <section>
         <h2>Records</h2>

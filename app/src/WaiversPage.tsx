@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
 import { freeAgentSignings } from "../../shared/waivers";
-import { Explainer, FoldSection, Manager, nobody, PlayerName, SectionHead, ShowFilter, useShownManager } from "./bits";
+import { Explainer, FoldSection, Manager, nobody, PlayerName, ScrollTable, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
@@ -21,15 +21,15 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
         <p className="hint">
           Pick-up points are what everyone they've signed (waivers and free agents) has scored in their starting XI.
         </p>
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
                 <th className="left">Manager</th>
+                <th className="num">Pick-up pts</th>
                 <th className="num">Claims won</th>
                 <th className="num">Lost out</th>
-                <th className="num hide-narrow">Free agents</th>
-                <th className="num">Pick-up pts</th>
+                <th className="num">Free agents</th>
               </tr>
             </thead>
             <tbody>
@@ -38,18 +38,18 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
                   <td className="left">
                     <Manager id={r.entryId} data={data} />
                   </td>
+                  <td className="num strong">{r.pickupPoints}</td>
                   <td className="num">
                     {r.won}
                     <span className="of">/{r.claims}</span>
                   </td>
                   <td className="num">{r.outbid}</td>
-                  <td className="num hide-narrow">{r.freeAgents}</td>
-                  <td className="num strong">{r.pickupPoints}</td>
+                  <td className="num">{r.freeAgents}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
       </section>
 
       <section>

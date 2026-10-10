@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { isOut } from "../../shared/waivers";
-import { Explainer, FoldSection, Manager, PlayerName, Pts, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
+import { Explainer, FoldSection, Manager, RowNo, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
 
 /**
@@ -258,40 +258,63 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
 
       <section>
         <h2>Table</h2>
-        <div className="table-wrap">
+        <p className="hint">On a phone it scrolls sideways; the first column stays put.</p>
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
                 <th className="left">Manager</th>
                 <th className="num">Pts</th>
                 <th className="num">Net</th>
+                <th className="num">Trades</th>
+                <th className="num">Won</th>
+                <th className="num">Lost</th>
+                <th className="left">Trades most with</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="left">Someone</td>
+                <td className="left">
+                  <RowNo>1</RowNo>Someone
+                </td>
                 <td className="num strong">291</td>
                 <td className="num">
                   <Pts n={25} signed />
                 </td>
+                <td className="num">4</td>
+                <td className="num">3</td>
+                <td className="num">1</td>
+                <td className="left">Someone else (2)</td>
               </tr>
               <tr className="mine">
-                <td className="left">You</td>
+                <td className="left">
+                  <RowNo>2</RowNo>You
+                </td>
                 <td className="num strong">286</td>
                 <td className="num">
                   <Pts n={-12} signed />
                 </td>
+                <td className="num">2</td>
+                <td className="num">0</td>
+                <td className="num">2</td>
+                <td className="left">Someone (2)</td>
               </tr>
               <tr>
-                <td className="left">Someone else</td>
+                <td className="left">
+                  <RowNo>3</RowNo>Someone else
+                </td>
                 <td className="num strong">261</td>
                 <td className="num">
                   <Pts n={0} signed />
                 </td>
+                <td className="num">1</td>
+                <td className="num">0</td>
+                <td className="num">0</td>
+                <td className="left">You (1)</td>
               </tr>
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
       </section>
 
       <section>

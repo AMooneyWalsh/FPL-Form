@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { Player } from "../../shared/types";
 import { isOut } from "../../shared/waivers";
 import type { LeagueData } from "./data";
@@ -222,14 +222,7 @@ export function SubNav({
   label: string;
 }) {
   const active = useRef<HTMLAnchorElement>(null);
-  const bar = useRef<HTMLElement>(null);
-  // Fade whichever edge has more chips hidden past it, so it's clear the menu scrolls.
-  const [more, setMore] = useState({ left: false, right: false });
-  const measure = () => {
-    const el = bar.current;
-    if (!el) return;
-    setMore({ left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 });
-  };
+  const [bar, more, measure] = useScrollEdges<HTMLElement>();
   // On a phone the menu can be wider than the screen, so bring the current one into view.
   useEffect(() => {
     const el = active.current;
@@ -237,13 +230,8 @@ export function SubNav({
     if (el && nav) nav.scrollLeft = el.offsetLeft - nav.offsetLeft - 16;
     measure();
   }, [current]);
-  useEffect(() => {
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-  const fade = `${more.left ? " more-left" : ""}${more.right ? " more-right" : ""}`;
   return (
-    <div className={`subnav-wrap${fade}`}>
+    <div className={`subnav-wrap${edgeClasses(more)}`}>
       <nav ref={bar} className="chips subnav" aria-label={label} onScroll={measure}>
         {views.map((v) => (
           <a
@@ -259,4 +247,57 @@ export function SubNav({
       </nav>
     </div>
   );
+}
+
+/**
+ * Whether something that scrolls sideways has more past its left or right
+ * edge, so it can fade that edge. Re-measures on scroll, resize and render.
+ */
+function useScrollEdges<T extends HTMLElement>(): [RefObject<T | null>, Edges, () => void] {
+  const ref = useRef<T>(null);
+  const [more, setMore] = useState<Edges>({ left: false, right: false });
+  const measure = () => {
+    const el = ref.current;
+    if (!el) return;
+    const left = el.scrollLeft > 4;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setMore((m) => (m.left === left && m.right === right ? m : { left, right }));
+  };
+  useEffect(() => {
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  });
+  return [ref, more, measure];
+}
+
+interface Edges {
+  left: boolean;
+  right: boolean;
+}
+
+function edgeClasses(more: Edges): string {
+  return `${more.left ? " more-left" : ""}${more.right ? " more-right" : ""}`;
+}
+
+/**
+ * Every data table goes in one of these. On a phone it scrolls sideways with
+ * the first column frozen, so put who the row is about (and their place or
+ * number, as a RowNo) first, then the most important number, then the rest.
+ * Never hide columns on small screens.
+ */
+export function ScrollTable({ children }: { children: ReactNode }) {
+  const [ref, more, measure] = useScrollEdges<HTMLDivElement>();
+  return (
+    <div className={`scroll-table${edgeClasses(more)}`}>
+      <div ref={ref} className="table-wrap" onScroll={measure}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** A place or pick number at the start of a frozen first cell: "1", "3rd", "#35". */
+export function RowNo({ children }: { children: ReactNode }) {
+  return <span className="row-no">{children}</span>;
 }

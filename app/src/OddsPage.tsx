@@ -3,7 +3,7 @@ import { seasonOdds, squadStrength, type OddsRow } from "../../shared/odds";
 import { lastFinishedEvent } from "../../shared/results";
 import type { Envelope, Player } from "../../shared/types";
 import { useApi } from "./api";
-import { Explainer, Manager } from "./bits";
+import { Explainer, Manager, ScrollTable } from "./bits";
 import type { LeagueData } from "./data";
 
 /** Prizes and forfeits for 2026/27, as agreed in the group chat. `place` is 1-based. */
@@ -132,7 +132,7 @@ export function OddsView({ data, myTeam }: { data: LeagueData; myTeam: number | 
 
       <section>
         <h2>Everyone</h2>
-        <div className="table-wrap">
+        <ScrollTable>
           <table className="data">
             <thead>
               <tr>
@@ -157,7 +157,7 @@ export function OddsView({ data, myTeam }: { data: LeagueData; myTeam: number | 
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
         <p className="hint">
           Bottom 4 is 11th to 14th, the forfeit places. The odds are a guide, not a promise: with this many weeks left
           they stay fairly open, and they'll sharpen as the season goes on.
