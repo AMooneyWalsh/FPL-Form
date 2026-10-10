@@ -339,6 +339,36 @@ describe("fixtureImpacts", () => {
   });
 });
 
+describe("double gameweeks", () => {
+  it("keeps each match's points apart, so a match report shows only that match", () => {
+    const fx = (id: number, h: number, a: number) => ({
+      id, kickoff_time: null, started: true, finished: true, finished_provisional: true, minutes: 90,
+      team_h: h, team_a: a, team_h_score: 1, team_a_score: 0,
+      stats: [{ s: "goals_scored", h: id === 1 ? [{ element: 7, value: 1 }] : [], a: [] }],
+    });
+    const raw: RawLiveResponse = {
+      elements: {
+        "7": {
+          stats: { minutes: 180, total_points: 11, bonus: 0, bps: 0 },
+          explain: [
+            [[{ stat: "minutes", value: 90, points: 2 }, { stat: "goals_scored", value: 1, points: 5 }], 1],
+            [[{ stat: "minutes", value: 90, points: 2 }, { stat: "clean_sheets", value: 1, points: 2 }], 2],
+          ],
+        },
+        "8": { stats: { minutes: 90, total_points: 2, bonus: 0, bps: 0 }, explain: [[[{ stat: "minutes", value: 90, points: 2 }], 1]] },
+      },
+      fixtures: [fx(1, 1, 2), fx(2, 1, 3)],
+    };
+    const dgw = toLiveGameweek(9, raw, {});
+    expect(dgw.elements[7].byFixture).toEqual({ 1: 7, 2: 4 });
+    // One match only: nothing extra stored.
+    expect(dgw.elements[8].byFixture).toBeUndefined();
+    const info = new Map([[7, { position: "MID" as const, teamId: 1 }]]);
+    const limits = { GKP: 0, DEF: 10, MID: 12, FWD: 12 };
+    expect(fixtureImpacts(dgw.fixtures[0], dgw, info, limits).home[0].points).toBe(7);
+  });
+});
+
 describe("bonus status", () => {
   it("calls bonus provisional while FPL shows it live, and confirmed only once the match is checked", () => {
     const raw = structuredClone(live5) as unknown as RawLiveResponse;
