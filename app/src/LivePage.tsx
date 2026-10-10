@@ -2,13 +2,14 @@ import { Fragment, useMemo, useState } from "react";
 import {
   bonusTable,
   defconTable,
+  fixtureImpacts,
   gamesOf,
   leagueOwners,
   liveMatches,
   liveTable,
   topPerformers,
   type DefconRow,
-  type EventKey,
+  type Impact,
   type LiveFixture,
   type LiveGameweek,
   type LiveMatch,
@@ -831,68 +832,99 @@ function DefconList({ rows, points, ctx }: { rows: DefconRow[]; points: Record<P
 
 // ---------------------------------------------------------------- fixtures
 
-const EVENT_LABELS: [EventKey, string][] = [
-  ["goals_scored", "Goals"],
-  ["assists", "Assists"],
-  ["own_goals", "Own goals"],
-  ["penalties_missed", "Penalties missed"],
-  ["penalties_saved", "Penalties saved"],
-  ["yellow_cards", "Yellow cards"],
-  ["red_cards", "Red cards"],
-];
 
 function FixturesView({ ctx }: { ctx: Ctx }) {
   const fixtures = [...ctx.gw.fixtures].sort((a, b) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id);
+  const info = useMemo(
+    () => new Map<number, PlayerInfo>(ctx.data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }])),
+    [ctx.data.playerList],
+  );
+  const limits = (ctx.data.rules.defcon ?? DEFAULT_DEFCON).limit;
   return (
     <section>
       <h2>Premier League fixtures</h2>
-      <p className="hint">Who scored, assisted and got carded, with the league owner of each player in brackets.</p>
+      <p className="hint lv-legend">
+        Everyone whose points moved, by team, with his points and who owns him.{" "}
+        <span className="lv-badge g">G</span> goal <span className="lv-badge a">A</span> assist{" "}
+        <span className="lv-card y" /> <span className="lv-card r" /> cards <span className="lv-badge b">B</span> bonus{" "}
+        <span className="lv-badge dc">DC</span> defensive contributions
+      </p>
       {fixtures.map((f) => (
-        <FixtureCard key={f.id} f={f} ctx={ctx} />
+        <FixtureCard key={f.id} f={f} ctx={ctx} impacts={f.started ? fixtureImpacts(f, ctx.gw, info, limits) : null} />
       ))}
     </section>
   );
 }
 
-function FixtureCard({ f, ctx }: { f: LiveFixture; ctx: Ctx }) {
-  const h = ctx.clubs.get(f.teamH)?.short;
-  const a = ctx.clubs.get(f.teamA)?.short;
+function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: { home: Impact[]; away: Impact[] } | null }) {
+  const live = f.started && !f.finishedProvisional;
   const status = f.finishedProvisional ? "FT" : f.started ? clock(f) : f.kickoff ? formatKickoff(f.kickoff, true) : "TBC";
+  const side = (teamId: number, right?: boolean) => (
+    <span className={`lv-fx-side ${right ? "right" : ""}`}>
+      <Shirt teamId={teamId} gk={false} ctx={ctx} />
+      <span className="lv-fx-team">{ctx.clubs.get(teamId)?.short}</span>
+    </span>
+  );
   return (
-    <article className="card lv-fx">
-      <div className="lv-fx-row">
-        <span className="lv-fx-team">{h}</span>
-        <span className="lv-fx-score">{f.started ? `${f.scoreH ?? 0} – ${f.scoreA ?? 0}` : "v"}</span>
-        <span className="lv-fx-team right">{a}</span>
-        <span className="lv-fx-state muted">{status}</span>
-      </div>
-      {EVENT_LABELS.map(([key, label]) => {
-        const list = f.events[key];
-        if (!list || list.length === 0) return null;
+    <article className={`card lv-fx ${live ? "is-live" : ""}`}>
+      <header className="lv-fx-top">
+        {side(f.teamH)}
+        <span className="lv-fx-mid">
+          <span className="lv-fx-score">{f.started ? `${f.scoreH ?? 0} – ${f.scoreA ?? 0}` : "v"}</span>
+          <span className={live ? "lv-fx-state lv-clock" : "lv-fx-state"}>{status}</span>
+        </span>
+        {side(f.teamA, true)}
+      </header>
+      {impacts && (impacts.home.length > 0 || impacts.away.length > 0) && (
+        <div className="lv-fx-cols">
+          <ImpactList list={impacts.home} ctx={ctx} />
+          <ImpactList list={impacts.away} ctx={ctx} />
+        </div>
+      )}
+    </article>
+  );
+}
+
+function ImpactList({ list, ctx }: { list: Impact[]; ctx: Ctx }) {
+  return (
+    <div className="lv-imp-list">
+      {list.map((i) => {
+        const owner = ctx.data.owners.get(i.element);
+        const mine = owner !== undefined && owner !== null && owner === ctx.myTeam;
         return (
-          <p key={key} className="lv-events">
-            <span className="lv-events-label">{label}</span>{" "}
-            {list.map((e, i) => {
-              const player = ctx.data.players.get(e.element);
-              const owner = ctx.owners.get(e.element);
-              return (
-                <span key={`${e.element}-${i}`} className="lv-event">
-                  {player?.name ?? e.element}
-                  {e.value > 1 && ` ×${e.value}`}
-                  {owner && (
-                    <span className={owner.entryId === ctx.myTeam ? "player-meta mine-name" : "player-meta"}>
-                      {" "}
-                      ({ctx.data.labels.get(owner.entryId)})
-                    </span>
-                  )}
-                  {i < list.length - 1 && ", "}
-                </span>
-              );
-            })}
-          </p>
+          <div key={i.element} className={`lv-imp ${owner ? "owned" : ""} ${mine ? "mine" : ""}`}>
+            <span className="lv-imp-name">{ctx.data.players.get(i.element)?.name ?? i.element}</span>
+            <span className="lv-imp-pts">{i.points}</span>
+            <span className="lv-imp-badges">
+              <Badges i={i} />
+            </span>
+            {owner ? <span className="lv-imp-owner">{ctx.data.labels.get(owner)}</span> : null}
+          </div>
         );
       })}
-    </article>
+    </div>
+  );
+}
+
+function Badges({ i }: { i: Impact }) {
+  const times = (n: number) => (n > 1 ? `×${n}` : "");
+  return (
+    <>
+      {i.goals > 0 && <span className="lv-badge g">G{times(i.goals)}</span>}
+      {i.assists > 0 && <span className="lv-badge a">A{times(i.assists)}</span>}
+      {i.ownGoals > 0 && <span className="lv-badge bad">OG{times(i.ownGoals)}</span>}
+      {i.pensSaved > 0 && <span className="lv-badge g">Pen saved</span>}
+      {i.pensMissed > 0 && <span className="lv-badge bad">Pen missed</span>}
+      {i.yellow > 0 && <span className="lv-card y" title="Yellow card" />}
+      {i.red > 0 && <span className="lv-card r" title="Red card" />}
+      {i.bonus > 0 && (
+        <span className="lv-badge b" title={i.bonusProvisional ? "Provisional bonus" : "Bonus"}>
+          B{i.bonus}
+          {i.bonusProvisional ? "*" : ""}
+        </span>
+      )}
+      {i.defcon && <span className="lv-badge dc">DC</span>}
+    </>
   );
 }
 

@@ -8,6 +8,7 @@ import {
   bonusFromBps,
   bonusTable,
   defconTable,
+  fixtureImpacts,
   leagueOwners,
   liveMatches,
   liveSquad,
@@ -302,5 +303,38 @@ describe("defconTable", () => {
       [11, 8, 10, false],
       [14, 9, 12, false],
     ]);
+  });
+});
+
+describe("fixtureImpacts", () => {
+  const f = {
+    id: 1, kickoff: null, started: true, finished: false, finishedProvisional: false, minutes: 60, teamH: 1, teamA: 2,
+    scoreH: 1, scoreA: 1, bonusConfirmed: false,
+    bps: [{ element: 10, value: 40 }, { element: 20, value: 30 }, { element: 11, value: 20 }, { element: 21, value: 5 }],
+    events: {
+      goals_scored: [{ element: 10, value: 1, home: true }, { element: 20, value: 1, home: false }],
+      assists: [{ element: 11, value: 1, home: true }],
+      yellow_cards: [{ element: 21, value: 1, home: false }],
+    },
+  };
+  const el = (points: number, dc = 0) => ({ minutes: 60, points, bonus: 0, bps: 0, starts: 1, stats: { defensive_contribution: dc }, breakdown: [] });
+  const gw = { event: 6, fixtures: [f], elements: { 10: el(6), 11: el(3), 20: el(5), 21: el(1), 22: el(4, 11) }, picks: {} } as unknown as Parameters<typeof fixtureImpacts>[1];
+  const info = new Map([
+    [10, { position: "MID", teamId: 1 }], [11, { position: "FWD", teamId: 1 }],
+    [20, { position: "FWD", teamId: 2 }], [21, { position: "DEF", teamId: 2 }], [22, { position: "DEF", teamId: 2 }],
+  ]) as unknown as Map<number, { position: "GKP" | "DEF" | "MID" | "FWD"; teamId: number }>;
+
+  it("splits by side, adds provisional bonus and DefCon, best first", () => {
+    const r = fixtureImpacts(f as never, gw, info, { GKP: 0, DEF: 10, MID: 12, FWD: 12 });
+    expect(r.home.map((i) => [i.element, i.goals, i.assists, i.bonus, i.points])).toEqual([
+      [10, 1, 0, 3, 9],
+      [11, 0, 1, 1, 4],
+    ]);
+    expect(r.away.map((i) => [i.element, i.goals, i.yellow, i.bonus, i.defcon, i.points])).toEqual([
+      [20, 1, 0, 2, false, 7],
+      [22, 0, 0, 0, true, 4],
+      [21, 0, 1, 0, false, 1],
+    ]);
+    expect(r.home[0].bonusProvisional).toBe(true);
   });
 });
