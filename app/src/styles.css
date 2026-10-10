@@ -1791,8 +1791,8 @@ table.lv-bonus td {
 
 .lv-fx-cols {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 10px;
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px solid var(--line);
@@ -1829,6 +1829,8 @@ table.lv-bonus td {
 }
 
 .lv-imp-pts {
+  justify-self: end;
+  padding-right: 6px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -1858,6 +1860,9 @@ table.lv-bonus td {
 
 /* Players nobody owns: there for context, so one small line. */
 .lv-imp-others {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
   margin: 6px 0 0;
   font-size: 11.5px;
   line-height: 1.6;
@@ -1865,7 +1870,11 @@ table.lv-bonus td {
 }
 
 .lv-imp-others-label {
+  flex-basis: 100%;
   font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .lv-imp-other {
