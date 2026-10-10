@@ -11,7 +11,7 @@ import {
   type Score,
 } from "../../shared/results";
 import { computeStandings } from "../../shared/standings";
-import { Manager, Pts, SubNav } from "./bits";
+import { Manager, Pts, SectionHead, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { OddsView } from "./OddsPage";
 import { StandingsTable } from "./StandingsTable";
@@ -52,10 +52,9 @@ function TableView({ data, myTeam }: { data: LeagueData; myTeam: number | null }
         <StandingsTable rows={standings} myTeam={myTeam} />
       </section>
       <section>
-        <div className="section-head">
-          <h2>Position each week</h2>
+        <SectionHead title="Position each week">
           <ManagerSelect data={data} value={compare} onChange={setCompare} placeholder="Compare with…" exclude={myTeam} label="Compare with" />
-        </div>
+        </SectionHead>
         <PositionChart data={data} myTeam={myTeam} compare={compare} />
       </section>
     </>
@@ -235,10 +234,9 @@ function LuckView({ data, myTeam }: { data: LeagueData; myTeam: number | null })
         <p className="hint">"Avg vs" is the average score of their opponents each week.</p>
       </section>
       <section>
-        <div className="section-head">
-          <h2>Week by week</h2>
+        <SectionHead title="Week by week">
           <ManagerSelect data={data} value={shown.entryId} onChange={setWho} label="Whose weeks" />
-        </div>
+        </SectionHead>
         <WeekStrip row={shown} />
       </section>
     </>

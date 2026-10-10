@@ -8,6 +8,7 @@ import { LEAGUE_VIEWS, LeaguePage } from "./LeaguePage";
 import { LIVE_VIEWS, LivePage } from "./LivePage";
 import { ManagerPage } from "./ManagerPage";
 import { SearchButton } from "./Search";
+import { Styleguide } from "./Styleguide";
 import { PlayerPage } from "./PlayersPage";
 import { MOVES_VIEWS, MovesPage } from "./MovesPage";
 
@@ -19,7 +20,7 @@ const PAGES = [
 ] as const;
 type PageId = (typeof PAGES)[number]["id"];
 /** Pages without a tab of their own, reached by tapping a name. */
-type DetailId = "player" | "manager";
+type DetailId = "player" | "manager" | "styleguide";
 interface Route {
   /** undefined = no link given, so App picks the landing page (Live while games are on, else League). */
   page: PageId | DetailId | undefined;
@@ -32,7 +33,7 @@ function routeFromHash(): Route {
   // Old links (#/table, #/trades, #/waivers, #/players) still work.
   if (first === "table") return { page: "league", sub: "table" };
   if (first === "trades" || first === "waivers" || first === "players") return { page: "moves", sub: first };
-  if (first === "player" || first === "manager") return { page: first, sub: second };
+  if (first === "player" || first === "manager" || first === "styleguide") return { page: first, sub: second };
   const page = PAGES.find((p) => p.id === first)?.id;
   return { page, sub: second };
 }
@@ -60,7 +61,7 @@ export function App() {
   const ready = data.status === "ready" ? data.value : null;
   const { sub } = route;
   const page: PageId | DetailId = route.page ?? (ready?.inProgress ? "live" : "league");
-  const detail = page === "player" || page === "manager";
+  const detail = page === "player" || page === "manager" || page === "styleguide";
   const { myTeam, decided, setMyTeam } = useMyTeam(ready ? [...ready.entries.keys()] : undefined);
 
   return (
@@ -132,6 +133,7 @@ export function App() {
             {detail && <BackLink />}
             {page === "player" && <PlayerPage id={Number(sub)} data={ready} myTeam={myTeam} />}
             {page === "manager" && <ManagerPage id={Number(sub)} data={ready} myTeam={myTeam} />}
+            {page === "styleguide" && <Styleguide data={ready} myTeam={myTeam} />}
             {page === "moves" && (
               <MovesPage data={ready} myTeam={myTeam} view={MOVES_VIEWS.find((v) => v.id === sub)?.id ?? "trades"} />
             )}

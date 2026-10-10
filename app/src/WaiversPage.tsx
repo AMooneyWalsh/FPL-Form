@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
 import { freeAgentSignings } from "../../shared/waivers";
-import { Manager, nobody, PlayerName, ShowFilter, useShownManager } from "./bits";
+import { Manager, nobody, PlayerName, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
@@ -53,10 +53,9 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
       </section>
 
       <section>
-        <div className="section-head">
-          <h2>Free agent signings</h2>
+        <SectionHead title="Free agent signings">
           <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
-        </div>
+        </SectionHead>
         <p className="hint">Players picked up without a waiver claim, newest first, and what they've scored since.</p>
         {mySignings.length === 0 && (
           <p className="notice">
@@ -84,10 +83,9 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
       </section>
 
       <section>
-        <div className="section-head">
-          <h2>Waiver battles</h2>
+        <SectionHead title="Waiver battles">
           <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
-        </div>
+        </SectionHead>
         <p className="hint">Players more than one manager put a claim in for. Winner first, then in priority order.</p>
         {shown.length === 0 && (
           <p className="notice">

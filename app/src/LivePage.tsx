@@ -22,7 +22,7 @@ import {
 import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope, Player, TeamSheets } from "../../shared/types";
 import { useApi } from "./api";
-import { InjuryFlag, Manager, SubNav } from "./bits";
+import { InjuryFlag, Manager, SectionHead, SubNav, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
 import { StandingsTable } from "./StandingsTable";
 
@@ -197,12 +197,11 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
   return (
     <>
       <section>
-        <div className="section-head">
-          <h2>Matches</h2>
+        <SectionHead title="Matches">
           <span className={`phase phase-${phase}`}>
             {phase === "live" ? "Live" : phase === "done" ? "Finished" : "Not started"}
           </span>
-        </div>
+        </SectionHead>
         <p className="hint">
           {phase === "live" && `${played} of ${gw.fixtures.length} matches finished · updates every 30 seconds.`}
           {phase === "done" &&
@@ -221,8 +220,8 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
         )}
         {ctx.sheets && ctx.sheets.announced.length > 0 && (
           <p className="hint">
-            Team news is in for some matches: <span className="ts ts-start">Starting</span>{" "}
-            <span className="ts ts-bench">Bench</span> <span className="ts ts-out">Not in squad</span> until kick-off.
+            Team news is in for some matches: <Tag tone="good">Starting</Tag> <Tag tone="warn">Bench</Tag>{" "}
+            <Tag tone="bad">Not in squad</Tag> until kick-off.
           </p>
         )}
         {!hasLineups && (
@@ -430,11 +429,16 @@ function sheetStatus(p: Player | undefined, ctx: Ctx): SheetStatus | null {
 }
 
 const SHEET_LABELS: Record<SheetStatus, string> = { start: "Starting", bench: "Bench", out: "Not in squad" };
+const SHEET_TONES: Record<SheetStatus, TagTone> = { start: "good", bench: "warn", out: "bad" };
 
 function SheetTag({ p, ctx }: { p: Player | undefined; ctx: Ctx }) {
   const status = sheetStatus(p, ctx);
   if (!status) return null;
-  return <span className={`ts ts-${status}`}>{SHEET_LABELS[status]}</span>;
+  return (
+    <Tag tone={SHEET_TONES[status]} className="ts">
+      {SHEET_LABELS[status]}
+    </Tag>
+  );
 }
 
 const POSITION_ORDER: Record<Player["position"], number> = { GKP: 0, DEF: 1, MID: 2, FWD: 3 };
@@ -702,10 +706,9 @@ function TableView({ ctx }: { ctx: Ctx }) {
   }
   return (
     <section>
-      <div className="section-head">
-        <h2>{phase === "upcoming" ? `Table before gameweek ${gw.event}` : phase === "live" ? "Live table" : `Table after gameweek ${gw.event}`}</h2>
+      <SectionHead title={phase === "upcoming" ? `Table before gameweek ${gw.event}` : phase === "live" ? "Live table" : `Table after gameweek ${gw.event}`}>
         {phase === "live" && <span className="phase phase-live">Live</span>}
-      </div>
+      </SectionHead>
       <p className="hint">
         {phase === "upcoming"
           ? "Nothing played yet. Once games start, this shows where everyone would finish if it ended there."

@@ -87,7 +87,9 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 ## UX review (10 Oct)
 
-- Findings and the agreed plan: `docs/ux-review-2026-10-10.md`. The two live-gameweek wording bugs are fixed. Next: a small design system, then usability fixes. Regroup with the owner before starting either.
+- Findings and the agreed plan: `docs/ux-review-2026-10-10.md`. The two live-gameweek wording bugs are fixed.
+- Design system built: rules in `docs/design-system.md`, live at `#/styleguide`. Tokens at the top of `styles.css`; `Tag`, `StatTile`, `SectionHead`, `Explainer` in `bits.tsx`. "You" is purple now (was green).
+- Next: usability fixes from the review, built on those pieces (`Explainer` isn't used on real pages yet). Regroup with the owner first.
 
 ## Checks before merging
 
