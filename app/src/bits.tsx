@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Player } from "../../shared/types";
 import { isOut } from "../../shared/waivers";
 import type { LeagueData } from "./data";
@@ -26,9 +26,70 @@ export function InjuryFlag({ p }: { p: Player }) {
   const out = isOut(p);
   const text = out ? (p.status === "s" ? "Ban" : "Out") : p.chanceNext !== null ? `${p.chanceNext}%` : "Doubt";
   return (
-    <span className={out ? "flag flag-out" : "flag flag-doubt"} title={p.news || undefined}>
+    <Tag tone={out ? "bad" : "warn"} title={p.news || undefined} className="flag">
       {text}
+    </Tag>
+  );
+}
+
+// ---------------------------------------------------------------- design system pieces
+// See docs/design-system.md, and #/styleguide for all of them on one page.
+
+export type TagTone = "good" | "warn" | "bad" | "neutral" | "mine" | "live";
+
+/** A small status label: "Out", "75%", "Starting", "Live". The tone says what it means, not what colour it is. */
+export function Tag({
+  tone,
+  children,
+  title,
+  className,
+}: {
+  tone: TagTone;
+  children: ReactNode;
+  title?: string;
+  className?: string;
+}) {
+  return (
+    <span className={`tag tag-${tone}${className ? ` ${className}` : ""}`} title={title}>
+      {children}
     </span>
+  );
+}
+
+export interface StatRank {
+  text: string;
+  /** Green for the good end of the league, red for the bad end, grey otherwise. */
+  tone: "good" | "bad" | "meh";
+}
+
+/** One number in a tile, e.g. "1st / Position", with an optional league rank under it. Use inside a .stat-row. */
+export function StatTile({ label, value, rank }: { label: string; value: string; rank?: StatRank }) {
+  return (
+    <div className="stat">
+      <span className="stat-value">{value}</span>
+      <span className="stat-label">{label}</span>
+      {rank && <span className={`stat-rank ${rank.tone}`}>{rank.text}</span>}
+    </div>
+  );
+}
+
+/** A section title with its controls (a Show filter, a picker, a Live tag) on the right. */
+export function SectionHead({ title, children }: { title: ReactNode; children?: ReactNode }) {
+  return (
+    <div className="section-head">
+      <h2>{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+/** "How this works": the explanation of a number, folded away until someone asks for it. */
+export function Explainer({ children, label = "How this works" }: { children: ReactNode; label?: string }) {
+  return (
+    <details className="explainer">
+      <summary>{label}</summary>
+      <div className="explainer-body">{children}</div>
+    </details>
   );
 }
 

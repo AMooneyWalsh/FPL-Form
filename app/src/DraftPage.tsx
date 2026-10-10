@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
 import { draftDay } from "../../shared/waivers";
-import { Manager, PlayerName, Pts, ShowFilter, useShownManager, SubNav } from "./bits";
+import { Manager, PlayerName, Pts, SectionHead, ShowFilter, SubNav, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export const DRAFT_VIEWS = [
@@ -111,10 +111,9 @@ function StealsAndBusts({ reports, data, myTeam }: { reports: PickReport[]; data
   const busts = [...pool].sort((a, b) => a.value - b.value).slice(0, 5);
   return (
     <section>
-      <div className="section-head">
-        <h2>Steals and busts</h2>
+      <SectionHead title="Steals and busts">
         <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
-      </div>
+      </SectionHead>
       <p className="hint">Picks doing far better, or far worse, than where they were taken.</p>
       <div className="two-col">
         <PickList title="Steals" picks={steals} data={data} myTeam={myTeam} />
@@ -286,10 +285,9 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
   const shown = who !== null ? redraft.filter((r) => r.entryId === who) : redraft.filter((r) => r.round <= rounds);
   return (
     <section>
-      <div className="section-head">
-        <h2>Hindsight redraft</h2>
+      <SectionHead title="Hindsight redraft">
         <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
-      </div>
+      </SectionHead>
       <p className="hint">
         The draft run again in the same order, with everyone taking the best scorer still available who fits their squad
         (2 GKP, 5 DEF, 5 MID, 3 FWD). Anyone in the game at the time counts, including players nobody drafted (late signings FPL added after the

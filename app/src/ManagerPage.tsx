@@ -3,7 +3,7 @@ import { draftGrades, pickReports, squadOrigins } from "../../shared/draft";
 import { tradeLedger, tradeVerdicts, waiverRecord } from "../../shared/moves";
 import { fixtureLuck, headToHead, scores, streaks, type Score } from "../../shared/results";
 import { computeStandings } from "../../shared/standings";
-import { Manager, PlayerName, Pts, useShownManager } from "./bits";
+import { Manager, PlayerName, Pts, StatTile, useShownManager, type StatRank } from "./bits";
 import type { LeagueData } from "./data";
 import { ManagerOdds } from "./OddsPage";
 import { TradeCard } from "./TradesPage";
@@ -55,10 +55,10 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
         <p className="hint">{entry.entry_name}</p>
         {standing && (
           <div className="stat-row">
-            <Stat label="Position" value={ordinal(standing.rank)} />
-            <Stat label="Record" value={`${standing.won}-${standing.drawn}-${standing.lost}`} />
-            <Stat label="Points" value={String(standing.total)} />
-            <Stat label="Scored" value={String(standing.pointsFor)} rank={rank((x) => x.pointsFor, "high", ["highest", "lowest"])} />
+            <StatTile label="Position" value={ordinal(standing.rank)} />
+            <StatTile label="Record" value={`${standing.won}-${standing.drawn}-${standing.lost}`} />
+            <StatTile label="Points" value={String(standing.total)} />
+            <StatTile label="Scored" value={String(standing.pointsFor)} rank={rank((x) => x.pointsFor, "high", ["highest", "lowest"])} />
           </div>
         )}
         {standing && standing.results.length > 0 && (
@@ -162,15 +162,6 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
   );
 }
 
-function Stat({ label, value, rank }: { label: string; value: string; rank?: Rank }) {
-  return (
-    <div className="stat">
-      <span className="stat-value">{value}</span>
-      <span className="stat-label">{label}</span>
-      {rank && <span className={`stat-rank ${rank.tone}`}>{rank.text}</span>}
-    </div>
-  );
-}
 
 function nextMatch(data: LeagueData, entryId: number): { event: number; opponent: number } | null {
   const leagueId = data.entries.get(entryId)?.id;
@@ -324,11 +315,7 @@ function seasonSummary(data: LeagueData, id: number, ctx: SummaryCtx): Summary |
 
 /** Which way is good for a number. "neutral" numbers (e.g. trades made) get no colour. */
 type Good = "high" | "low" | "neutral";
-type Tone = "good" | "bad" | "meh";
-interface Rank {
-  text: string;
-  tone: Tone;
-}
+type Rank = StatRank;
 type RankFn = (get: (s: Summary) => number, good: Good, words?: [string, string]) => Rank | undefined;
 
 /**
@@ -346,7 +333,7 @@ function rankOf(values: number[], value: number, good: Good, words: [string, str
   const [w, pos] = fromTop <= fromBottom ? [words[0], fromTop] : [words[1], fromBottom];
   const text = pos === 1 ? (tied ? `Joint ${w}` : `${cap(w)} in league`) : `${tied ? "Joint " : ""}${ordinal(pos)} ${w}`;
   const third = Math.ceil(values.length / 3);
-  const tone: Tone = good === "neutral" ? "meh" : fromTop <= third ? "good" : fromBottom <= third ? "bad" : "meh";
+  const tone: Rank["tone"] = good === "neutral" ? "meh" : fromTop <= third ? "good" : fromBottom <= third ? "bad" : "meh";
   return { text, tone };
 }
 
@@ -381,9 +368,9 @@ function SeasonSummary({
 
       <h3 className="card-title">Luck</h3>
       <div className="stat-row">
-        <Stat label="Luck" value={`${s.luck.value > 0 ? "+" : ""}${round1(s.luck.value)}`} rank={rank((x) => x.luck.value, "high", ["luckiest", "unluckiest"])} />
-        <Stat label="Lucky wins" value={String(s.luck.luckyWins.length)} rank={rank((x) => x.luck.luckyWins.length, "high", ["most", "fewest"])} />
-        <Stat
+        <StatTile label="Luck" value={`${s.luck.value > 0 ? "+" : ""}${round1(s.luck.value)}`} rank={rank((x) => x.luck.value, "high", ["luckiest", "unluckiest"])} />
+        <StatTile label="Lucky wins" value={String(s.luck.luckyWins.length)} rank={rank((x) => x.luck.luckyWins.length, "high", ["most", "fewest"])} />
+        <StatTile
           label="Unlucky losses"
           value={String(s.luck.unluckyLosses.length)}
           rank={rank((x) => x.luck.unluckyLosses.length, "low", ["fewest", "most"])}
@@ -402,10 +389,10 @@ function SeasonSummary({
 
       <h3 className="card-title">Scores</h3>
       <div className="stat-row">
-        <Stat label={`Highest (GW${s.high.event})`} value={String(s.high.score)} rank={rank((x) => x.high.score, "high")} />
-        <Stat label={`Lowest (GW${s.low.event})`} value={String(s.low.score)} rank={rank((x) => x.low.score, "high")} />
-        <Stat label="Average" value={String(s.average)} rank={rank((x) => x.average, "high", ["highest", "lowest"])} />
-        <Stat label="Bench pts" value={String(s.benchPoints)} rank={rank((x) => x.benchPoints, "low", ["fewest", "most"])} />
+        <StatTile label={`Highest (GW${s.high.event})`} value={String(s.high.score)} rank={rank((x) => x.high.score, "high")} />
+        <StatTile label={`Lowest (GW${s.low.event})`} value={String(s.low.score)} rank={rank((x) => x.low.score, "high")} />
+        <StatTile label="Average" value={String(s.average)} rank={rank((x) => x.average, "high", ["highest", "lowest"])} />
+        <StatTile label="Bench pts" value={String(s.benchPoints)} rank={rank((x) => x.benchPoints, "low", ["fewest", "most"])} />
       </div>
       <ul className="plain facts">
         {s.bigWin && (
@@ -427,8 +414,8 @@ function SeasonSummary({
 
       <h3 className="card-title">Players</h3>
       <div className="stat-row">
-        <Stat label="Have played" value={String(s.playersUsed)} rank={rank((x) => x.playersUsed, "neutral", ["most", "fewest"])} />
-        <Stat label="Owned" value={String(s.squadsUsed)} rank={rank((x) => x.squadsUsed, "neutral", ["most", "fewest"])} />
+        <StatTile label="Have played" value={String(s.playersUsed)} rank={rank((x) => x.playersUsed, "neutral", ["most", "fewest"])} />
+        <StatTile label="Owned" value={String(s.squadsUsed)} rank={rank((x) => x.squadsUsed, "neutral", ["most", "fewest"])} />
       </div>
 
       {s.top.length > 0 && (
@@ -449,10 +436,10 @@ function SeasonSummary({
       )}
       <h3 className="card-title">Transfers</h3>
       <div className="stat-row">
-        <Stat label="Trades" value={String(s.trades)} rank={rank((x) => x.trades, "neutral", ["most", "fewest"])} />
-        <Stat label="Trade net" value={`${s.tradeNet > 0 ? "+" : ""}${s.tradeNet}`} rank={rank((x) => x.tradeNet, "high")} />
-        <Stat label="Waivers won" value={String(s.waiversWon)} rank={rank((x) => x.waiversWon, "high", ["most", "fewest"])} />
-        <Stat label="Pickup pts" value={String(s.pickupPoints)} rank={rank((x) => x.pickupPoints, "high", ["most", "fewest"])} />
+        <StatTile label="Trades" value={String(s.trades)} rank={rank((x) => x.trades, "neutral", ["most", "fewest"])} />
+        <StatTile label="Trade net" value={`${s.tradeNet > 0 ? "+" : ""}${s.tradeNet}`} rank={rank((x) => x.tradeNet, "high")} />
+        <StatTile label="Waivers won" value={String(s.waiversWon)} rank={rank((x) => x.waiversWon, "high", ["most", "fewest"])} />
+        <StatTile label="Pickup pts" value={String(s.pickupPoints)} rank={rank((x) => x.pickupPoints, "high", ["most", "fewest"])} />
       </div>
     </section>
   );

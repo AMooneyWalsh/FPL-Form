@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
-import { Manager, nobody, PlayerName, Pts, ShowFilter, useShownManager } from "./bits";
+import { Manager, nobody, PlayerName, Pts, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 import { TradeNetwork } from "./TradeNetwork";
 
@@ -75,10 +75,9 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
       <TradeNetwork ledger={ledger} data={data} myTeam={myTeam} />
 
       <section>
-        <div className="section-head">
-          <h2>Every trade</h2>
+        <SectionHead title="Every trade">
           <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
-        </div>
+        </SectionHead>
         <p className="hint">
           Big number: what each player was worth to the manager who got him. That's his points in their XI, plus, if
           they traded him on, a share of what they got for him. Small number: all his points since, whoever had him.
