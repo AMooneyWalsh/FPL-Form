@@ -3,7 +3,7 @@ import { seasonOdds, squadStrength, type OddsRow } from "../../shared/odds";
 import { lastFinishedEvent } from "../../shared/results";
 import type { Envelope, Player } from "../../shared/types";
 import { useApi } from "./api";
-import { Manager } from "./bits";
+import { Explainer, Manager } from "./bits";
 import type { LeagueData } from "./data";
 
 /** Prizes and forfeits for 2026/27, as agreed in the group chat. `place` is 1-based. */
@@ -79,12 +79,15 @@ export function OddsView({ data, myTeam }: { data: LeagueData; myTeam: number | 
     <>
       <section>
         <h2>Season odds</h2>
-        <p className="hint">
-          We play the rest of the season ({stop - last} gameweeks) 10,000 times and count where everyone ends up. Each
-          manager's likely weekly score mixes what they've scored so far with how strong their squad looks now, so a
-          good trade moves the odds straight away. Early in the season it leans on the squad; later on, results take
-          over. Updates whenever the league data does.
-        </p>
+        <p className="hint">Everyone's chances, from playing the last {stop - last} gameweeks 10,000 times.</p>
+        <Explainer>
+          <p>
+            Each manager's likely weekly score mixes what they've scored so far with how strong their squad looks now, so
+            a good trade moves the odds straight away. Early in the season it leans on the squad; later on, results take
+            over.
+          </p>
+          <p>Updates whenever the league data does.</p>
+        </Explainer>
         {immune && (
           <p className="notice">
             Immune from a forfeit right now:{" "}

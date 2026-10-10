@@ -89,7 +89,8 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 - Findings and the agreed plan: `docs/ux-review-2026-10-10.md`. The two live-gameweek wording bugs are fixed.
 - Design system built: rules in `docs/design-system.md`, live at `#/styleguide`. Tokens at the top of `styles.css`; `Tag`, `StatTile`, `SectionHead`, `Explainer` in `bits.tsx`. "You" is purple now (was green).
-- Next: usability fixes from the review, built on those pieces (`Explainer` isn't used on real pages yet). Regroup with the owner first.
+- Usability batch done (see "Done" in the review doc): Live Fixtures/Bonus by day with folding, slim header, menu fades, fold-away explanations, folded trade cards and waiver gameweeks, plain labels, form on the phone table.
+- Still open from the review: a proper player page, a "My team" view, desktop layout.
 
 ## Checks before merging
 

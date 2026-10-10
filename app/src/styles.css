@@ -137,39 +137,85 @@ body {
 }
 
 .masthead {
-  margin: 0 -16px 16px;
-  padding: 20px 16px 16px;
+  margin: 0 -16px;
+  padding: var(--sp-3) var(--sp-4) var(--sp-2);
   background: var(--brand);
   color: var(--brand-text);
-  margin-bottom: 0;
 }
 
 .masthead h1 {
   margin: 0;
   font-size: var(--fs-xl);
+  white-space: nowrap;
 }
 
 .masthead .sub {
-  margin: 4px 0 0;
+  margin: 0;
+  font-size: var(--fs-sm);
   opacity: 0.8;
 }
 
+/* Deadlines: one tappable line for the next one, the other two underneath when opened. */
 .deadlines {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
-  align-items: start;
-  gap: 8px;
-  margin-top: 14px;
-  padding: 10px 12px;
+  margin: var(--sp-2) 0 0;
   border-radius: var(--r-lg);
   background: var(--on-brand-subtle);
   font-size: var(--fs-sm);
   line-height: 1.3;
 }
 
+.dl-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  min-height: 36px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .dl-gw {
   font-weight: 700;
-  align-self: center;
+}
+
+.dl-next {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dl-in {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dl-chevron {
+  width: 6px;
+  height: 6px;
+  margin: 0 2px 3px 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.75;
+}
+
+.dl-summary[aria-expanded="true"] .dl-chevron {
+  transform: rotate(-135deg);
+  margin-bottom: -3px;
+}
+
+.dl-all {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+  padding: 0 var(--sp-3) var(--sp-2);
 }
 
 .dl {
@@ -193,12 +239,6 @@ body {
 .dl.passed .dl-time {
   font-weight: 400;
   opacity: 0.6;
-}
-
-.dl-in {
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  color: var(--brand-text);
 }
 
 .notice {
@@ -325,6 +365,38 @@ table.standings {
 .standings .manager {
   font-size: var(--fs-sm);
   color: var(--muted);
+}
+
+/* Team and manager names stay on one line each and trim with "…" on small phones. */
+.standings .team-cell {
+  width: 100%;
+  max-width: 0;
+}
+
+.standings .team-cell .team,
+.standings .team-cell .manager {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .standings .form .chip {
+    width: 14px;
+    height: 16px;
+    border-radius: var(--r-sm);
+    font-size: var(--fs-xs);
+  }
+
+  .standings .form {
+    gap: 2px;
+  }
+
+  .standings th,
+  .standings td {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
 }
 
 .standings tr.mine td {
@@ -645,8 +717,11 @@ ol.journey {
 }
 
 .claim {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
   font-size: var(--fs-sm);
-  padding: 3px 8px;
+  padding: var(--sp-1) 10px;
   border-radius: var(--r-pill);
   background: var(--bg);
   color: var(--muted);
@@ -887,17 +962,49 @@ button.more {
 }
 
 /* Section menu under the top tabs. Sticks just below them while scrolling. */
-.chips.subnav {
+.subnav-wrap {
   position: sticky;
   top: var(--tabs-h, 44px);
   z-index: 4;
-  flex-wrap: nowrap;
-  overflow-x: auto;
   margin: -16px -16px 14px;
-  padding: 10px 16px;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
+}
+
+.chips.subnav {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin: 0;
+  padding: 10px 16px;
   scrollbar-width: none;
+}
+
+/* A fade on whichever edge has more chips past it, so it's clear the menu scrolls. */
+.subnav-wrap::before,
+.subnav-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.subnav-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+}
+
+.subnav-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+}
+
+.subnav-wrap.more-left::before,
+.subnav-wrap.more-right::after {
+  opacity: 1;
 }
 
 .chips.subnav .chip-btn {
@@ -1203,7 +1310,7 @@ button.more {
 .masthead-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--sp-2);
 }
 
@@ -2465,7 +2572,76 @@ button.link.search-cancel {
   border-radius: var(--r-sm);
 }
 
-/* ---- live: fixtures and bonus by day, folding cards ---- */
+/* ---- folding: cards that open on tap, and sections that fold away ---- */
+
+.trade-line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+}
+
+.trade-line-who {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trade-line-pts {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.trade-card .card-head {
+  margin-bottom: var(--sp-1);
+}
+
+.trade-card .fold-btn + .trade-sides {
+  margin-top: var(--sp-2);
+}
+
+.fold-section {
+  margin-bottom: var(--sp-2);
+}
+
+.fold-section > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 40px;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  list-style: none;
+}
+
+.fold-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold-section > summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+
+.fold-section[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.fold-section-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+/* ---- live: fixtures and bonus by day ---- */
 
 .lv-day {
   margin: var(--sp-5) 0 var(--sp-2);
@@ -2478,7 +2654,7 @@ button.link.search-cancel {
 }
 
 /* The tappable top of a fixture or bonus card: opens and folds it. */
-.lv-fold {
+.fold-btn {
   display: block;
   width: 100%;
   margin: 0;
@@ -2491,18 +2667,18 @@ button.link.search-cancel {
   cursor: pointer;
 }
 
-.lv-fold:disabled {
+.fold-btn:disabled {
   cursor: default;
 }
 
-.lv-fold-row {
+.fold-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-2);
 }
 
-.lv-fold-meta {
+.fold-meta {
   justify-content: flex-start;
   white-space: nowrap;
   margin-top: 2px;
@@ -2511,7 +2687,7 @@ button.link.search-cancel {
 }
 
 /* What a folded card would show: the bonus places, or the league's scorers. */
-.lv-fold-summary {
+.fold-summary {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;

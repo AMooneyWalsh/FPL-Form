@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Player } from "../../shared/types";
 import { isOut, waiverSuggestions, weakestAt, type FixtureRunItem } from "../../shared/waivers";
-import { PlayerName } from "./bits";
+import { Explainer, PlayerName } from "./bits";
 import type { LeagueData } from "./data";
 
 const POSITIONS = ["All", "GKP", "DEF", "MID", "FWD"] as const;
@@ -38,11 +38,16 @@ export function SuggestionsPage({ data, myTeam }: { data: LeagueData; myTeam: nu
       <section>
         <h2>Waiver suggestions</h2>
         <p className="hint">
-          The best free agents right now. The rating mixes recent form (60%) with points a game this season (40%),
-          then goes up for easy fixtures and down for hard ones. Anyone injured or suspended is left out, and doubts
-          are marked down by their chance of playing.
-          {myTeam !== null && " Each one suggests who in your squad to drop."}
+          The best free agents right now{myTeam !== null && ", and who in your squad to drop for each"}.
         </p>
+        <Explainer>
+          <p>
+            The rating mixes recent form (60%) with points a game this season (40%), then goes up for easy fixtures and
+            down for hard ones. Anyone injured or suspended is left out, and doubts are marked down by their chance of
+            playing.
+          </p>
+          <p>Fixture colours are FPL's own difficulty ratings: green is easy, red is hard.</p>
+        </Explainer>
         <div className="chips small" role="group" aria-label="Position">
           {POSITIONS.map((p) => (
             <button key={p} className={pos === p ? "chip-btn active" : "chip-btn"} onClick={() => setPos(p)}>
@@ -68,11 +73,12 @@ export function SuggestionsPage({ data, myTeam }: { data: LeagueData; myTeam: nu
         ))}
       </section>
 
-      <p className="hint">
-        Fixture colours are FPL's own difficulty ratings: green is easy, red is hard.
-        {!data.officialDifficulty &&
-          " FPL's ratings couldn't be loaded just now, so these are an estimate from each club's FPL points this season."}
-      </p>
+      {!data.officialDifficulty && (
+        <p className="notice warn">
+          FPL's difficulty ratings couldn't be loaded just now, so fixture colours are an estimate from each club's FPL
+          points this season.
+        </p>
+      )}
     </>
   );
 }

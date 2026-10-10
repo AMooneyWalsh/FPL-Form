@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { isOut } from "../../shared/waivers";
-import { Explainer, Manager, PlayerName, Pts, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
+import { Explainer, FoldSection, Manager, PlayerName, Pts, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
 
 /**
@@ -164,6 +164,27 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
           <p>Longer explanations go in here, folded away, so the numbers come first.</p>
           <p>Use it for anything over one line: how a score is worked out, what a column means.</p>
         </Explainer>
+      </section>
+
+      <section>
+        <h2>Folding</h2>
+        <FoldSection title="Gameweek 6" count="4 battles" open>
+          <div className="card">
+            <button className="fold-btn" aria-expanded={false}>
+              <span className="fold-row">
+                <strong>A card that opens on tap</strong>
+                <Tag tone="live">Live</Tag>
+              </span>
+              <span className="fold-row fold-meta">
+                <span>14:00 · FT</span>
+                <span className="fold-summary">Folded, it shows a one-line summary</span>
+              </span>
+            </button>
+          </div>
+        </FoldSection>
+        <FoldSection title="Gameweek 5" count="12 battles">
+          <p className="hint">Older groups start folded.</p>
+        </FoldSection>
       </section>
 
       <section>

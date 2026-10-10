@@ -68,10 +68,7 @@ export function App() {
     <div className="page">
       <header className="masthead">
         <div className="masthead-row">
-          <div>
-            <h1>{ready?.league.league.name ?? "Drafty In Here"}</h1>
-            {ready && <p className="sub">{headline(ready)}</p>}
-          </div>
+          <h1>{ready?.league.league.name ?? "Drafty In Here"}</h1>
           {ready && (
             <div className="masthead-tools">
               <SearchButton data={ready} />
@@ -79,6 +76,7 @@ export function App() {
             </div>
           )}
         </div>
+        {ready && <p className="sub">{headline(ready)}</p>}
         {ready && <DeadlineBanner data={ready} />}
       </header>
       <nav className="tabs" aria-label="Pages">
@@ -157,26 +155,42 @@ export function App() {
 }
 
 const DEADLINE_LABELS: Record<DeadlineKind, string> = { trades: "Trades", waivers: "Waivers", team: "Team deadline" };
+const NEXT_LABELS: Record<DeadlineKind, string> = { trades: "Trades close", waivers: "Waivers", team: "Team deadline" };
 
-/** The next gameweek's trade, waiver and team deadlines, in the viewer's own time zone. */
+/**
+ * The next gameweek's deadlines, in the viewer's own time zone. One line for
+ * the next one with a countdown; tap it for all three.
+ */
 function DeadlineBanner({ data }: { data: LeagueData }) {
   const [now, setNow] = useState(Date.now);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
   const up = upcomingDeadlines(data.deadlines, now);
   if (!up) return null;
+  const next = up.items.find((d) => d.kind === up.next)!;
   return (
     <section className="deadlines" aria-label={`Gameweek ${up.event} deadlines`}>
-      <span className="dl-gw">GW{up.event}</span>
-      {up.items.map((d) => (
-        <div key={d.kind} className={`dl${d.passed ? " passed" : ""}${d.kind === up.next ? " next" : ""}`}>
-          <span className="dl-label">{DEADLINE_LABELS[d.kind]}</span>
-          <span className="dl-time">{d.passed ? "Closed" : deadlineTime(d.at, now)}</span>
-          {d.kind === up.next && <span className="dl-in">{countdown(d.at, now)}</span>}
+      <button className="dl-summary" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span className="dl-gw">GW{up.event}</span>
+        <span className="dl-next">
+          {NEXT_LABELS[next.kind]} <strong>{deadlineTime(next.at, now)}</strong>
+        </span>
+        <span className="dl-in">{countdown(next.at, now)}</span>
+        <span className="dl-chevron" aria-hidden="true" />
+      </button>
+      {open && (
+        <div className="dl-all">
+          {up.items.map((d) => (
+            <div key={d.kind} className={`dl${d.passed ? " passed" : ""}`}>
+              <span className="dl-label">{DEADLINE_LABELS[d.kind]}</span>
+              <span className="dl-time">{d.passed ? "Closed" : deadlineTime(d.at, now)}</span>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </section>
   );
 }

@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
-import { Manager, nobody, PlayerName, Pts, SectionHead, ShowFilter, useShownManager } from "./bits";
+import { Explainer, Manager, nobody, PlayerName, Pts, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 import { TradeNetwork } from "./TradeNetwork";
 
@@ -15,10 +15,14 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
     <>
       <section>
         <h2>Who's winning at trading</h2>
-        <p className="hint">
-          Points the players they traded for have scored for them, minus points the players they gave away have scored
-          since. Only points from the starting XI count.
-        </p>
+        <p className="hint">Points from the players they got, minus points from the players they gave away.</p>
+        <Explainer>
+          <p>
+            The players they got count what they've scored in that manager's starting XI. The players they gave away
+            count what they've scored in their new owner's starting XI. Bench points don't count, and a player they'd
+            got in a trade themselves isn't counted again when they pass him on.
+          </p>
+        </Explainer>
         <div className="table-wrap">
           <table className="data">
             <thead>
@@ -78,31 +82,81 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
         <SectionHead title="Every trade">
           <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
         </SectionHead>
-        <p className="hint">
-          Big number: what each player was worth to the manager who got him. That's his points in their XI, plus, if
-          they traded him on, a share of what they got for him. Small number: all his points since, whoever had him.
-        </p>
+        <p className="hint">Newest first. Tap a trade to see each player's points.</p>
+        <Explainer>
+          <p>
+            Each player's number is what he was worth to the manager who got him: his points in their starting XI, plus,
+            if they traded him on, a share of what they got for him.
+          </p>
+          <p>"In all" is everything he's scored since the trade, for whoever had him, bench included.</p>
+        </Explainer>
         {shown.length === 0 && (
           <p className="notice">{who === null ? "No trades yet this season." : nobody(data, who, myTeam, "made any trades")}</p>
         )}
         {shown.map((v) => (
-          <TradeCard key={v.id} v={v} data={data} myTeam={myTeam} />
+          <TradeCard key={v.id} v={v} data={data} myTeam={myTeam} folded />
         ))}
       </section>
     </>
   );
 }
 
-export function TradeCard({ v, data, myTeam }: { v: TradeVerdict; data: LeagueData; myTeam: number | null }) {
+/** Asks the trade card with this id to open, e.g. when a "traded on" link points at it. */
+const OPEN_TRADE = "open-trade";
+
+/**
+ * One trade. `folded` starts it as a short summary (who got whom, and the
+ * verdict) that opens on tap, for long lists.
+ */
+export function TradeCard({
+  v,
+  data,
+  myTeam,
+  folded = false,
+}: {
+  v: TradeVerdict;
+  data: LeagueData;
+  myTeam: number | null;
+  folded?: boolean;
+}) {
+  const [open, setOpen] = useState(!folded);
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      if ((e as CustomEvent<number>).detail === v.id) setOpen(true);
+    };
+    window.addEventListener(OPEN_TRADE, onOpen);
+    return () => window.removeEventListener(OPEN_TRADE, onOpen);
+  }, [v.id]);
   const date = new Date(v.time).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  const mine = v.offerer.entryId === myTeam || v.receiver.entryId === myTeam;
+  const head = (
+    <header className="card-head">
+      <span>
+        GW{v.event} · {date}
+      </span>
+      <Verdict v={v} data={data} />
+    </header>
+  );
+  if (!open) {
+    return (
+      <article className={`card trade-card${mine ? " mine-card" : ""}`} id={`trade-${v.id}`}>
+        <button className="fold-btn" onClick={() => setOpen(true)} aria-expanded={false}>
+          {head}
+          <SideLine side={v.offerer} v={v} data={data} />
+          <SideLine side={v.receiver} v={v} data={data} />
+        </button>
+      </article>
+    );
+  }
   return (
-    <article className="card" id={`trade-${v.id}`}>
-      <header className="card-head">
-        <span>
-          GW{v.event} · {date}
-        </span>
-        <Verdict v={v} data={data} />
-      </header>
+    <article className={`card trade-card${mine ? " mine-card" : ""}`} id={`trade-${v.id}`}>
+      {folded ? (
+        <button className="fold-btn" onClick={() => setOpen(false)} aria-expanded={true}>
+          {head}
+        </button>
+      ) : (
+        head
+      )}
       <div className="trade-sides">
         <Side side={v.offerer} v={v} data={data} myTeam={myTeam} />
         <Side side={v.receiver} v={v} data={data} myTeam={myTeam} />
@@ -118,6 +172,25 @@ export function TradeCard({ v, data, myTeam }: { v: TradeVerdict; data: LeagueDa
           </p>
         ))}
     </article>
+  );
+}
+
+/** A folded trade's side in one line: "Daire got Suzuki, Richards, Enzo +3 · 2 pts". */
+function SideLine({ side, v, data }: { side: TradeSide; v: TradeVerdict; data: LeagueData }) {
+  const names = side.received.map((p) => data.players.get(p.element)?.name ?? "someone");
+  const won = !v.pending && v.winner === side.entryId;
+  return (
+    <span className="trade-line">
+      <span className="trade-line-who">
+        <strong>{data.labels.get(side.entryId)}</strong> got {names.slice(0, 3).join(", ")}
+        {names.length > 3 && ` +${names.length - 3}`}
+      </span>
+      {!v.pending && (
+        <span className={won ? "trade-line-pts pts-pos" : "trade-line-pts"}>
+          {Math.round(side.total)} {Math.round(side.total) === 1 ? "pt" : "pts"}
+        </span>
+      )}
+    </span>
   );
 }
 
@@ -144,7 +217,8 @@ function Side({ side, v, data, myTeam }: { side: TradeSide; v: TradeVerdict; dat
             <PlayerName id={p.element} data={data} />
             {!v.pending && (
               <span className="pts">
-                {Math.round(p.value)} <span className="raw">({p.raw})</span>
+                {Math.round(p.value)}
+                {p.raw !== Math.round(p.value) && <span className="raw"> ({p.raw} in all)</span>}
               </span>
             )}
             {!v.pending && <Trail p={p} data={data} />}
@@ -153,7 +227,8 @@ function Side({ side, v, data, myTeam }: { side: TradeSide; v: TradeVerdict; dat
       </ul>
       {!v.pending && (
         <div className="side-total">
-          {Math.round(side.total)} pts <span className="raw">· on paper {side.raw}</span>
+          {Math.round(side.total)} pts
+          {side.raw !== Math.round(side.total) && <span className="raw"> · {side.raw} in all</span>}
         </div>
       )}
     </div>
@@ -176,7 +251,10 @@ function Trail({ p, data }: { p: TradedPlayer; data: LeagueData }) {
         {p.points !== 0 && `${p.points} for them, then `}
         <button
           className="inline-link"
-          onClick={() => document.getElementById(`trade-${o.tradeId}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}
+          onClick={() => {
+            window.dispatchEvent(new CustomEvent(OPEN_TRADE, { detail: o.tradeId }));
+            document.getElementById(`trade-${o.tradeId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
         >
           ↳ traded on in GW{o.event} for {names}
         </button>{" "}
