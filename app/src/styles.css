@@ -1801,34 +1801,25 @@ table.lv-bonus td {
 .lv-imp-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   min-width: 0;
 }
 
-/* Name and points on the first line; badges and owner under it. */
+/* One row per owned player: name and points, then what he did and who owns him. */
 .lv-imp {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   column-gap: 6px;
-  row-gap: 2px;
-  padding: 5px 6px;
-  border-radius: 8px;
+  row-gap: 3px;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
   font-size: 13px;
-}
-
-/* Players nobody in the league owns are there for context, so quieter. */
-.lv-imp:not(.owned) {
-  color: var(--muted);
-}
-
-.lv-imp.owned {
-  background: var(--bg);
 }
 
 .lv-imp.mine {
   background: var(--mine);
   box-shadow: inset 3px 0 0 var(--win);
+  padding-left: 7px;
 }
 
 .lv-imp-name {
@@ -1849,15 +1840,92 @@ table.lv-bonus td {
   align-items: center;
 }
 
-.lv-imp-owner {
+.lv-owner {
   justify-self: end;
-  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
   font-weight: 700;
+  white-space: nowrap;
+  background: var(--chip, var(--line));
   color: var(--text);
 }
 
-.lv-imp.mine .lv-imp-owner {
-  color: var(--win);
+.lv-owner.mine {
+  background: var(--win);
+  color: #fff;
+}
+
+/* Players nobody owns: there for context, so one small line. */
+.lv-imp-others {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.lv-imp-others-label {
+  font-weight: 700;
+}
+
+.lv-imp-other {
+  white-space: nowrap;
+}
+
+.lv-imp-other .lv-badge,
+.lv-imp-other .lv-card {
+  margin-left: 1px;
+  transform: scale(0.9);
+}
+
+.lv-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.lv-sub {
+  margin: 18px 0 8px;
+  font-size: 15px;
+}
+
+.lv-upcoming {
+  padding: 4px 14px;
+}
+
+.lv-up-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.lv-up-row:last-child {
+  border-bottom: 0;
+}
+
+.lv-up-teams {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.lv-up-teams .lv-shirt {
+  width: 20px;
+  height: 20px;
+}
+
+.lv-up-when {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .lv-badge {
@@ -1879,8 +1947,9 @@ table.lv-bonus td {
   background: var(--series-1);
 }
 
+/* Not orange or yellow, so bonus can't be mistaken for a yellow card. */
 .lv-badge.b {
-  background: var(--series-4);
+  background: #7c4dcc;
 }
 
 .lv-badge.dc {
@@ -1907,10 +1976,6 @@ table.lv-bonus td {
   background: var(--loss);
 }
 
-.lv-legend .lv-badge,
-.lv-legend .lv-card {
-  margin-left: 2px;
-}
 
 @media (max-width: 360px) {
   .lv-nums {
