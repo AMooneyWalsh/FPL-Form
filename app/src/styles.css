@@ -1445,6 +1445,42 @@ button.small-link {
   border-bottom: 3px solid color-mix(in srgb, var(--muted) 45%, transparent);
 }
 
+/* On the pitch right now and counting: the thing to watch. A red edge and a
+   faint tint. Bench players who don't count are left alone. */
+.lv-row.playing:not(.benched):not(.off) .lv-row-main {
+  background: color-mix(in srgb, var(--loss) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--loss);
+  padding-left: 6px;
+}
+
+/* Yet to play: the points are a dash, so mute them. */
+.lv-row.to-play .lv-row-pts {
+  color: var(--muted);
+}
+
+/* The minute of a match that's under way. */
+.lv-clock {
+  color: var(--loss);
+  font-weight: 700;
+}
+
+.lv-clock::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 3px 1px 0;
+  border-radius: 50%;
+  background: var(--loss);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lv-clock::before {
+    animation: none;
+  }
+}
+
 /* Greyed: bench players who don't count, and starters who were subbed off. */
 .lv-row.benched .lv-row-main,
 .lv-row.off .lv-row-main {
