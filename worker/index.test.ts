@@ -285,7 +285,8 @@ describe("live route", () => {
     upstream.mockClear();
     vi.setSystemTime(new Date("2026-09-30T12:00:40Z"));
     await get("/api/live/6", env);
-    expect(paths()).toEqual(["event/6/live"]);
+    // Scores and the main game's match minutes; the lineups come from the cache.
+    expect(paths().sort()).toEqual(["event/6/live", "https://fantasy.premierleague.com/api/fixtures/?event=6"]);
   });
 
   it("keeps asking for a lineup that failed to load", async () => {
@@ -311,6 +312,21 @@ describe("live route", () => {
     expect((await get("/api/live/6", env)).headers.get("Cache-Control")).toBe("public, max-age=30");
     vi.setSystemTime(new Date("2026-09-30T12:00:20Z"));
     expect((await get("/api/live/6", env)).headers.get("Cache-Control")).toBe("public, max-age=10");
+  });
+
+  it("takes the match minute from the main game, as the Draft API sends 0", async () => {
+    const zero = { ...live, fixtures: [{ ...live.fixtures[0], minutes: 0 }] };
+    upstream.mockImplementation(async (input) => {
+      const url = String(input);
+      if (url === "https://fantasy.premierleague.com/api/fixtures/?event=6") return new Response(JSON.stringify([{ id: 9, minutes: 63 }]));
+      const path = url.replace("https://draft.premierleague.com/api/", "");
+      if (path === "game") return new Response(JSON.stringify({ current_event: 6, current_event_finished: false }));
+      if (path === "league/634/details") return new Response(JSON.stringify(league));
+      if (/^event\/\d+\/live$/.test(path)) return new Response(JSON.stringify(zero));
+      return new Response(JSON.stringify({ picks: [], subs: [] }));
+    });
+    const body = (await (await get("/api/live/6", makeEnv())).json()) as { data: { fixtures: { minutes: number }[] } };
+    expect(body.data.fixtures[0].minutes).toBe(63);
   });
 
   it("refuses gameweeks too far ahead", async () => {
