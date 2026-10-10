@@ -834,31 +834,62 @@ function DefconList({ rows, points, ctx }: { rows: DefconRow[]; points: Record<P
 
 
 function FixturesView({ ctx }: { ctx: Ctx }) {
-  const fixtures = [...ctx.gw.fixtures].sort((a, b) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id);
   const info = useMemo(
     () => new Map<number, PlayerInfo>(ctx.data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }])),
     [ctx.data.playerList],
   );
   const limits = (ctx.data.rules.defcon ?? DEFAULT_DEFCON).limit;
+  const byKickoff = (a: LiveFixture, b: LiveFixture) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id;
+  // What's happening now first, then what's done (latest first), then what's still to come.
+  const live = ctx.gw.fixtures.filter((f) => f.started && !f.finishedProvisional).sort(byKickoff);
+  const done = ctx.gw.fixtures.filter((f) => f.finishedProvisional).sort((a, b) => byKickoff(b, a));
+  const upcoming = ctx.gw.fixtures.filter((f) => !f.started).sort(byKickoff);
   return (
     <section>
       <h2>Premier League fixtures</h2>
-      <p className="hint lv-legend">
-        Everyone whose points moved, by team, with his points and who owns him.{" "}
-        <span className="lv-badge g">G</span> goal <span className="lv-badge a">A</span> assist{" "}
-        <span className="lv-card y" /> <span className="lv-card r" /> cards <span className="lv-badge b">B</span> bonus{" "}
-        <span className="lv-badge dc">DC</span> defensive contributions
+      <p className="lv-legend">
+        <span>
+          <span className="lv-badge g">G</span> goal
+        </span>
+        <span>
+          <span className="lv-badge a">A</span> assist
+        </span>
+        <span>
+          <span className="lv-card y" /> <span className="lv-card r" /> card
+        </span>
+        <span>
+          <span className="lv-badge b">B</span> bonus
+        </span>
+        <span>
+          <span className="lv-badge dc">DC</span> DefCon
+        </span>
       </p>
-      {fixtures.map((f) => (
-        <FixtureCard key={f.id} f={f} ctx={ctx} impacts={f.started ? fixtureImpacts(f, ctx.gw, info, limits) : null} />
+      {[...live, ...done].map((f) => (
+        <FixtureCard key={f.id} f={f} ctx={ctx} impacts={fixtureImpacts(f, ctx.gw, info, limits)} />
       ))}
+      {upcoming.length > 0 && (
+        <>
+          <h3 className="lv-sub">Still to play</h3>
+          <div className="card lv-upcoming">
+            {upcoming.map((f) => (
+              <div key={f.id} className="lv-up-row">
+                <span className="lv-up-teams">
+                  <Shirt teamId={f.teamH} gk={false} ctx={ctx} />
+                  {ctx.clubs.get(f.teamH)?.short} v {ctx.clubs.get(f.teamA)?.short}
+                  <Shirt teamId={f.teamA} gk={false} ctx={ctx} />
+                </span>
+                <span className="lv-up-when">{f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }
 
-function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: { home: Impact[]; away: Impact[] } | null }) {
-  const live = f.started && !f.finishedProvisional;
-  const status = f.finishedProvisional ? "FT" : f.started ? clock(f) : f.kickoff ? formatKickoff(f.kickoff, true) : "TBC";
+function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: { home: Impact[]; away: Impact[] } }) {
+  const live = !f.finishedProvisional;
   const side = (teamId: number, right?: boolean) => (
     <span className={`lv-fx-side ${right ? "right" : ""}`}>
       <Shirt teamId={teamId} gk={false} ctx={ctx} />
@@ -870,12 +901,14 @@ function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: {
       <header className="lv-fx-top">
         {side(f.teamH)}
         <span className="lv-fx-mid">
-          <span className="lv-fx-score">{f.started ? `${f.scoreH ?? 0} – ${f.scoreA ?? 0}` : "v"}</span>
-          <span className={live ? "lv-fx-state lv-clock" : "lv-fx-state"}>{status}</span>
+          <span className="lv-fx-score">
+            {f.scoreH ?? 0} – {f.scoreA ?? 0}
+          </span>
+          <span className={live ? "lv-fx-state lv-clock" : "lv-fx-state"}>{live ? clock(f) : "FT"}</span>
         </span>
         {side(f.teamA, true)}
       </header>
-      {impacts && (impacts.home.length > 0 || impacts.away.length > 0) && (
+      {(impacts.home.length > 0 || impacts.away.length > 0) && (
         <div className="lv-fx-cols">
           <ImpactList list={impacts.home} ctx={ctx} />
           <ImpactList list={impacts.away} ctx={ctx} />
@@ -885,23 +918,37 @@ function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: {
   );
 }
 
+/** Owned players get a row each; players nobody owns share one quiet line at the bottom. */
 function ImpactList({ list, ctx }: { list: Impact[]; ctx: Ctx }) {
+  const owned = list.filter((i) => ctx.data.owners.get(i.element));
+  const others = list.filter((i) => !ctx.data.owners.get(i.element));
   return (
     <div className="lv-imp-list">
-      {list.map((i) => {
-        const owner = ctx.data.owners.get(i.element);
-        const mine = owner !== undefined && owner !== null && owner === ctx.myTeam;
+      {owned.map((i) => {
+        const owner = ctx.data.owners.get(i.element)!;
+        const mine = owner === ctx.myTeam;
         return (
-          <div key={i.element} className={`lv-imp ${owner ? "owned" : ""} ${mine ? "mine" : ""}`}>
+          <div key={i.element} className={`lv-imp ${mine ? "mine" : ""}`}>
             <span className="lv-imp-name">{ctx.data.players.get(i.element)?.name ?? i.element}</span>
             <span className="lv-imp-pts">{i.points}</span>
             <span className="lv-imp-badges">
               <Badges i={i} />
             </span>
-            {owner ? <span className="lv-imp-owner">{ctx.data.labels.get(owner)}</span> : null}
+            <span className={`lv-owner ${mine ? "mine" : ""}`}>{ctx.data.labels.get(owner)}</span>
           </div>
         );
       })}
+      {others.length > 0 && (
+        <p className="lv-imp-others">
+          <span className="lv-imp-others-label">Unowned:</span>{" "}
+          {others.map((i, n) => (
+            <span key={i.element} className="lv-imp-other">
+              {ctx.data.players.get(i.element)?.name ?? i.element} <Badges i={i} />
+              {n < others.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </p>
+      )}
     </div>
   );
 }
