@@ -36,6 +36,11 @@ export interface LiveElement {
   stats: Partial<Record<StatKey | "minutes", number>>;
   /** Where his points came from: [stat, count, points], e.g. ["clean_sheets", 1, 4]. */
   breakdown: [string, number, number][];
+  /**
+   * Points in each match, keyed by fixture id. Only set in a double gameweek,
+   * where `points` covers both matches and a match report needs just its own.
+   */
+  byFixture?: Record<number, number>;
 }
 
 /** Match events, for the fixtures view. */
@@ -145,10 +150,12 @@ export function toLiveGameweek(event: number, raw: RawLiveResponse, picks: Recor
     }
     // Merge double-gameweek lines so "Minutes" appears once with both games added.
     const merged = new Map<string, [number, number]>();
-    for (const [items] of el.explain ?? []) {
+    const byFixture: Record<number, number> = {};
+    for (const [items, fixture] of el.explain ?? []) {
       for (const x of items) {
         const cur = merged.get(x.stat) ?? [0, 0];
         merged.set(x.stat, [cur[0] + x.value, cur[1] + x.points]);
+        byFixture[fixture] = (byFixture[fixture] ?? 0) + x.points;
       }
     }
     elements[Number(id)] = {
@@ -159,6 +166,7 @@ export function toLiveGameweek(event: number, raw: RawLiveResponse, picks: Recor
       starts: s.starts ?? 0,
       stats,
       breakdown: [...merged.entries()].map(([stat, [value, points]]) => [stat, value, points]),
+      ...(Object.keys(byFixture).length > 1 ? { byFixture } : {}),
     };
   }
   const fixtures: LiveFixture[] = raw.fixtures.map((f) => {
@@ -608,7 +616,8 @@ export interface Impact {
 
 /**
  * Per side of a match, every player who scored, assisted, was carded, got
- * bonus or earned DefCon, highest points first. For a match report.
+ * bonus or earned DefCon, highest points first. For a match report. In a
+ * double gameweek the points are this match's only.
  */
 export function fixtureImpacts(
   f: LiveFixture,
@@ -623,7 +632,7 @@ export function fixtureImpacts(
       const el = gw.elements[element];
       i = {
         element, home, goals: 0, assists: 0, ownGoals: 0, pensSaved: 0, pensMissed: 0, yellow: 0, red: 0,
-        bonus: 0, bonusProvisional: false, defcon: false, points: el?.points ?? 0,
+        bonus: 0, bonusProvisional: false, defcon: false, points: el?.byFixture?.[f.id] ?? el?.points ?? 0,
       };
       byId.set(element, i);
     }

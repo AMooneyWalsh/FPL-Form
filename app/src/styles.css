@@ -1713,9 +1713,6 @@ button.small-link {
   font-weight: 600;
 }
 
-.lv-fx-head {
-  align-items: center;
-}
 
 .lv-fx-title {
   color: var(--text);
@@ -1723,16 +1720,9 @@ button.small-link {
   font-size: var(--fs-md);
 }
 
-.lv-conf {
-  color: var(--good);
-  font-weight: 700;
-}
 
-.lv-prov {
-  color: var(--muted);
-  font-weight: 700;
-}
 
+table.lv-bonus th,
 table.lv-bonus td {
   padding: 6px 4px;
 }
@@ -1797,10 +1787,6 @@ table.lv-bonus td {
   font-weight: 700;
 }
 
-.lv-bps-note {
-  margin: 4px 0 0;
-  text-align: right;
-}
 
 /* ---- fixtures: one match report per card ---- */
 
@@ -1968,7 +1954,7 @@ table.lv-bonus td {
 
 .lv-up-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 8px;
   padding: 7px 0;
@@ -1992,11 +1978,6 @@ table.lv-bonus td {
   height: 20px;
 }
 
-.lv-up-when {
-  font-size: var(--fs-sm);
-  color: var(--muted);
-  white-space: nowrap;
-}
 
 .lv-badge {
   display: inline-block;
@@ -2482,4 +2463,77 @@ button.link.search-cancel {
   height: 12px;
   background: var(--series-1);
   border-radius: var(--r-sm);
+}
+
+/* ---- live: fixtures and bonus by day, folding cards ---- */
+
+.lv-day {
+  margin: var(--sp-5) 0 var(--sp-2);
+}
+
+.lv-legend + .lv-day,
+.explainer + .lv-day,
+.notice + .lv-day {
+  margin-top: var(--sp-3);
+}
+
+/* The tappable top of a fixture or bonus card: opens and folds it. */
+.lv-fold {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lv-fold:disabled {
+  cursor: default;
+}
+
+.lv-fold-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.lv-fold-meta {
+  justify-content: flex-start;
+  white-space: nowrap;
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* What a folded card would show: the bonus places, or the league's scorers. */
+.lv-fold-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.lv-fx-summary {
+  display: block;
+  margin-top: var(--sp-2);
+  text-align: center;
+}
+
+.lv-bonus-card[open],
+.lv-bonus-card .lv-bonus {
+  margin-top: var(--sp-2);
+}
+
+.lv-up-time {
+  min-width: 44px;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
 }

@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import {
   bonusTable,
   defconTable,
@@ -8,6 +8,7 @@ import {
   liveMatches,
   liveTable,
   topPerformers,
+  type BonusRow,
   type DefconRow,
   type Impact,
   type LiveFixture,
@@ -22,7 +23,7 @@ import {
 import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope, Player, TeamSheets } from "../../shared/types";
 import { useApi } from "./api";
-import { InjuryFlag, Manager, SectionHead, SubNav, Tag, type TagTone } from "./bits";
+import { Explainer, InjuryFlag, Manager, PlayerName, SectionHead, SubNav, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
 import { StandingsTable } from "./StandingsTable";
 
@@ -724,106 +725,194 @@ function TableView({ ctx }: { ctx: Ctx }) {
 const DEFAULT_DEFCON = { limit: { GKP: 0, DEF: 10, MID: 12, FWD: 12 }, points: { GKP: 0, DEF: 2, MID: 2, FWD: 2 } };
 
 function BonusView({ ctx }: { ctx: Ctx }) {
-  const table = useMemo(() => bonusTable(ctx.gw), [ctx.gw]);
+  // Everyone's BPS, so the card can pick the bonus places plus league players close to them.
+  const table = useMemo(() => new Map(bonusTable(ctx.gw, Infinity).map((t) => [t.fixture.id, t.rows])), [ctx.gw]);
   const defcon = ctx.data.rules.defcon ?? DEFAULT_DEFCON;
   const defcons = useMemo(() => {
     const info = new Map<number, PlayerInfo>(ctx.data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }]));
     return defconTable(ctx.gw, info, defcon.limit);
   }, [ctx.gw, ctx.data.playerList, defcon]);
-  const started = table.filter((t) => t.rows.length > 0);
-  const waiting = table.filter((t) => t.rows.length === 0);
   return (
     <section>
       <h2>Bonus points</h2>
-      <p className="hint">
-        The three best BPS in each match get 3, 2 and 1 bonus points (ties share). Until FPL confirms it, this is our
-        working-out from the live BPS, so it can change while a match is on. A manager's name shows who in the league owns
-        the player.
-      </p>
-      <p className="hint">
-        Defensive contributions (DefCon): a defender gets {defcon.points.DEF} points for {defcon.limit.DEF} clearances,
-        blocks, interceptions and tackles in a match; a midfielder or forward needs {defcon.limit.MID}, and ball recoveries
-        count too. Each match lists who has got there and who is close.
-      </p>
-      {started.length === 0 && <p className="notice">Bonus appears once matches start.</p>}
-      {started.map(({ fixture, rows }) => (
-        <article key={fixture.id} className="card">
-          <header className="card-head lv-fx-head">
-            <span className="lv-fx-title">{fixtureTitle(fixture, ctx)}</span>
-            <span className={fixture.bonusConfirmed ? "lv-conf" : "lv-prov"}>
-              {fixture.bonusConfirmed ? "Confirmed" : "Provisional"}
-            </span>
-          </header>
-          <table className="data lv-bonus">
-            <tbody>
-              {rows.map((r) => {
-                const player = ctx.data.players.get(r.element);
-                const owner = ctx.owners.get(r.element);
-                return (
-                  <tr key={r.element} className={owner?.entryId === ctx.myTeam ? "mine" : undefined}>
-                    <td className="lv-bonus-pts">{r.bonus > 0 ? <span className={`lv-b b${r.bonus}`}>{r.bonus}</span> : null}</td>
-                    <td className="left">
-                      {player?.name ?? r.element} <span className="player-meta">{player?.team}</span>
-                    </td>
-                    <td className="left lv-bonus-owner">
-                      {owner ? (
-                        <>
-                          <Manager id={owner.entryId} data={ctx.data} />
-                          {!owner.counts && <span className="player-meta"> bench</span>}
-                        </>
-                      ) : null}
-                    </td>
-                    <td className="num">{r.bps}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <p className="hint lv-bps-note">Last column is BPS.</p>
-          <DefconList rows={defcons.get(fixture.id) ?? []} points={defcon.points} ctx={ctx} />
-        </article>
-      ))}
-      {waiting.length > 0 && (
-        <p className="hint">
-          Not started: {waiting.map((t) => fixtureTitle(t.fixture, ctx)).join(", ")}.
+      <Explainer>
+        <p>
+          The three best BPS (bonus points system scores) in each match get 3, 2 and 1 bonus points. Ties share. While a
+          match is on, this is our working-out from the live BPS, so it can change. After full time FPL checks the match
+          and confirms it.
         </p>
-      )}
+        <p>
+          While a match is on, each one shows the bonus places plus anyone in the league within {NEAR_BONUS} BPS of
+          them. After full time it shows who got the bonus.
+        </p>
+        <p>
+          Defensive contributions (DefCon): a defender gets {defcon.points.DEF} points for {defcon.limit.DEF} clearances,
+          blocks, interceptions and tackles in a match; a midfielder or forward needs {defcon.limit.MID}, and ball
+          recoveries count too. While a match is on, it lists who has got there and who is close.
+        </p>
+      </Explainer>
+      {ctx.gw.fixtures.every((f) => !f.started) && <p className="notice">Bonus appears once matches start.</p>}
+      {fixtureDays(ctx.gw.fixtures).map((d) => (
+        <Fragment key={d.key}>
+          <h3 className="lv-day">{d.label}</h3>
+          {d.started.map((f) => (
+            <BonusCard
+              key={f.id}
+              f={f}
+              rows={table.get(f.id) ?? []}
+              defcons={defcons.get(f.id) ?? []}
+              points={defcon.points}
+              ctx={ctx}
+              startOpen={startsOpen(f, ctx, [...(table.get(f.id) ?? []).filter((r) => r.bonus > 0), ...(defcons.get(f.id) ?? []).filter((r) => r.earned)])}
+            />
+          ))}
+          {d.upcoming.length > 0 && <UpcomingList list={d.upcoming} ctx={ctx} />}
+        </Fragment>
+      ))}
     </section>
   );
 }
 
-function DefconList({ rows, points, ctx }: { rows: DefconRow[]; points: Record<Player["position"], number>; ctx: Ctx }) {
+/** League players this close to the last bonus place are worth watching. */
+const NEAR_BONUS = 5;
+
+const STATE_TAGS: Record<Exclude<FxState, "upcoming">, [TagTone, string]> = {
+  live: ["live", "Live"],
+  waiting: ["warn", "Waiting for FPL"],
+  done: ["good", "Confirmed"],
+};
+
+function BonusCard({
+  f,
+  rows,
+  defcons,
+  points,
+  ctx,
+  startOpen,
+}: {
+  f: LiveFixture;
+  rows: BonusRow[];
+  defcons: DefconRow[];
+  points: Record<Player["position"], number>;
+  ctx: Ctx;
+  startOpen: boolean;
+}) {
+  const [open, setOpen] = useState(startOpen);
+  const state = fxState(f) as Exclude<FxState, "upcoming">;
+  const [tone, label] = STATE_TAGS[state];
+  const winners = rows.filter((r) => r.bonus > 0);
+  const line = Math.min(...winners.map((r) => r.bps));
+  // While it's on, league players close enough to catch up are worth watching. After full time, only the bonus counts.
+  const shown = rows.filter((r) => r.bonus > 0 || (state === "live" && ctx.owners.has(r.element) && r.bps >= line - NEAR_BONUS));
+  const dcShown = state === "live" ? defcons : defcons.filter((r) => r.earned);
+  const name = (id: number) => ctx.data.players.get(id)?.name ?? String(id);
+  return (
+    <article className={`card lv-fx lv-bonus-card ${state === "live" ? "is-live" : ""}`}>
+      <button className="lv-fold" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span className="lv-fold-row">
+          <span className="lv-fx-title">{scoreLine(f, ctx)}</span>
+          <Tag tone={tone}>{label}</Tag>
+        </span>
+        <span className="lv-fold-row lv-fold-meta">
+          <span className={state === "live" ? "lv-clock" : undefined}>{stateText(f)}</span>
+          {!open && winners.length > 0 && (
+            <span className="lv-fold-summary">{winners.map((r) => `${name(r.element)} ${r.bonus}`).join(" · ")}</span>
+          )}
+        </span>
+      </button>
+      {open && (
+        <>
+          <table className="data lv-bonus">
+            <thead>
+              <tr>
+                <th className="lv-bonus-pts">
+                  <span className="sr-only">Bonus</span>
+                </th>
+                <th className="left">Player</th>
+                <th className="left">Owner</th>
+                <th className="num">BPS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((r) => (
+                <OwnedRow key={r.element} element={r.element} ctx={ctx} lead={r.bonus > 0 ? <span className={`lv-b b${r.bonus}`}>{r.bonus}</span> : null}>
+                  <td className="num">{r.bps}</td>
+                </OwnedRow>
+              ))}
+            </tbody>
+          </table>
+          <DefconList rows={dcShown} points={points} ctx={ctx} empty={state === "live" ? "Nobody close yet." : "Nobody earned it."} />
+        </>
+      )}
+    </article>
+  );
+}
+
+/** One player row in the bonus and DefCon tables: a lead cell, his name, his owner, then the caller's cells. */
+function OwnedRow({ element, ctx, lead, children }: { element: number; ctx: Ctx; lead: ReactNode; children: ReactNode }) {
+  const owner = ctx.owners.get(element);
+  return (
+    <tr className={owner?.entryId === ctx.myTeam ? "mine" : undefined}>
+      <td className="lv-bonus-pts">{lead}</td>
+      <td className="left">
+        <PlayerName id={element} data={ctx.data} detail={false} />{" "}
+        <span className="player-meta">{ctx.data.players.get(element)?.team}</span>
+      </td>
+      <td className="left lv-bonus-owner">
+        {owner ? (
+          <>
+            <Manager id={owner.entryId} data={ctx.data} mine={ctx.myTeam} />
+            {!owner.counts && <span className="player-meta"> bench</span>}
+          </>
+        ) : null}
+      </td>
+      {children}
+    </tr>
+  );
+}
+
+function DefconList({
+  rows,
+  points,
+  ctx,
+  empty,
+}: {
+  rows: DefconRow[];
+  points: Record<Player["position"], number>;
+  ctx: Ctx;
+  empty: string;
+}) {
   return (
     <>
       <div className="lv-dc-head">Defensive contributions</div>
       {rows.length === 0 ? (
-        <p className="hint lv-bps-note">Nobody close yet.</p>
+        <p className="hint lv-pad">{empty}</p>
       ) : (
         <table className="data lv-bonus">
+          <thead>
+            <tr>
+              <th className="lv-bonus-pts">
+                <span className="sr-only">Points</span>
+              </th>
+              <th className="left">Player</th>
+              <th className="left">Owner</th>
+              <th className="num">Count</th>
+            </tr>
+          </thead>
           <tbody>
             {rows.map((r) => {
               const player = ctx.data.players.get(r.element);
-              const owner = ctx.owners.get(r.element);
               return (
-                <tr key={r.element} className={owner?.entryId === ctx.myTeam ? "mine" : undefined}>
-                  <td className="lv-bonus-pts">
-                    {r.earned ? <span className="lv-b dc">+{player ? points[player.position] : 2}</span> : null}
-                  </td>
-                  <td className="left">
-                    {player?.name ?? r.element} <span className="player-meta">{player?.team}</span>
-                  </td>
-                  <td className="left lv-bonus-owner">
-                    {owner ? (
-                      <>
-                        <Manager id={owner.entryId} data={ctx.data} />
-                        {!owner.counts && <span className="player-meta"> bench</span>}
-                      </>
-                    ) : null}
-                  </td>
+                <OwnedRow
+                  key={r.element}
+                  element={r.element}
+                  ctx={ctx}
+                  lead={r.earned ? <span className="lv-b dc">+{player ? points[player.position] : 2}</span> : null}
+                >
                   <td className={`num lv-dc-count ${r.earned ? "earned" : ""}`}>
                     {r.value}/{r.limit}
                   </td>
-                </tr>
+                </OwnedRow>
               );
             })}
           </tbody>
@@ -835,18 +924,12 @@ function DefconList({ rows, points, ctx }: { rows: DefconRow[]; points: Record<P
 
 // ---------------------------------------------------------------- fixtures
 
-
 function FixturesView({ ctx }: { ctx: Ctx }) {
   const info = useMemo(
     () => new Map<number, PlayerInfo>(ctx.data.playerList.map((p) => [p.id, { position: p.position, teamId: p.teamId }])),
     [ctx.data.playerList],
   );
   const limits = (ctx.data.rules.defcon ?? DEFAULT_DEFCON).limit;
-  const byKickoff = (a: LiveFixture, b: LiveFixture) => (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id;
-  // What's happening now first, then what's done (latest first), then what's still to come.
-  const live = ctx.gw.fixtures.filter((f) => f.started && !f.finishedProvisional).sort(byKickoff);
-  const done = ctx.gw.fixtures.filter((f) => f.finishedProvisional).sort((a, b) => byKickoff(b, a));
-  const upcoming = ctx.gw.fixtures.filter((f) => !f.started).sort(byKickoff);
   return (
     <section>
       <h2>Premier League fixtures</h2>
@@ -867,51 +950,71 @@ function FixturesView({ ctx }: { ctx: Ctx }) {
           <span className="lv-badge dc">DC</span> DefCon
         </span>
       </p>
-      {[...live, ...done].map((f) => (
-        <FixtureCard key={f.id} f={f} ctx={ctx} impacts={fixtureImpacts(f, ctx.gw, info, limits)} />
+      {fixtureDays(ctx.gw.fixtures).map((d) => (
+        <Fragment key={d.key}>
+          <h3 className="lv-day">{d.label}</h3>
+          {d.started.map((f) => {
+            const impacts = fixtureImpacts(f, ctx.gw, info, limits);
+            return (
+              <FixtureCard key={f.id} f={f} ctx={ctx} impacts={impacts} startOpen={startsOpen(f, ctx, [...impacts.home, ...impacts.away])} />
+            );
+          })}
+          {d.upcoming.length > 0 && <UpcomingList list={d.upcoming} ctx={ctx} />}
+        </Fragment>
       ))}
-      {upcoming.length > 0 && (
-        <>
-          <h3 className="lv-sub">Still to play</h3>
-          <div className="card lv-upcoming">
-            {upcoming.map((f) => (
-              <div key={f.id} className="lv-up-row">
-                <span className="lv-up-teams">
-                  <Shirt teamId={f.teamH} gk={false} ctx={ctx} />
-                  {ctx.clubs.get(f.teamH)?.short} v {ctx.clubs.get(f.teamA)?.short}
-                  <Shirt teamId={f.teamA} gk={false} ctx={ctx} />
-                </span>
-                <span className="lv-up-when">{f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"}</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
     </section>
   );
 }
 
-function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: { home: Impact[]; away: Impact[] } }) {
-  const live = !f.finishedProvisional;
+function FixtureCard({
+  f,
+  ctx,
+  impacts,
+  startOpen,
+}: {
+  f: LiveFixture;
+  ctx: Ctx;
+  impacts: { home: Impact[]; away: Impact[] };
+  startOpen: boolean;
+}) {
+  const [open, setOpen] = useState(startOpen);
+  const live = fxState(f) === "live";
   const side = (teamId: number, right?: boolean) => (
     <span className={`lv-fx-side ${right ? "right" : ""}`}>
       <Shirt teamId={teamId} gk={false} ctx={ctx} />
       <span className="lv-fx-team">{ctx.clubs.get(teamId)?.short}</span>
     </span>
   );
+  const hasReport = impacts.home.length > 0 || impacts.away.length > 0;
+  // Folded: the league's players who scored in this match, best first.
+  const owned = [...impacts.home, ...impacts.away]
+    .filter((i) => ctx.data.owners.get(i.element) && i.points > 0)
+    .sort((a, b) => Number(isMine(b.element, ctx)) - Number(isMine(a.element, ctx)) || b.points - a.points);
+  const summary = owned
+    .slice(0, 3)
+    .map((i) => `${ctx.data.players.get(i.element)?.name ?? i.element} ${i.points}`)
+    .join(" · ");
   return (
     <article className={`card lv-fx ${live ? "is-live" : ""}`}>
-      <header className="lv-fx-top">
-        {side(f.teamH)}
-        <span className="lv-fx-mid">
-          <span className="lv-fx-score">
-            {f.scoreH ?? 0} – {f.scoreA ?? 0}
+      <button className="lv-fold" onClick={() => setOpen((o) => !o)} aria-expanded={open} disabled={!hasReport}>
+        <span className="lv-fx-top">
+          {side(f.teamH)}
+          <span className="lv-fx-mid">
+            <span className="lv-fx-score">
+              {f.scoreH ?? 0} – {f.scoreA ?? 0}
+            </span>
+            <span className={live ? "lv-fx-state lv-clock" : "lv-fx-state"}>{stateText(f)}</span>
           </span>
-          <span className={live ? "lv-fx-state lv-clock" : "lv-fx-state"}>{live ? clock(f) : "FT"}</span>
+          {side(f.teamA, true)}
         </span>
-        {side(f.teamA, true)}
-      </header>
-      {(impacts.home.length > 0 || impacts.away.length > 0) && (
+        {!open && summary && (
+          <span className="lv-fold-summary lv-fx-summary">
+            {summary}
+            {owned.length > 3 && ` · +${owned.length - 3} more`}
+          </span>
+        )}
+      </button>
+      {open && hasReport && (
         // One grid for both teams, so the owned rows and the unowned lines sit level across the card.
         <div className="lv-fx-cols">
           <OwnedList list={impacts.home} ctx={ctx} />
@@ -922,6 +1025,99 @@ function FixtureCard({ f, ctx, impacts }: { f: LiveFixture; ctx: Ctx; impacts: {
       )}
     </article>
   );
+}
+
+/** Matches still to play on one day: a line each with the kick-off time. */
+function UpcomingList({ list, ctx }: { list: LiveFixture[]; ctx: Ctx }) {
+  return (
+    <div className="card lv-upcoming">
+      {list.map((f) => (
+        <div key={f.id} className="lv-up-row">
+          <span className="lv-up-time">{f.kickoff ? kickoffTime(f.kickoff) : "TBC"}</span>
+          <span className="lv-up-teams">
+            <Shirt teamId={f.teamH} gk={false} ctx={ctx} />
+            {ctx.clubs.get(f.teamH)?.short} v {ctx.clubs.get(f.teamA)?.short}
+            <Shirt teamId={f.teamA} gk={false} ctx={ctx} />
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- fixture order and folding
+
+type FxState = "upcoming" | "live" | "waiting" | "done";
+
+/** Not started, being played, full time but FPL still checking, or checked and final. */
+function fxState(f: LiveFixture): FxState {
+  if (!f.started) return "upcoming";
+  if (!f.finishedProvisional) return "live";
+  return f.finished ? "done" : "waiting";
+}
+
+/** "67'" while it's on, "15:00 · FT" after. */
+function stateText(f: LiveFixture): string {
+  if (fxState(f) === "live") return clock(f);
+  return f.kickoff ? `${kickoffTime(f.kickoff)} · FT` : "FT";
+}
+
+function scoreLine(f: LiveFixture, ctx: Ctx): string {
+  return `${ctx.clubs.get(f.teamH)?.short ?? "?"} ${f.scoreH ?? 0} – ${f.scoreA ?? 0} ${ctx.clubs.get(f.teamA)?.short ?? "?"}`;
+}
+
+/**
+ * The gameweek's matches by day, in kick-off order, in the viewer's own time
+ * zone. Matches without a date go last. The same order before, during and
+ * after the gameweek, so nothing jumps about.
+ */
+function fixtureDays(fixtures: LiveFixture[]): { key: string; label: string; started: LiveFixture[]; upcoming: LiveFixture[] }[] {
+  const sorted = [...fixtures].sort(
+    (a, b) => (a.kickoff ? 0 : 1) - (b.kickoff ? 0 : 1) || (a.kickoff ?? "").localeCompare(b.kickoff ?? "") || a.id - b.id,
+  );
+  const days = new Map<string, { key: string; label: string; started: LiveFixture[]; upcoming: LiveFixture[] }>();
+  for (const f of sorted) {
+    const key = f.kickoff ? new Date(f.kickoff).toDateString() : "tbc";
+    if (!days.has(key)) days.set(key, { key, label: f.kickoff ? dayLabel(f.kickoff) : "Date to be confirmed", started: [], upcoming: [] });
+    days.get(key)![f.started ? "started" : "upcoming"].push(f);
+  }
+  return [...days.values()];
+}
+
+/** "Today", "Tomorrow", "Yesterday", or "Saturday 10 October". */
+function dayLabel(iso: string): string {
+  const day = new Date(iso);
+  const today = new Date();
+  const diff = Math.round(
+    (new Date(day.getFullYear(), day.getMonth(), day.getDate()).getTime() -
+      new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) /
+      86_400_000,
+  );
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Tomorrow";
+  if (diff === -1) return "Yesterday";
+  return day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+}
+
+function kickoffTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}
+
+/** The viewer owns this player: in this gameweek's lineup once it's out, else in their squad now. */
+function isMine(element: number, ctx: Ctx): boolean {
+  if (ctx.myTeam === null) return false;
+  const picks = ctx.gw.picks[ctx.myTeam]?.picks;
+  return picks ? picks.some((p) => p.element === element) : ctx.data.owners.get(element) === ctx.myTeam;
+}
+
+/**
+ * Open while it's being played. Once it's over, open only if one of the viewer's
+ * players is in what the card shows (scored, got bonus, earned DefCon). Otherwise folded.
+ */
+function startsOpen(f: LiveFixture, ctx: Ctx, shown: { element: number }[]): boolean {
+  const state = fxState(f);
+  if (state === "live") return true;
+  return state !== "upcoming" && shown.some((r) => isMine(r.element, ctx));
 }
 
 /** Owned players get a row each: name and points on top, what they did and who owns them below. */
@@ -935,7 +1131,9 @@ function OwnedList({ list, ctx }: { list: Impact[]; ctx: Ctx }) {
           const mine = owner === ctx.myTeam;
           return (
             <div key={i.element} className={`lv-imp ${mine ? "mine" : ""}`}>
-              <span className="lv-imp-name">{ctx.data.players.get(i.element)?.name ?? i.element}</span>
+              <span className="lv-imp-name">
+                <PlayerName id={i.element} data={ctx.data} detail={false} />
+              </span>
               <span className="lv-imp-pts">{i.points}</span>
               <span className="lv-imp-badges">
                 <Badges i={i} />
@@ -988,12 +1186,6 @@ function Badges({ i }: { i: Impact }) {
 
 // ---------------------------------------------------------------- helpers
 
-function fixtureTitle(f: LiveFixture, ctx: Ctx): string {
-  const h = ctx.clubs.get(f.teamH)?.short ?? "?";
-  const a = ctx.clubs.get(f.teamA)?.short ?? "?";
-  if (!f.started) return `${h} v ${a} (${f.kickoff ? formatKickoff(f.kickoff, true) : "TBC"})`;
-  return `${h} ${f.scoreH ?? 0} - ${f.scoreA ?? 0} ${a}${f.finishedProvisional ? " · FT" : ` · ${clock(f)}`}`;
-}
 
 function firstKickoff(gw: LiveGameweek): string | null {
   return gw.fixtures.map((f) => f.kickoff).filter((k): k is string => !!k).sort()[0] ?? null;
