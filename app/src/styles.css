@@ -2049,11 +2049,19 @@ a.link {
 }
 
 .search-bar .search {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
 }
 
 .search-cancel {
   white-space: nowrap;
+}
+
+/* Link buttons are full width elsewhere; here Cancel only takes the room it needs. */
+button.link.search-cancel {
+  width: auto;
+  flex: 0 0 auto;
 }
 
 .search-hits {

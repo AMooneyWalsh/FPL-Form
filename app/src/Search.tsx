@@ -75,7 +75,7 @@ function SearchSheet({ data, onClose }: { data: LeagueData; onClose: () => void 
           ref={input}
           className="search"
           type="search"
-          placeholder="Search players or managers"
+          placeholder="Player or manager"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
