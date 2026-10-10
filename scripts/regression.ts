@@ -66,7 +66,7 @@ for (let gw = 1; gw <= game.current_event; gw++) {
   );
   check(leagueOwners(lm).size === entries.length * 15, `GW${gw}: every lineup player has a league owner`);
   check(
-    bonusTable(lg).every(({ fixture, rows }) => !fixture.bonusConfirmed || rows.every((r) => r.bonus === (lg.elements[r.element]?.bonus ?? 0))),
+    bonusTable(lg).every(({ fixture, rows }) => !fixture.bonusInPoints || rows.every((r) => r.bonus === (lg.elements[r.element]?.bonus ?? 0))),
     `GW${gw}: bonus worked out from BPS matches FPL's confirmed bonus`,
   );
   check(

@@ -26,7 +26,7 @@ export type StatKey = (typeof STAT_KEYS)[number];
 
 export interface LiveElement {
   minutes: number;
-  /** FPL's running total. Includes bonus only once FPL has confirmed it. */
+  /** FPL's running total. Includes bonus once FPL has added it (live, these days). */
   points: number;
   bonus: number;
   bps: number;
@@ -67,7 +67,12 @@ export interface LiveFixture {
   teamA: number;
   scoreH: number | null;
   scoreA: number | null;
-  /** FPL has added the official bonus to players' points. */
+  /**
+   * FPL has put bonus into players' points. Since 2026/27 it does this live, as
+   * the match goes on, so this is not the same as the bonus being final.
+   */
+  bonusInPoints: boolean;
+  /** Bonus is final: FPL has checked the match data after full time. */
   bonusConfirmed: boolean;
   /** Bonus points system scores for everyone who played, both teams. */
   bps: { element: number; value: number }[];
@@ -171,7 +176,8 @@ export function toLiveGameweek(event: number, raw: RawLiveResponse, picks: Recor
       teamA: f.team_a,
       scoreH: f.team_h_score,
       scoreA: f.team_a_score,
-      bonusConfirmed: !!bonus && bonus.h.length + bonus.a.length > 0,
+      bonusInPoints: !!bonus && bonus.h.length + bonus.a.length > 0,
+      bonusConfirmed: f.finished,
       bps: bps ? [...bps.h, ...bps.a] : [],
       events: Object.fromEntries(
         EVENT_KEYS.flatMap((k) => {
@@ -212,7 +218,7 @@ export function bonusFromBps(bps: { element: number; value: number }[]): Map<num
 export function provisionalBonus(gw: LiveGameweek): Map<number, number> {
   const out = new Map<number, number>();
   for (const f of gw.fixtures) {
-    if (!f.started || f.bonusConfirmed) continue;
+    if (!f.started || f.bonusInPoints) continue;
     for (const [el, pts] of bonusFromBps(f.bps)) out.set(el, (out.get(el) ?? 0) + pts);
   }
   return out;
@@ -632,14 +638,15 @@ export function fixtureImpacts(
   }
   if (f.started) {
     const isHome = (el: number) => info.get(el)?.teamId === f.teamH;
-    const provisional = f.bonusConfirmed ? null : bonusFromBps(f.bps);
+    // Work bonus out from BPS only when FPL hasn't put it into the points yet.
+    const fromBps = f.bonusInPoints ? null : bonusFromBps(f.bps);
     for (const { element } of f.bps) {
-      const b = provisional ? provisional.get(element) ?? 0 : gw.elements[element]?.bonus ?? 0;
+      const b = fromBps ? fromBps.get(element) ?? 0 : gw.elements[element]?.bonus ?? 0;
       if (!b) continue;
       const i = get(element, isHome(element));
       i.bonus = b;
-      i.bonusProvisional = !!provisional;
-      if (provisional) i.points += b;
+      i.bonusProvisional = !f.bonusConfirmed;
+      if (fromBps) i.points += b;
     }
     for (const [id, el] of Object.entries(gw.elements)) {
       const p = info.get(Number(id));
