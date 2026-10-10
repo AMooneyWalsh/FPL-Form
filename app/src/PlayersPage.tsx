@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { passedThrough, playerJourney, type Stint } from "../../shared/moves";
+import { passedThrough, playerJourney, type Stint, type StintEnd } from "../../shared/moves";
 import { Manager, PlayerName, playerSearchText } from "./bits";
 import type { LeagueData } from "./data";
 
@@ -92,7 +92,9 @@ export function PlayerPage({ id, data, myTeam }: { id: number; data: LeagueData;
 }
 
 function Journey({ id, stints, data, myTeam }: { id: number; stints: Stint[]; data: LeagueData; myTeam: number | null }) {
-  const owner = data.seasons.ownerAt(id, data.seasons.lastEvent);
+  // Who has him today (after this week's waivers and trades), not just at the last gameweek played.
+  const now = data.owners.get(id);
+  const owner = now ? { entryId: now } : null;
   const hops = passedThrough(id, data.trades, data.seasons);
   return (
     <article className="card">
@@ -112,6 +114,7 @@ function Journey({ id, stints, data, myTeam }: { id: number; stints: Stint[]; da
               {s.to !== s.from ? `–${s.to}` : ""}
             </span>
             <span className="journey-pts">{s.points} pts</span>
+            {s.ended && <span className="journey-end">{endedText(s.ended, data)}</span>}
           </li>
         ))}
       </ol>
@@ -123,6 +126,12 @@ function Journey({ id, stints, data, myTeam }: { id: number; stints: Stint[]; da
       )}
     </article>
   );
+}
+
+/** "Dropped in GW5 for Robertson (waiver)" or "Traded to Ross in GW5". */
+function endedText(e: StintEnd, data: LeagueData): string {
+  if (e.how === "traded") return `Traded to ${data.labels.get(e.to) ?? "someone"} in GW${e.event}`;
+  return `Dropped in GW${e.event} for ${data.players.get(e.for)?.name ?? "another player"} (${e.kind})`;
 }
 
 function total(stints: Stint[]) {

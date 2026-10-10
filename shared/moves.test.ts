@@ -76,12 +76,21 @@ describe("with league 634's real data (GW1-5)", () => {
     }
   });
 
+  it("knows how every finished spell ended", () => {
+    const everyone = new Set(gameweeks.flatMap((g) => Object.values(g.squads).flatMap((s) => [...s.played, ...s.bench])));
+    for (const el of everyone) {
+      const stints = playerJourney(el, seasons, { transactions, trades, draft });
+      // Every spell followed by another manager's must have ended in a drop or a trade.
+      stints.slice(0, -1).forEach((s) => expect(s.ended, `player ${el} with ${s.entryId} to GW${s.to}`).toBeDefined());
+    }
+  });
+
   it("follows a drafted player through a trade (Sarr: drafted by Daire, traded to Michael)", () => {
     const SARR = 208;
     const pick = draft.find((d) => d.element === SARR)!;
     expect(pick.entry).toBe(1679);
     const stints = playerJourney(SARR, seasons, { transactions, trades, draft });
-    expect(stints[0]).toMatchObject({ entryId: 1679, from: 1, to: 1, how: "draft", draftPick: pick.index });
+    expect(stints[0]).toMatchObject({ entryId: 1679, from: 1, to: 1, how: "draft", draftPick: pick.index, ended: { how: "traded", to: 1447 } });
     expect(stints[1]).toMatchObject({ entryId: 1447, from: 2, how: "trade" });
   });
 });
