@@ -334,6 +334,7 @@ function MatchSide({ entry, squad, ctx, right }: { entry: number; squad: LiveSqu
         </span>
       )}
       {squad && <Dots squad={squad} />}
+      {squad && ctx.phase === "live" && <SquadSummary squad={squad} />}
     </span>
   );
 }
@@ -353,6 +354,21 @@ function Dots({ squad }: { squad: LiveSquad }) {
       {counting.map((p) => (
         <Dot key={p.element} status={p.status} />
       ))}
+    </span>
+  );
+}
+
+/** "2 playing · 5 to play" under each side, so you can see who has more to come without opening the match. */
+function SquadSummary({ squad }: { squad: LiveSquad }) {
+  const counting = squad.players.filter((p) => p.counts);
+  const playing = counting.filter((p) => p.status === "playing").length;
+  const toPlay = counting.filter((p) => p.status === "to-play").length;
+  if (!playing && !toPlay) return <span className="lv-summary">All played</span>;
+  return (
+    <span className="lv-summary">
+      {playing > 0 && <span className="lv-summary-live">{playing} playing</span>}
+      {playing > 0 && toPlay > 0 && " · "}
+      {toPlay > 0 && `${toPlay} to play`}
     </span>
   );
 }
