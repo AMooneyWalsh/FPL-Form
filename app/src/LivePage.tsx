@@ -808,15 +808,15 @@ function BonusCard({
   const name = (id: number) => ctx.data.players.get(id)?.name ?? String(id);
   return (
     <article className={`card lv-fx lv-bonus-card ${state === "live" ? "is-live" : ""}`}>
-      <button className="lv-fold" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <span className="lv-fold-row">
+      <button className="fold-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span className="fold-row">
           <span className="lv-fx-title">{scoreLine(f, ctx)}</span>
           <Tag tone={tone}>{label}</Tag>
         </span>
-        <span className="lv-fold-row lv-fold-meta">
+        <span className="fold-row fold-meta">
           <span className={state === "live" ? "lv-clock" : undefined}>{stateText(f)}</span>
           {!open && winners.length > 0 && (
-            <span className="lv-fold-summary">{winners.map((r) => `${name(r.element)} ${r.bonus}`).join(" · ")}</span>
+            <span className="fold-summary">{winners.map((r) => `${name(r.element)} ${r.bonus}`).join(" · ")}</span>
           )}
         </span>
       </button>
@@ -996,7 +996,7 @@ function FixtureCard({
     .join(" · ");
   return (
     <article className={`card lv-fx ${live ? "is-live" : ""}`}>
-      <button className="lv-fold" onClick={() => setOpen((o) => !o)} aria-expanded={open} disabled={!hasReport}>
+      <button className="fold-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open} disabled={!hasReport}>
         <span className="lv-fx-top">
           {side(f.teamH)}
           <span className="lv-fx-mid">
@@ -1008,7 +1008,7 @@ function FixtureCard({
           {side(f.teamA, true)}
         </span>
         {!open && summary && (
-          <span className="lv-fold-summary lv-fx-summary">
+          <span className="fold-summary lv-fx-summary">
             {summary}
             {owned.length > 3 && ` · +${owned.length - 3} more`}
           </span>

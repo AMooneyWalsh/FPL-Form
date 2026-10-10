@@ -2,14 +2,14 @@ import { useMemo, useState } from "react";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins, type Origins, type PickReport } from "../../shared/draft";
 import { computeStandings } from "../../shared/standings";
 import { draftDay } from "../../shared/waivers";
-import { Manager, PlayerName, Pts, SectionHead, ShowFilter, SubNav, useShownManager } from "./bits";
+import { Explainer, Manager, PlayerName, Pts, SectionHead, ShowFilter, SubNav, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export const DRAFT_VIEWS = [
   { id: "grades", label: "Grades" },
-  { id: "picks", label: "Steals" },
-  { id: "no-moves", label: "No moves" },
-  { id: "origins", label: "Points" },
+  { id: "picks", label: "Steals & busts" },
+  { id: "no-moves", label: "Original squads" },
+  { id: "origins", label: "Point sources" },
   { id: "redraft", label: "Redraft" },
   { id: "day", label: "Draft day" },
 ] as const;
@@ -41,7 +41,7 @@ export function DraftPage({ data, myTeam, view }: { data: LeagueData; myTeam: nu
       <p className="hint">
         {data.seasons.lastEvent === 0
           ? "No gameweeks have been played yet, so all of this starts at zero until gameweek 1."
-          : `Everything here uses points from ${data.seasons.lastEvent === 1 ? "the first gameweek" : `the ${data.seasons.lastEvent} gameweeks`} played so far${data.inProgress ? `, including gameweek ${data.game.current_event} as it stands` : ""}, so early on it can swing a lot from week to week.`}
+          : `Points from ${data.seasons.lastEvent === 1 ? "gameweek 1" : `gameweeks 1–${data.seasons.lastEvent}`}${data.inProgress ? `, with gameweek ${data.game.current_event} as it stands` : ""}. Early on it can swing a lot.`}
       </p>
       {view === "grades" && <Grades grades={grades} data={data} myTeam={myTeam} />}
       {view === "picks" && <StealsAndBusts reports={reports} data={data} myTeam={myTeam} />}
@@ -59,18 +59,20 @@ function Grades({ grades, data, myTeam }: { grades: ReturnType<typeof draftGrade
   return (
     <section>
       <h2>Draft grades</h2>
-      <p className="hint">
-        How every manager's 15 picks have done this season, whoever owns them now. "Vs slot" compares where each pick
-        was taken with where his points rank among all 210 picks: +10 means picks are doing 10 places better than where
-        they went, on average.
-      </p>
+      <p className="hint">How each manager's 15 draft picks have scored, whoever owns them now.</p>
+      <Explainer>
+        <p>
+          "Vs draft spot" compares where each pick was taken with where his points rank among all 210 picks. +10 means a
+          manager's picks are doing 10 places better than where they went, on average.
+        </p>
+      </Explainer>
       <div className="table-wrap">
         <table className="data">
           <thead>
             <tr>
               <th className="left">Manager</th>
               <th className="num">Pts</th>
-              <th className="num">Vs slot</th>
+              <th className="num">Vs draft spot</th>
               <th className="num hide-narrow">Kept</th>
               <th className="left hide-narrow">Best pick</th>
             </tr>
@@ -160,14 +162,17 @@ function DraftOnlyTable({
   return (
     <section>
       <h2>If nobody had made a move</h2>
-      <p className="hint">
-        Where each manager would be if they'd kept their 15 draft picks all season and never made a waiver claim or
-        trade, next to where they actually are. "Moves" is how many places better or worse off their waivers and trades have left them.
-      </p>
-      <p className="hint">
-        Nobody picked these draft-only teams week to week, so each one fields its best possible XI every gameweek. That
-        makes the scores higher than real ones, but it's the same for everyone.
-      </p>
+      <p className="hint">Where everyone would be if they'd kept their 15 draft picks all season.</p>
+      <Explainer>
+        <p>
+          No waiver claims, no trades: just the original squads, next to where everyone actually is. "Moves" is how many
+          places better or worse off their waivers and trades have left them.
+        </p>
+        <p>
+          Nobody picked these squads week to week, so each one fields its best possible XI every gameweek. That makes the
+          scores higher than real ones, but it's the same for everyone.
+        </p>
+      </Explainer>
       <div className="table-wrap">
         <table className="data">
           <thead>
@@ -233,10 +238,10 @@ function SquadOrigins({ origins, data, myTeam }: { origins: Origins[]; data: Lea
   return (
     <section>
       <h2>Where the points come from</h2>
-      <p className="hint">
-        Each manager's points this season, split by how they got the player who scored them. The numbers underneath are
-        how many of their current 15 came each way.
-      </p>
+      <p className="hint">Each manager's points, split by how they got the player who scored them.</p>
+      <Explainer>
+        <p>The numbers under each bar are how many of their current 15 came each way.</p>
+      </Explainer>
       <div className="legend">
         {ORIGINS.map(({ key, label }, i) => (
           <span key={key} className="legend-item">
@@ -288,12 +293,14 @@ function Redraft({ redraft, data, myTeam }: { redraft: ReturnType<typeof hindsig
       <SectionHead title="Hindsight redraft">
         <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
       </SectionHead>
-      <p className="hint">
-        The draft run again in the same order, with everyone taking the best scorer still available who fits their squad
-        (2 GKP, 5 DEF, 5 MID, 3 FWD). Anyone in the game at the time counts, including players nobody drafted (late signings FPL added after the
-        draft are left out). Pick one manager with
-        "Show" to also see the best player still available at each of their real picks.
-      </p>
+      <p className="hint">The draft run again, with everyone taking the best scorer left who fits their squad.</p>
+      <Explainer>
+        <p>
+          Same order as the real draft. Each squad still has to be 2 GKP, 5 DEF, 5 MID and 3 FWD. Anyone in the game at
+          the time counts, including players nobody drafted; late signings FPL added after the draft are left out.
+        </p>
+        <p>Pick one manager with "Show" to also see the best player still available at each of their real picks.</p>
+      </Explainer>
       {who !== null && (
         <p className="hint">
           "Best then" is the draft with only {data.labels.get(who)} knowing what we know now. Everyone else makes

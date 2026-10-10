@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
 import { freeAgentSignings } from "../../shared/waivers";
-import { Manager, nobody, PlayerName, SectionHead, ShowFilter, useShownManager } from "./bits";
+import { Explainer, FoldSection, Manager, nobody, PlayerName, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 
 export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
@@ -26,8 +26,8 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
             <thead>
               <tr>
                 <th className="left">Manager</th>
-                <th className="num">Won</th>
-                <th className="num">Outbid</th>
+                <th className="num">Claims won</th>
+                <th className="num">Lost out</th>
                 <th className="num hide-narrow">Free agents</th>
                 <th className="num">Pick-up pts</th>
               </tr>
@@ -86,19 +86,24 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
         <SectionHead title="Waiver battles">
           <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
         </SectionHead>
-        <p className="hint">Players more than one manager put a claim in for. Winner first, then in priority order.</p>
+        <p className="hint">Players more than one manager claimed. Winner first, then in waiver order.</p>
+        <Explainer>
+          <p>
+            "Void" means the claim didn't count because the player that manager meant to drop had already gone in an
+            earlier claim.
+          </p>
+        </Explainer>
         {shown.length === 0 && (
           <p className="notice">
             {who === null ? "No waiver battles yet this season." : nobody(data, who, myTeam, "been in a waiver battle")}
           </p>
         )}
-        {[...byGw.entries()].map(([gw, list]) => (
-          <div key={gw}>
-            <h3>Gameweek {gw}</h3>
+        {[...byGw.entries()].map(([gw, list], i) => (
+          <FoldSection key={gw} title={`Gameweek ${gw}`} count={`${list.length} ${list.length === 1 ? "battle" : "battles"}`} open={i === 0}>
             {list.map((b) => (
               <Battle key={`${b.event}-${b.element}`} b={b} data={data} myTeam={myTeam} />
             ))}
-          </div>
+          </FoldSection>
         ))}
       </section>
     </>
@@ -121,7 +126,7 @@ function Battle({ b, data, myTeam }: { b: WaiverBattle; data: LeagueData; myTeam
         {b.claims.map((c) => (
           <span key={c.entryId} className={`claim ${c.result === "a" ? "won" : ""} ${c.entryId === myTeam ? "is-mine" : ""}`}>
             <Manager id={c.entryId} data={data} />
-            {c.result === "do" && <span className="claim-why"> (drop gone)</span>}
+            {c.result === "do" && <span className="claim-why"> (void)</span>}
           </span>
         ))}
       </div>

@@ -63,6 +63,8 @@ Weights: 400 body, 600 names and labels, 700 numbers that matter and headings, 8
 | `SubNav` | The sticky chip menu under the tabs. One per tab. |
 | `SectionHead` | A section title (`h2`) with its controls on the right (Show filter, picker, Live tag). |
 | `Explainer` | "How this works": anything longer than one line of hint goes in here, folded away. Numbers first, explanation on request. |
+| `FoldSection` | A titled group that folds away with a count, e.g. "Gameweek 5 · 12 battles". Newest open, older folded. |
+| `.fold-btn` | The tappable top of a card that opens and folds it (trade cards, Live fixtures and bonus). Folded, it shows a one or two line summary. Never put links inside it. |
 | `Tag` | Small status label. Tones: `good`, `warn`, `bad`, `neutral`, `mine`, `live`. |
 | `InjuryFlag` | Out / Ban / 75% next to a player's name (a `Tag`). |
 | `StatTile` | One number with a label and optional league rank. Put 2 to 4 in a `.stat-row`. |
@@ -72,8 +74,15 @@ Weights: 400 body, 600 names and labels, 700 numbers that matter and headings, 8
 
 CSS-only patterns: `.card` (and `.mine-card`), `.table-wrap` + `table.data` (with `tr.mine`), `.notice` / `.notice.warn` / `.notice.error`, `.chips` + `.chip-btn`, `.form` + `.chip.W/D/L`, `.fdr-1..5`, `.hint`, `a.link`.
 
+## Long lists
+
+- Anything that grows all season (trades, waiver battles, matches) folds. Show the newest or most relevant open and the rest as one or two line summaries you tap to open.
+- What starts open: things happening now (a live match), and things about you (a match with your players in it). Open/closed is only a starting point; once someone taps, leave it alone, even when the data refreshes.
+- Matches are listed by day in kick-off order, with day headings ("Today", "Saturday 17 October") and each kick-off time, before, during and after the gameweek.
+- Section menus (`SubNav`) fade at an edge when there are more chips past it.
+
 ## Words
 
-- Plain English. No jargon a new friend wouldn't know ("on paper", "drop gone", "vs slot"); if a number needs a name, explain it in an `Explainer`.
+- Plain English. No jargon a new friend wouldn't know (we replaced "on paper" with "in all", "drop gone" with "void", "vs slot" with "vs draft spot", "outbid" with "lost out"); if a number needs a name, explain it in an `Explainer`.
 - One line of `.hint` under a section title at most. Anything longer goes in an `Explainer`.
 - Friendly and a bit cheeky ("Jammiest", "Most robbed") is the house style. No em dashes.

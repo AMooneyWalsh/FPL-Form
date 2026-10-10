@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { LedgerRow } from "../../shared/moves";
-import { Manager, Pts } from "./bits";
+import { Explainer, Manager, Pts } from "./bits";
 import type { LeagueData } from "./data";
 
 const SIZE = 360;
@@ -35,10 +35,13 @@ export function TradeNetwork({ ledger, data, myTeam }: { ledger: LedgerRow[]; da
   return (
     <section>
       <h2>Trade network</h2>
-      <p className="hint">
-        Dot size is how many trades someone has made, green or red is whether they're up or down on them, and thicker
-        lines mean a pair trade more. Tap a manager to see just their trades.
-      </p>
+      <p className="hint">Who trades with whom. Tap a manager to see just their trades.</p>
+      <Explainer label="How to read it">
+        <p>
+          Dot size is how many trades someone has made. Green or red is whether they're up or down on them. Thicker lines
+          mean a pair trade more.
+        </p>
+      </Explainer>
       <div className="card net-card">
         <svg viewBox={`-40 0 ${SIZE + 80} ${SIZE}`} className="net" role="img" aria-label="Trade network">
           <rect x={-40} width={SIZE + 80} height={SIZE} fill="transparent" onClick={() => setFocus(null)} />

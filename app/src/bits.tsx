@@ -83,6 +83,29 @@ export function SectionHead({ title, children }: { title: ReactNode; children?: 
   );
 }
 
+/** A titled group that folds away, e.g. one gameweek of waiver battles. `open` is only where it starts. */
+export function FoldSection({
+  title,
+  count,
+  open,
+  children,
+}: {
+  title: string;
+  count?: string;
+  open?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <details className="fold-section" open={open}>
+      <summary>
+        <span className="fold-section-title">{title}</span>
+        {count && <span className="muted">{count}</span>}
+      </summary>
+      {children}
+    </details>
+  );
+}
+
 /** "How this works": the explanation of a number, folded away until someone asks for it. */
 export function Explainer({ children, label = "How this works" }: { children: ReactNode; label?: string }) {
   return (
@@ -199,25 +222,41 @@ export function SubNav({
   label: string;
 }) {
   const active = useRef<HTMLAnchorElement>(null);
+  const bar = useRef<HTMLElement>(null);
+  // Fade whichever edge has more chips hidden past it, so it's clear the menu scrolls.
+  const [more, setMore] = useState({ left: false, right: false });
+  const measure = () => {
+    const el = bar.current;
+    if (!el) return;
+    setMore({ left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 });
+  };
   // On a phone the menu can be wider than the screen, so bring the current one into view.
   useEffect(() => {
     const el = active.current;
-    const bar = el?.parentElement;
-    if (el && bar) bar.scrollLeft = el.offsetLeft - bar.offsetLeft - 16;
+    const nav = bar.current;
+    if (el && nav) nav.scrollLeft = el.offsetLeft - nav.offsetLeft - 16;
+    measure();
   }, [current]);
+  useEffect(() => {
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  const fade = `${more.left ? " more-left" : ""}${more.right ? " more-right" : ""}`;
   return (
-    <nav className="chips subnav" aria-label={label}>
-      {views.map((v) => (
-        <a
-          key={v.id}
-          ref={v.id === current ? active : undefined}
-          href={`#/${page}/${v.id}`}
-          className={v.id === current ? "chip-btn active" : "chip-btn"}
-          aria-current={v.id === current ? "page" : undefined}
-        >
-          {v.label}
-        </a>
-      ))}
-    </nav>
+    <div className={`subnav-wrap${fade}`}>
+      <nav ref={bar} className="chips subnav" aria-label={label} onScroll={measure}>
+        {views.map((v) => (
+          <a
+            key={v.id}
+            ref={v.id === current ? active : undefined}
+            href={`#/${page}/${v.id}`}
+            className={v.id === current ? "chip-btn active" : "chip-btn"}
+            aria-current={v.id === current ? "page" : undefined}
+          >
+            {v.label}
+          </a>
+        ))}
+      </nav>
+    </div>
   );
 }

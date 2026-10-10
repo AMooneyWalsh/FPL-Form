@@ -11,7 +11,7 @@ import {
   type Score,
 } from "../../shared/results";
 import { computeStandings } from "../../shared/standings";
-import { Manager, Pts, SectionHead, SubNav } from "./bits";
+import { Explainer, Manager, Pts, SectionHead, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { OddsView } from "./OddsPage";
 import { StandingsTable } from "./StandingsTable";
@@ -182,10 +182,13 @@ function LuckView({ data, myTeam }: { data: LeagueData; myTeam: number | null })
     <>
       <section>
         <h2>Fixture luck</h2>
-        <p className="hint">
-          In any gameweek, scoring more than the league's median (the middle score) should normally win. "Expected wins"
-          counts those weeks. Luck is actual wins minus expected: plus means jammy, minus means robbed.
-        </p>
+        <p className="hint">Wins compared with how often you outscored the league's middle score.</p>
+        <Explainer>
+          <p>
+            In any gameweek, scoring more than the league's median (the middle score) should normally win. "Expected
+            wins" counts those weeks. Luck is actual wins minus expected: plus means jammy, minus means robbed.
+          </p>
+        </Explainer>
         <RangePicker span={span} setSpan={setSpan} last={last} />
         <div className="verdicts">
           <div className="card verdict-card">

@@ -19,14 +19,14 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
               <th className="num">W-D-L</th>
             ) : (
               <>
-                <th className="num">W</th>
-                <th className="num">D</th>
-                <th className="num">L</th>
+                <th className="num hide-narrow">W</th>
+                <th className="num hide-narrow">D</th>
+                <th className="num hide-narrow">L</th>
               </>
             )}
             <th className="num hide-narrow">+/-</th>
+            {!live && <th className="left">Form</th>}
             <th className="num">Pts</th>
-            {!live && <th className="left hide-narrow">Form</th>}
           </tr>
         </thead>
         <tbody>
@@ -48,7 +48,7 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
                     </span>
                   )}
                 </td>
-                <td className="left">
+                <td className="left team-cell">
                   <a className="team" href={`#/manager/${r.entryId}`}>
                     {r.teamName}
                   </a>
@@ -76,15 +76,14 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
                   </td>
                 ) : (
                   <>
-                    <td className="num">{r.won}</td>
-                    <td className="num">{r.drawn}</td>
-                    <td className="num">{r.lost}</td>
+                    <td className="num hide-narrow">{r.won}</td>
+                    <td className="num hide-narrow">{r.drawn}</td>
+                    <td className="num hide-narrow">{r.lost}</td>
                   </>
                 )}
                 <td className="num hide-narrow">{diff > 0 ? `+${diff}` : diff}</td>
-                <td className="num pts">{r.total}</td>
                 {!live && (
-                  <td className="left hide-narrow">
+                  <td className="left">
                     <span className="form">
                       {r.results.slice(-5).map((res, i) => (
                         <span key={i} className={`chip ${res}`}>
@@ -94,6 +93,7 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
                     </span>
                   </td>
                 )}
+                <td className="num pts">{r.total}</td>
               </tr>
             );
           })}
