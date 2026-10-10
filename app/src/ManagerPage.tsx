@@ -75,7 +75,15 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
         )}
         {next && record && (
           <p>
-            Next: gameweek {next.event} v <Manager id={next.opponent} data={data} mine={myTeam} />.{" "}
+            {isLive(data, next.event) ? "Playing now" : "Next"}: gameweek {next.event} v{" "}
+            <Manager id={next.opponent} data={data} mine={myTeam} />.{" "}
+            {isLive(data, next.event) && (
+              <>
+                <a className="link" href="#/live/matches">
+                  Live score
+                </a>{" "}
+              </>
+            )}
             <span className="muted">
               {record.matches.length === 0
                 ? "First meeting this season."
@@ -174,6 +182,11 @@ function nextMatch(data: LeagueData, entryId: number): { event: number; opponent
   const other = m.league_entry_1 === leagueId ? m.league_entry_2 : m.league_entry_1;
   const opponent = byLeagueId.get(other);
   return opponent === undefined ? null : { event: m.event, opponent };
+}
+
+/** True while this gameweek is being played, when the league feed still shows its matches as 0-0. */
+function isLive(data: LeagueData, event: number): boolean {
+  return data.inProgress && event === data.game.current_event;
 }
 
 function ordinal(n: number): string {

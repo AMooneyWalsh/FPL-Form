@@ -286,6 +286,8 @@ function HeadToHeadView({ data, myTeam }: { data: LeagueData; myTeam: number | n
   const second = b !== null && b !== first ? b : (defaultOpponent(first) ?? ids.find((id) => id !== first)!);
   const h = headToHead(data.league, first, second);
   const next = nextMeeting(data.league, first, second);
+  // The league feed shows this week's matches as 0-0 until the gameweek ends, so point to Live instead.
+  const playingNow = next !== null && data.inProgress && next === data.game.current_event;
   return (
     <section>
       <h2>Head to head</h2>
@@ -302,9 +304,20 @@ function HeadToHeadView({ data, myTeam }: { data: LeagueData; myTeam: number | n
         </div>
         <div className="hint">
           {h.matches.length === 0
-            ? "They haven't played each other yet."
+            ? playingNow
+              ? "No results between them yet."
+              : "They haven't played each other yet."
             : `${h.matches.length} ${h.matches.length === 1 ? "meeting" : "meetings"}${h.draws ? `, ${h.draws} drawn` : ""} · points ${h.aPoints}–${h.bPoints}`}
-          {next !== null && ` · next in GW${next}`}
+          {playingNow ? (
+            <>
+              {` They're playing each other now, in GW${next}. `}
+              <a className="link" href="#/live/matches">
+                Live score
+              </a>
+            </>
+          ) : (
+            next !== null && ` · next in GW${next}`
+          )}
         </div>
       </div>
       {h.matches.length > 0 && (
