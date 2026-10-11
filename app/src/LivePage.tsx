@@ -19,6 +19,8 @@ import {
   type Owner,
   type Performer,
   type PlayerInfo,
+  type SheetLookup,
+  type SheetSpot,
 } from "../../shared/live";
 import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope, Player, TeamSheets } from "../../shared/types";
@@ -162,7 +164,7 @@ function LiveView({
     const clubs = new Map<number, Club>();
     for (const p of data.playerList) clubs.set(p.teamId, { short: p.team, code: p.teamCode });
     const phase = phaseOf(gw);
-    const matches = liveMatches(data.league, gw, info, data.rules);
+    const matches = liveMatches(data.league, gw, info, data.rules, sheetLookup(data.playerList, sheets));
     return {
       data,
       gw,
@@ -214,10 +216,21 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
         {hasLineups && (
           <p className="hint">
             <span className="lv-key">
-              <Dot status="playing" /> playing now <Dot status="on-bench" /> on the bench <Dot status="played" /> played{" "}
-              <Dot status="to-play" /> to play
+              {(
+                [
+                  ["playing", "playing now"],
+                  ["on-bench", "on the bench"],
+                  ["not-in-squad", "not in squad"],
+                  ["played", "played"],
+                  ["to-play", "to play"],
+                ] as const
+              ).map(([status, label]) => (
+                <span key={status}>
+                  <Dot status={status} /> {label}
+                </span>
+              ))}
             </span>{" "}
-            · tap a match for lineups, a player for his points.
+            <br />Tap a match for lineups, a player for his points.
           </p>
         )}
         {ctx.sheets && ctx.sheets.announced.length > 0 && (
@@ -419,7 +432,18 @@ function Lineups({ home, away, ctx }: { home: LiveSquad; away: LiveSquad; ctx: C
   );
 }
 
-type SheetStatus = "start" | "bench" | "out";
+type SheetStatus = SheetSpot;
+
+/** Team sheet spot by FPL player id, for clubs whose sheet is out. */
+function sheetLookup(players: Player[], sheets: TeamSheets | null): SheetLookup | undefined {
+  if (!sheets || sheets.announced.length === 0) return undefined;
+  const byId = new Map(players.map((p) => [p.id, p]));
+  return (element) => {
+    const p = byId.get(element);
+    if (!p?.code || !sheets.announced.includes(p.team)) return undefined;
+    return sheets.players[p.code] ?? "out";
+  };
+}
 
 /**
  * Where a player is on his club's official team sheet, until his match kicks
@@ -592,10 +616,20 @@ function PlayerRow({ p, squad, bench, groupEnd, ctx }: { p: LivePlayer; squad: L
   // Until FPL confirms the subs they are our projection of what will happen.
   const pending = ctx.phase !== "done" && !squad.officialSubs;
   const blank = !bench && p.counts && (p.status === "did-not-play" || p.status === "no-game");
+  const notInSquad = p.status === "not-in-squad";
   const note = p.subbedIn
     ? { cls: "in", text: pending ? `Will come on for ${other}` : `Came on for ${other}` }
     : p.subbedOut
-      ? { cls: "out", text: pending ? `Didn't play, ${other} will come on` : `0 mins, replaced by ${other}` }
+      ? {
+          cls: "out",
+          text: notInSquad
+            ? `Not in squad, ${other} will come on`
+            : pending
+              ? `Didn't play, ${other} will come on`
+              : `0 mins, replaced by ${other}`,
+        }
+      : notInSquad
+        ? { cls: "out", text: bench ? "Not in squad" : "Not in squad, no sub available yet" }
       : !bench && p.counts && p.status === "on-bench"
         ? { cls: "wait", text: "On the bench" }
         : blank

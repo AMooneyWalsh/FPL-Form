@@ -1442,6 +1442,12 @@ button.small-link {
 /* ---- live: matches and lineups ---- */
 
 .lv-key {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+}
+
+.lv-key > span {
   white-space: nowrap;
 }
 
@@ -1607,6 +1613,7 @@ button.small-link {
 }
 
 .lv-dot.did-not-play,
+.lv-dot.not-in-squad,
 .lv-dot.no-game {
   background: var(--line);
 }
@@ -1670,7 +1677,8 @@ button.small-link {
 
 /* Match on but he hasn't come off the bench: no highlight, faded, so the eye
    skips to the players who are actually out there. */
-.lv-row.on-bench .lv-row-main {
+.lv-row.on-bench .lv-row-main,
+.lv-row.not-in-squad .lv-row-main {
   opacity: 0.6;
 }
 

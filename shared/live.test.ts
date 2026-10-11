@@ -217,6 +217,19 @@ describe("player stats and points breakdown (GW5)", () => {
     expect(statuses(2).some((p) => p.status === "on-bench")).toBe(false);
   });
 
+  it("uses the team sheet to spot players left out of the squad, from kick-off", () => {
+    const early = { ...gw, fixtures: gw.fixtures.map((f) => ({ ...f, finishedProvisional: false, minutes: 2 })) };
+    const unused = liveSquad(171050, gw, info, rules)!.players.filter((p) => p.minutes === 0 && p.status !== "no-game");
+    expect(unused.length).toBeGreaterThan(0);
+    const [out, ...rest] = unused.map((p) => p.element);
+    const sheet = (el: number) => (el === out ? "out" : rest.includes(el) ? "bench" : undefined);
+    const squad = liveSquad(171050, early, info, rules, sheet)!;
+    expect(squad.players.find((p) => p.element === out)!.status).toBe("not-in-squad");
+    for (const el of rest) expect(squad.players.find((p) => p.element === el)!.status).toBe("on-bench");
+    // Anyone with minutes is playing whatever the sheet says.
+    expect(squad.players.filter((p) => p.minutes > 0).every((p) => p.status === "playing")).toBe(true);
+  });
+
   it("adds up points left on the bench", () => {
     for (const { sq } of all) {
       const bench = sq.players.filter((p) => !p.counts).reduce((s, p) => s + p.points, 0);
