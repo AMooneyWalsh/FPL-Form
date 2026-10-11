@@ -204,6 +204,19 @@ describe("player stats and points breakdown (GW5)", () => {
     expect(squad.players.every((p) => !p.cameOff)).toBe(true);
   });
 
+  it("tells players on the pitch from subs still sitting on the bench", () => {
+    const at = (minutes: number) => ({ ...gw, fixtures: gw.fixtures.map((f) => ({ ...f, finishedProvisional: false, minutes })) });
+    const statuses = (minutes: number) =>
+      [...realScores.keys()].flatMap((id) => liveSquad(id, at(minutes), info, rules)!.players);
+    const mid = statuses(60);
+    const unused = mid.filter((p) => p.minutes === 0 && p.status !== "no-game");
+    expect(unused.length).toBeGreaterThan(0);
+    expect(unused.every((p) => p.status === "on-bench")).toBe(true);
+    expect(mid.filter((p) => p.minutes > 0).every((p) => p.status === "playing")).toBe(true);
+    // Right after kick-off FPL hasn't handed out minutes yet, so nobody is benched.
+    expect(statuses(2).some((p) => p.status === "on-bench")).toBe(false);
+  });
+
   it("adds up points left on the bench", () => {
     for (const { sq } of all) {
       const bench = sq.players.filter((p) => !p.counts).reduce((s, p) => s + p.points, 0);

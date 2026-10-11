@@ -234,7 +234,8 @@ export function provisionalBonus(gw: LiveGameweek): Map<number, number> {
 
 // ---------------------------------------------------------------- squads
 
-export type PlayerStatus = "played" | "playing" | "to-play" | "did-not-play" | "no-game";
+/** "on-bench": his match is under way but he's a sub who hasn't come on (yet). */
+export type PlayerStatus = "played" | "playing" | "on-bench" | "to-play" | "did-not-play" | "no-game";
 
 export interface LivePlayer {
   element: number;
@@ -285,12 +286,22 @@ export function gamesOf(teamId: number | undefined, gw: LiveGameweek): LiveFixtu
   return gw.fixtures.filter((f) => f.teamH === teamId || f.teamA === teamId);
 }
 
+/** Match minute after which a player with no minutes is taken to be a sub. */
+const BENCH_AFTER_MINUTES = 5;
+
 function statusOf(element: number, gw: LiveGameweek, info: Map<number, PlayerInfo>): PlayerStatus {
   const team = info.get(element)?.teamId;
   const games = gamesOf(team, gw);
   if (games.length === 0) return "no-game";
-  const minutes = gw.elements[element]?.minutes ?? 0;
-  if (games.some((f) => f.started && !f.finishedProvisional)) return "playing";
+  const el = gw.elements[element];
+  const minutes = el?.minutes ?? 0;
+  const live = games.filter((f) => f.started && !f.finishedProvisional);
+  if (live.length > 0) {
+    // FPL gives starters minutes within the first few minutes. Until the clock
+    // has run a little (or if we don't know it) assume he's on.
+    const settled = live.every((f) => f.minutes >= BENCH_AFTER_MINUTES);
+    return minutes > 0 || (el?.starts ?? 0) > 0 || !settled ? "playing" : "on-bench";
+  }
   if (games.some((f) => !f.started)) return minutes > 0 ? "playing" : "to-play";
   return minutes > 0 ? "played" : "did-not-play";
 }
@@ -358,7 +369,7 @@ export function liveSquad(
     entryId,
     players,
     score: counting.reduce((s, p) => s + p.points, 0),
-    started: counting.filter((p) => p.status === "played" || p.status === "playing" || p.status === "did-not-play").length,
+    started: counting.filter((p) => p.status === "played" || p.status === "playing" || p.status === "on-bench" || p.status === "did-not-play").length,
     toPlay: counting.filter((p) => p.status === "to-play").length,
     benchPoints: players.filter((p) => !p.counts).reduce((sum, p) => sum + p.points, 0),
     officialSubs,
