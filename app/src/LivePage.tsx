@@ -214,7 +214,8 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
         {hasLineups && (
           <p className="hint">
             <span className="lv-key">
-              <Dot status="playing" /> playing now <Dot status="played" /> played <Dot status="to-play" /> to play
+              <Dot status="playing" /> playing now <Dot status="on-bench" /> on the bench <Dot status="played" /> played{" "}
+              <Dot status="to-play" /> to play
             </span>{" "}
             · tap a match for lineups, a player for his points.
           </p>
@@ -359,17 +360,21 @@ function Dots({ squad }: { squad: LiveSquad }) {
   );
 }
 
-/** "2 playing · 5 to play" under each side, so you can see who has more to come without opening the match. */
+/** "2 playing · 1 on bench · 5 to play" under each side, so you can see who has more to come without opening the match. */
 function SquadSummary({ squad }: { squad: LiveSquad }) {
   const counting = squad.players.filter((p) => p.counts);
-  const playing = counting.filter((p) => p.status === "playing").length;
-  const toPlay = counting.filter((p) => p.status === "to-play").length;
-  if (!playing && !toPlay) return <span className="lv-summary">All played</span>;
+  const count = (s: LivePlayer["status"]) => counting.filter((p) => p.status === s).length;
+  const playing = count("playing");
+  const parts = [
+    count("on-bench") > 0 && `${count("on-bench")} on bench`,
+    count("to-play") > 0 && `${count("to-play")} to play`,
+  ].filter(Boolean);
+  if (!playing && parts.length === 0) return <span className="lv-summary">All played</span>;
   return (
     <span className="lv-summary">
       {playing > 0 && <span className="lv-summary-live">{playing} playing</span>}
-      {playing > 0 && toPlay > 0 && " · "}
-      {toPlay > 0 && `${toPlay} to play`}
+      {playing > 0 && parts.length > 0 && " · "}
+      {parts.join(" · ")}
     </span>
   );
 }
@@ -591,7 +596,9 @@ function PlayerRow({ p, squad, bench, groupEnd, ctx }: { p: LivePlayer; squad: L
     ? { cls: "in", text: pending ? `Will come on for ${other}` : `Came on for ${other}` }
     : p.subbedOut
       ? { cls: "out", text: pending ? `Didn't play, ${other} will come on` : `0 mins, replaced by ${other}` }
-      : blank
+      : !bench && p.counts && p.status === "on-bench"
+        ? { cls: "wait", text: "On the bench" }
+        : blank
         ? { cls: "out", text: ctx.phase === "done" ? "Didn't play, no sub could come on" : "Didn't play, no sub available yet" }
         : null;
   const benchNo = bench ? (p.position === "GKP" ? "GK" : String(p.slot - ctx.data.rules.play - 1)) : null;
