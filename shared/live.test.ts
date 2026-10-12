@@ -9,6 +9,7 @@ import {
   bonusTable,
   defconTable,
   fixtureImpacts,
+  gamesOf,
   leagueOwners,
   liveMatches,
   liveSquad,
@@ -18,6 +19,7 @@ import {
   toLiveGameweek,
   topPerformers,
   type LivePicks,
+  type LivePlayer,
   type PlayerInfo,
   type RawLiveResponse,
 } from "./live";
@@ -228,6 +230,41 @@ describe("player stats and points breakdown (GW5)", () => {
     for (const el of rest) expect(squad.players.find((p) => p.element === el)!.status).toBe("on-bench");
     // Anyone with minutes is playing whatever the sheet says.
     expect(squad.players.filter((p) => p.minutes > 0).every((p) => p.status === "playing")).toBe(true);
+  });
+
+  it("calls a score settled only when nobody left could change it", () => {
+    for (const id of realScores.keys()) expect(liveSquad(id, gw, info, rules)!.settled).toBe(true);
+    const midMatch = { ...gw, fixtures: gw.fixtures.map((f) => ({ ...f, finishedProvisional: false, minutes: 60 })) };
+    expect([...realScores.keys()].some((id) => liveSquad(id, midMatch, info, rules)!.settled)).toBe(false);
+    // A bench player still to play only matters if a starter blanked and he could come on.
+    // Find a squad with an unused outfield sub whose match involves none of the starters.
+    const found = [...realScores.keys()].flatMap((id) => {
+      const sq = liveSquad(id, gw, info, rules)!;
+      const xi = sq.players.filter((p) => p.counts);
+      const clear = (p: LivePlayer) =>
+        gamesOf(p.teamId, gw).length > 0 &&
+        !gamesOf(p.teamId, gw).some((f) => xi.some((x) => x.teamId === f.teamH || x.teamId === f.teamA));
+      const sub = sq.players.find((p) => !p.counts && !p.subbedOut && p.position !== "GKP" && clear(p));
+      const starter = sub && xi.find((p) => p.position === sub.position && !p.subbedIn);
+      return sub && starter ? [{ id, sub, starter }] : [];
+    })[0]!;
+    expect(found).toBeDefined();
+    const { id, sub, starter } = found;
+    const notYet = {
+      ...gw,
+      fixtures: gw.fixtures.map((f) => (f.teamH === sub.teamId || f.teamA === sub.teamId ? { ...f, started: false, finishedProvisional: false } : f)),
+      elements: { ...gw.elements, [sub.element]: { ...gw.elements[sub.element], minutes: 0, starts: 0 } },
+    };
+    expect(liveSquad(id, notYet, info, rules)!.settled).toBe(true);
+    // The starter blanks and no other sub played, so only the one still to play can come on.
+    const zero = (el: number) => [el, { ...notYet.elements[el], minutes: 0, starts: 0 }] as const;
+    const others = liveSquad(id, gw, info, rules)!.players.filter((p) => p.slot > rules.play && p.element !== sub.element);
+    const blanked = {
+      ...notYet,
+      picks: { ...notYet.picks, [id]: { ...notYet.picks[id], subs: [] } },
+      elements: { ...notYet.elements, ...Object.fromEntries([starter.element, ...others.map((p) => p.element)].map(zero)) },
+    };
+    expect(liveSquad(id, blanked, info, rules)!.settled).toBe(false);
   });
 
   it("adds up points left on the bench", () => {

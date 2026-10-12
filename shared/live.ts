@@ -287,6 +287,12 @@ export interface LiveSquad {
   benchPoints: number;
   /** Subs came from FPL (true) or are our projection (false). */
   officialSubs: boolean;
+  /**
+   * Nothing left that can change the score, bar FPL's own corrections (bonus,
+   * late stat changes): every counting player is done, and no bench player
+   * still to play could come on for someone who didn't play.
+   */
+  settled: boolean;
 }
 
 /** A club's matches this gameweek (none, one, or two in a double gameweek). */
@@ -381,6 +387,11 @@ export function liveSquad(
   }
 
   const counting = players.filter((p) => p.counts);
+  const stillGoing = (p: LivePlayer) => p.status === "playing" || p.status === "on-bench" || p.status === "to-play";
+  const blank = (p: LivePlayer) => p.status === "did-not-play" || p.status === "no-game" || p.status === "not-in-squad";
+  const settled =
+    !counting.some(stillGoing) &&
+    !(counting.some(blank) && players.some((p) => !p.counts && !p.subbedOut && stillGoing(p)));
   return {
     entryId,
     players,
@@ -389,6 +400,7 @@ export function liveSquad(
     toPlay: counting.filter((p) => p.status === "to-play").length,
     benchPoints: players.filter((p) => !p.counts).reduce((sum, p) => sum + p.points, 0),
     officialSubs,
+    settled,
   };
 }
 
