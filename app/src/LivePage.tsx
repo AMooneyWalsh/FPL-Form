@@ -233,6 +233,12 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
             <br />Tap a match for lineups, a player for his points.
           </p>
         )}
+        {!gwConfirmed(ctx) && ctx.matches.some((m) => isDecided(m, phase)) && (
+          <p className="hint">
+            <span className="lv-res W">W</span> <span className="lv-res L">L</span> outlined: everyone in that match has
+            played, but bonus and subs aren't official until FPL confirms the gameweek, usually the next day.
+          </p>
+        )}
         {ctx.sheets && ctx.sheets.announced.length > 0 && (
           <p className="hint">
             Team news is in for some matches: <Tag tone="good">Starting</Tag> <Tag tone="warn">Bench</Tag>{" "}
@@ -289,6 +295,17 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
   );
 }
 
+/** Neither side has anyone left who could change the score. */
+function isDecided(m: LiveMatch, phase: Phase): boolean {
+  return !!(m.home && m.away && (phase === "done" || (m.home.settled && m.away.settled)));
+}
+
+/** FPL has finished the gameweek: scores are official and won't move again. */
+function gwConfirmed(ctx: Ctx): boolean {
+  const { current_event, current_event_finished } = ctx.data.game;
+  return ctx.gw.event < current_event || (ctx.gw.event === current_event && current_event_finished);
+}
+
 function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: boolean }) {
   const [open, setOpen] = useState(startOpen);
   const { phase, myTeam } = ctx;
@@ -297,6 +314,8 @@ function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: b
   const result = (mine: number | null, theirs: number | null) =>
     mine === null || theirs === null ? null : mine > theirs ? "W" : mine < theirs ? "L" : "D";
   const isMine = m.homeEntry === myTeam || m.awayEntry === myTeam;
+  const decided = isDecided(m, phase);
+  const final = gwConfirmed(ctx);
   return (
     <article className={`card match ${isMine ? "mine-card" : ""}`}>
       <button className="lv-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
@@ -307,11 +326,12 @@ function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: b
             <span className="muted">–</span>
             <span>{a ?? "–"}</span>
           </span>
-          {/* Once it's over, W/L next to the score. While it's live the score says it all. */}
-          {phase === "done" && m.home && m.away && (
-            <span className="lv-chips">
-              <span className={`lv-res ${result(h, a)} ${phase}`}>{result(h, a)}</span>
-              <span className={`lv-res ${result(a, h)} ${phase}`}>{result(a, h)}</span>
+          {/* Once neither side has anyone left to play, W/L next to the score.
+              Outlined until FPL confirms the gameweek, solid after. */}
+          {decided && (
+            <span className="lv-chips" title={final ? "Final result" : "Everyone has played. Points can still move a little until FPL confirms the gameweek."}>
+              <span className={`lv-res ${result(h, a)} ${final ? "final" : ""}`}>{result(h, a)}</span>
+              <span className={`lv-res ${result(a, h)} ${final ? "final" : ""}`}>{result(a, h)}</span>
             </span>
           )}
         </span>

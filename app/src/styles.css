@@ -1548,17 +1548,17 @@ button.small-link {
   color: var(--bad);
 }
 
-/* Solid once the gameweek is over; outlined while it can still change. */
-.lv-res.done {
+/* Solid once FPL confirms the gameweek; outlined while points can still move. */
+.lv-res.final {
   color: var(--on-color);
   background: var(--neutral);
 }
 
-.lv-res.done.W {
+.lv-res.final.W {
   background: var(--good);
 }
 
-.lv-res.done.L {
+.lv-res.final.L {
   background: var(--bad);
 }
 
