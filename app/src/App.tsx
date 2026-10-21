@@ -29,7 +29,8 @@ interface Route {
 }
 
 function routeFromHash(): Route {
-  const [first, second] = window.location.hash.replace(/^#\/?/, "").split("/");
+  // Settings after a "?" (e.g. #/league/h2h?a=1&b=2) are read by the page itself, via hashParams.
+  const [first, second] = window.location.hash.replace(/^#\/?/, "").split("?")[0].split("/");
   // Old links (#/table, #/trades, #/waivers, #/players) still work.
   if (first === "table") return { page: "league", sub: "table" };
   if (first === "trades" || first === "waivers" || first === "players") return { page: "moves", sub: first };
