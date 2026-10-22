@@ -3,6 +3,7 @@ import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type Tra
 import { Explainer, Manager, nobody, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
 import { TradeNetwork } from "./TradeNetwork";
+import { biggestTurnarounds, TradeWeeks, Turnarounds } from "./TradeWeeks";
 
 export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [who, setWho] = useShownManager();
@@ -10,6 +11,15 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
   const ledger = useMemo(() => tradeLedger(verdicts, [...data.entries.keys()]), [verdicts, data]);
   const shown =
     who === null ? verdicts : verdicts.filter((v) => v.offerer.entryId === who || v.receiver.entryId === who);
+  const turnarounds = useMemo(() => biggestTurnarounds(verdicts, data), [verdicts, data]);
+  // Opening a trade from the turnarounds may first need the Show filter cleared,
+  // so it waits until the cards have re-rendered.
+  const [opening, setOpening] = useState<number | null>(null);
+  useEffect(() => {
+    if (opening === null) return;
+    openTrade(opening);
+    setOpening(null);
+  }, [opening]);
 
   return (
     <>
@@ -78,6 +88,16 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
 
       <TradeNetwork ledger={ledger} data={data} myTeam={myTeam} />
 
+      <Turnarounds
+        rows={turnarounds}
+        data={data}
+        myTeam={myTeam}
+        onOpen={(id) => {
+          if (!shown.some((v) => v.id === id)) setWho(null);
+          setOpening(id);
+        }}
+      />
+
       <section>
         <SectionHead title="Every trade">
           <ShowFilter data={data} value={who} onChange={setWho} myTeam={myTeam} />
@@ -103,6 +123,12 @@ export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number 
 
 /** Asks the trade card with this id to open, e.g. when a "traded on" link points at it. */
 const OPEN_TRADE = "open-trade";
+
+/** Opens a trade card further down the page and scrolls to it. */
+function openTrade(id: number) {
+  window.dispatchEvent(new CustomEvent(OPEN_TRADE, { detail: id }));
+  document.getElementById(`trade-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
 /**
  * One trade. `folded` starts it as a short summary (who got whom, and the
@@ -161,6 +187,7 @@ export function TradeCard({
         <Side side={v.offerer} v={v} data={data} myTeam={myTeam} />
         <Side side={v.receiver} v={v} data={data} myTeam={myTeam} />
       </div>
+      <TradeWeeks v={v} data={data} myTeam={myTeam} />
       {data.reversals
         .filter((r) => r.tradeId === v.id)
         .map((r) => (
@@ -249,13 +276,7 @@ function Trail({ p, data }: { p: TradedPlayer; data: LeagueData }) {
     return (
       <div className="note">
         {p.points !== 0 && `${p.points} for them, then `}
-        <button
-          className="inline-link"
-          onClick={() => {
-            window.dispatchEvent(new CustomEvent(OPEN_TRADE, { detail: o.tradeId }));
-            document.getElementById(`trade-${o.tradeId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-          }}
-        >
+        <button className="inline-link" onClick={() => openTrade(o.tradeId)}>
           ↳ traded on in GW{o.event} for {names}
         </button>{" "}
         · {worth}

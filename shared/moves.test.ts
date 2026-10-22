@@ -5,7 +5,19 @@ import leagueJson from "../fixtures/league-634-details.json";
 import tradesJson from "../fixtures/trades.json";
 import transactionsJson from "../fixtures/transactions.json";
 import type { Gameweek } from "./gameweek";
-import { cancelReversals, passedThrough, playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "./moves";
+import {
+  cancelReversals,
+  passedThrough,
+  playerJourney,
+  Seasons,
+  timelineStory,
+  tradeLedger,
+  tradeTimeline,
+  tradeVerdicts,
+  waiverBattles,
+  waiverRecord,
+  type TimelinePoint,
+} from "./moves";
 import type { DraftChoice, Trade, Transaction } from "./types";
 
 const gameweeks = gameweeksJson as unknown as Gameweek[];
@@ -342,5 +354,128 @@ describe("waiver battles", () => {
 
   it("ignores a player only one manager wanted", () => {
     expect(waiverBattles([claim(1, "a", 1, 5), claim(1, "di", 2, 6)], s)).toEqual([]);
+  });
+});
+
+describe("trade verdicts over time", () => {
+  const { trades: effective } = cancelReversals(trades);
+  const verdicts = tradeVerdicts(effective, seasons, transactions);
+  const timeline = tradeTimeline(effective, seasons, transactions);
+
+  it("ends every trade's timeline on the card's verdict", () => {
+    for (const v of verdicts) {
+      const points = timeline.get(v.id) ?? [];
+      if (v.pending) {
+        expect(points).toEqual([]);
+        continue;
+      }
+      expect(points.at(-1)).toEqual({
+        event: seasons.lastEvent,
+        offerer: v.offerer.total,
+        receiver: v.receiver.total,
+        winner: v.winner,
+        margin: v.margin,
+      });
+    }
+  });
+
+  it("has a point for every gameweek from the trade's own to the latest", () => {
+    for (const v of verdicts.filter((x) => !x.pending)) {
+      const events = timeline.get(v.id)!.map((p) => p.event);
+      expect(events).toEqual(Array.from({ length: seasons.lastEvent - v.event + 1 }, (_, i) => v.event + i));
+    }
+  });
+
+  it("matches the verdict as it stood after each gameweek", () => {
+    for (const event of [2, 3, 4]) {
+      const then = tradeVerdicts(effective, seasons.upTo(event), transactions);
+      for (const v of then.filter((x) => !x.pending)) {
+        const point = timeline.get(v.id)!.find((p) => p.event === event)!;
+        expect([point.offerer, point.receiver, point.winner, point.margin]).toEqual([
+          v.offerer.total,
+          v.receiver.total,
+          v.winner,
+          v.margin,
+        ]);
+      }
+    }
+  });
+
+  it("shows Ross pulling away from Daire on the 26 August trade", () => {
+    const ROSS = 174816;
+    const points = timeline.get(101798)!;
+    expect(points.map((p) => [p.event, p.winner, p.margin])).toEqual([
+      [2, ROSS, 12],
+      [3, ROSS, 21],
+      [4, ROSS, 37],
+      [5, ROSS, 54],
+    ]);
+    expect(timelineStory(points)).toEqual({ changes: 0, everyWeek: ROSS, comeback: null });
+  });
+
+  it("shows Daire coming from 5 behind on Michael's GW2 trade", () => {
+    const DAIRE = 1679;
+    const points = timeline.get(112088)!;
+    expect(points.map((p) => [p.event, p.winner, p.margin])).toEqual([
+      [2, 1447, 5],
+      [3, DAIRE, 5],
+      [4, DAIRE, 8],
+      [5, DAIRE, 14],
+    ]);
+    expect(timelineStory(points)).toEqual({ changes: 1, everyWeek: null, comeback: { entryId: DAIRE, from: 5 } });
+  });
+});
+
+describe("telling a trade's story", () => {
+  const at = (event: number, winner: number | null, margin: number): TimelinePoint => ({ event, offerer: 0, receiver: 0, winner, margin });
+
+  it("counts the lead changing hands, ignoring level weeks", () => {
+    const story = timelineStory([at(1, 1, 3), at(2, null, 0), at(3, 2, 4), at(4, 1, 2), at(5, 1, 6)]);
+    expect(story.changes).toBe(2);
+    expect(story.everyWeek).toBeNull();
+    expect(story.comeback).toEqual({ entryId: 1, from: 4 });
+  });
+
+  it("has no comeback when it's level now", () => {
+    expect(timelineStory([at(1, 1, 3), at(2, null, 0)])).toEqual({ changes: 0, everyWeek: null, comeback: null });
+  });
+
+  it("swings once the onward trade at the end of a chain pays off", () => {
+    // Adam's example, a week at a time: Ndiaye (100) scores for Ross (2) in
+    // GW2; Bruno (300, what Saka became) only gets going for Daire (1) in GW3.
+    const s = new Seasons([
+      gw(1, {}, { 1: [[100], []], 2: [[200], []], 3: [[300], []] }),
+      gw(2, { 100: 6 }, { 1: [[300], []], 2: [[100], []], 3: [[200], []] }),
+      gw(3, { 100: 1, 300: 12 }, { 1: [[300], []], 2: [[100], []], 3: [[200], []] }),
+    ]);
+    const swaps = [
+      trade(1, 2, 1, 2, [[200, 100]], "2026-08-20T10:00:00Z"),
+      trade(2, 2, 1, 3, [[300, 200]], "2026-08-20T11:00:00Z"),
+    ];
+    const points = tradeTimeline(swaps, s).get(1)!;
+    expect(points).toEqual([
+      { event: 2, offerer: 0, receiver: 6, winner: 2, margin: 6 },
+      { event: 3, offerer: 12, receiver: 7, winner: 1, margin: 5 },
+    ]);
+    expect(timelineStory(points).comeback).toEqual({ entryId: 1, from: 6 });
+  });
+
+  it("counts an onward trade made after the cut-off for nothing yet", () => {
+    // Manager 1 gets 200 in GW2, then passes him on for 300 effective GW3.
+    const s = new Seasons([
+      gw(1, {}, { 1: [[100], []], 2: [[200], []], 3: [[300], []] }),
+      gw(2, { 200: 4, 100: 2 }, { 1: [[200], []], 2: [[100], []], 3: [[300], []] }),
+      gw(3, { 300: 9 }, { 1: [[300], []], 2: [[100], []], 3: [[200], []] }),
+    ]);
+    const swaps = [
+      trade(1, 2, 1, 2, [[200, 100]], "2026-08-20T10:00:00Z"),
+      trade(2, 3, 1, 3, [[300, 200]], "2026-08-27T10:00:00Z"),
+    ];
+    const points = tradeTimeline(swaps, s).get(1)!;
+    expect(points.map((p) => [p.offerer, p.receiver])).toEqual([
+      [4, 2],
+      [13, 2],
+    ]);
+    expect(points.at(-1)!.offerer).toBe(tradeVerdicts(swaps, s).find((v) => v.id === 1)!.offerer.total);
   });
 });

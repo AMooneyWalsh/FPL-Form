@@ -2766,3 +2766,197 @@ button.link.search-cancel {
   font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
 }
+
+/* ================================================================
+   Trade grades over time (inside an opened trade card, TradeWeeks.tsx)
+   and the weekly recap (League > Recap, RecapPage.tsx)
+   ================================================================ */
+
+.trade-weeks {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--line);
+}
+
+.trade-weeks h3 {
+  margin: 0 0 var(--sp-1);
+}
+
+.tw-chart {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  touch-action: pan-y;
+  cursor: pointer;
+}
+
+.tw-chart .tw-zero {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.tw-chart .tw-bar {
+  fill: var(--neutral);
+}
+
+.tw-chart .tw-bar.s1 {
+  fill: var(--series-1);
+}
+
+.tw-chart .tw-bar.s2 {
+  fill: var(--series-2);
+}
+
+.tw-chart .tw-bar.faded {
+  opacity: 0.6;
+}
+
+.tw-chart .tw-name {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tw-chart .tw-ahead,
+.tw-chart .axis {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.tw-chart .tw-value {
+  fill: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tw-story {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.tw-detail {
+  margin: 0;
+}
+
+.turnarounds li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.turnarounds li:first-child {
+  border-top: 0;
+}
+
+.turnarounds .chip-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.recap-lead p {
+  margin: 0 0 var(--sp-2);
+}
+
+.recap-lead p:first-child {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.recap-lead p:last-child {
+  margin-bottom: 0;
+}
+
+.recap-results {
+  padding: 0;
+  overflow: hidden;
+}
+
+.recap-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+
+.recap-result:first-child {
+  border-top: 0;
+}
+
+.recap-result.is-mine {
+  box-shadow: inset 3px 0 0 var(--mine-edge);
+}
+
+.rr-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rr-home {
+  text-align: right;
+}
+
+.rr-score {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.recap-result .won,
+.recap-result .won .mgr {
+  font-weight: 700;
+}
+
+.recap-awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0 var(--sp-3);
+}
+
+.award {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--sp-3);
+  align-items: baseline;
+}
+
+.award-title {
+  grid-column: 1 / -1;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.award-who {
+  font-weight: 600;
+}
+
+.award-stat {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.award-stat.good {
+  color: var(--good);
+}
+
+.award-stat.bad {
+  color: var(--bad);
+}
+
+.award-line {
+  grid-column: 1 / -1;
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-sm);
+}

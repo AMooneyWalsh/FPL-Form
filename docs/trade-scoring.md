@@ -82,6 +82,16 @@ Effect on the 26 Aug trade: Ross +70 became **Ross +54** (Hill 10 + Doku 4 again
 
 Code: `cancelReversals` in `shared/moves.ts`, applied to the trade list before anything else uses it (`app/src/data.ts`).
 
+## Week by week (trade grades over time)
+
+Added 21 Oct 2026. An opened trade card shows who was ahead after every gameweek since the trade, once two gameweeks have been played, with one line like "Daire came from 5 behind" or "Lead changed hands twice". Tap or drag along the chart to see any week's totals. The Trades page also lists the biggest turnarounds (the manager ahead now was once at least 3 behind).
+
+- Code: `tradeTimeline` and `timelineStory` in `shared/moves.ts`, UI in `app/src/TradeWeeks.tsx`. Tests in `shared/moves.test.ts`; `scripts/regression.ts` checks it against live data.
+- It replays `tradeVerdicts` with the season cut off after each gameweek (`Seasons.upTo`). So each point is exactly what the card would have said that week, chains and all, and **the last point is always the card's verdict**.
+- Trades and transactions after the cut-off can't change a point: a player's spell stops at the cut-off, and so does the search for an onward trade. An onward trade for the next gameweek is found but counts for nothing yet, so the total is the same.
+- Example: on Michael and Daire's GW2 trade (Hill, Tel, Gonzalo for Vuskovic, O.Dango, Abraham) Michael led by 5 after GW2, then Daire led every week after, 28 ahead by GW7.
+- Worked out once per data load for every trade (about 20 ms after GW7) the first time a card opens.
+
 ## 2. Trade ledger
 
 Per manager, across all their trades:

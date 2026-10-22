@@ -18,6 +18,11 @@ export class Seasons {
     return this.gameweeks.at(-1)?.event ?? 0;
   }
 
+  /** The season as it stood after gameweek `event`. */
+  upTo(event: number): Seasons {
+    return new Seasons(this.gameweeks.filter((g) => g.event <= event));
+  }
+
   ownerAt(element: number, event: number) {
     const i = this.gameweeks.findIndex((g) => g.event === event);
     return i === -1 ? undefined : this.owners[i].get(element);
@@ -280,6 +285,70 @@ export function tradeVerdicts(trades: Trade[], seasons: Seasons, transactions: T
       };
     })
     .sort((a, b) => b.time.localeCompare(a.time));
+}
+
+// ---------------------------------------------------------------- trades over time
+
+/** Where a trade's verdict stood after one gameweek. */
+export interface TimelinePoint {
+  event: number;
+  /** Each side's total (follows chains), as on the card. */
+  offerer: number;
+  receiver: number;
+  winner: number | null;
+  margin: number;
+}
+
+/**
+ * Each trade's verdict after every gameweek from its own to the latest, keyed
+ * by trade id. It replays tradeVerdicts with the season cut off at each
+ * gameweek, so the last point is always the card's verdict. Trades and
+ * transactions after the cut-off can't change it (a player's spell stops at
+ * the cut-off, and so does the search for an onward trade), so they're passed
+ * in as they are, apart from trades too late to matter.
+ */
+export function tradeTimeline(trades: Trade[], seasons: Seasons, transactions: Transaction[] = []): Map<number, TimelinePoint[]> {
+  const timeline = new Map<number, TimelinePoint[]>();
+  const processed = trades.filter((t) => t.state === "p");
+  if (processed.length === 0) return timeline;
+  const first = Math.min(...processed.map((t) => t.event));
+  for (const gw of seasons.gameweeks) {
+    if (gw.event < first) continue;
+    // An onward trade the gameweek after the cut-off still counts (for nothing yet); later ones can't.
+    const known = processed.filter((t) => t.event <= gw.event + 1);
+    for (const v of tradeVerdicts(known, seasons.upTo(gw.event), transactions)) {
+      if (v.pending) continue;
+      const points = timeline.get(v.id) ?? [];
+      points.push({ event: gw.event, offerer: v.offerer.total, receiver: v.receiver.total, winner: v.winner, margin: v.margin });
+      timeline.set(v.id, points);
+    }
+  }
+  return timeline;
+}
+
+/** The shape of a trade's story so far, for one line under its chart. */
+export interface TimelineStory {
+  /** Times the lead went from one manager to the other (level weeks don't count). */
+  changes: number;
+  /** Ahead after every gameweek, if anyone was. */
+  everyWeek: number | null;
+  /** The manager ahead now came back from this far behind (0 if never behind). */
+  comeback: { entryId: number; from: number } | null;
+}
+
+export function timelineStory(points: TimelinePoint[]): TimelineStory {
+  let changes = 0;
+  let leader: number | null = null;
+  for (const p of points) {
+    if (p.winner === null) continue;
+    if (leader !== null && p.winner !== leader) changes++;
+    leader = p.winner;
+  }
+  const now = points.at(-1)?.winner ?? null;
+  const everyWeek = now !== null && points.every((p) => p.winner === now) ? now : null;
+  // How far behind the current leader ever was.
+  const worst = now === null ? 0 : Math.max(0, ...points.filter((p) => p.winner !== null && p.winner !== now).map((p) => p.margin));
+  return { changes, everyWeek, comeback: now !== null && worst > 0 ? { entryId: now, from: worst } : null };
 }
 
 export interface LedgerRow {
