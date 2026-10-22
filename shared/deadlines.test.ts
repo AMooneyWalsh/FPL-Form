@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import bootstrap from "../fixtures/bootstrap-static.json";
-import { countdown, upcomingDeadlines } from "./deadlines";
+import { countdown, nextDeadline, upcomingDeadlines } from "./deadlines";
 import { trimPlayers } from "../worker/index";
 import type { PlayersPayload } from "./types";
 
@@ -40,5 +40,20 @@ describe("countdown", () => {
     expect(countdown("2026-10-09T21:25:00Z", now)).toBe("in 25 min");
     expect(countdown("2026-10-10T10:00:00Z", now)).toBe("in 13 h");
     expect(countdown("2026-10-15T10:00:00Z", now)).toBe("in 6 days");
+  });
+});
+
+describe("nextDeadline", () => {
+  it("skips a gameweek whose waivers have already closed", () => {
+    // GW6 waivers closed 9 Oct 10:00, but its team deadline was still to come.
+    expect(nextDeadline(deadlines!, "waivers", Date.parse("2026-10-09T21:00:00Z"))?.event).toBe(7);
+    expect(nextDeadline(deadlines!, "waivers", Date.parse("2026-10-09T09:00:00Z"))).toEqual({
+      event: 6,
+      at: "2026-10-09T10:00:00Z",
+    });
+  });
+
+  it("is empty after the last one", () => {
+    expect(nextDeadline(deadlines!, "waivers", Date.parse("2027-07-01T00:00:00Z"))).toBeNull();
   });
 });

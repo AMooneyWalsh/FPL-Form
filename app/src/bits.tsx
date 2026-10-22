@@ -301,3 +301,57 @@ export function ScrollTable({ children }: { children: ReactNode }) {
 export function RowNo({ children }: { children: ReactNode }) {
   return <span className="row-no">{children}</span>;
 }
+
+/** Settings carried in the link after a "?", e.g. a=1412 in #/league/h2h?a=1412&b=72619. */
+export function hashParams(): URLSearchParams {
+  return new URLSearchParams(window.location.hash.split("?")[1] ?? "");
+}
+
+/**
+ * Updates the settings in the link without moving the page, so a pick can be
+ * shared by copying the address. Doesn't fire hashchange (no scroll to top).
+ * Empty or null values are left out.
+ */
+export function replaceHashParams(values: Record<string, string | number | null | undefined>) {
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(values)) if (v !== null && v !== undefined && v !== "") params.set(k, String(v));
+  const base = window.location.hash.split("?")[0] || "#/";
+  const query = params.toString();
+  window.history.replaceState(window.history.state, "", query ? `${base}?${query}` : base);
+}
+
+/** A dropdown of managers, A to Z, for picking one (compare with, head to head). Long lists use ShowFilter instead. */
+export function ManagerSelect({
+  data,
+  value,
+  onChange,
+  placeholder,
+  exclude,
+  label = "Manager",
+}: {
+  data: LeagueData;
+  value: number | null;
+  onChange: (id: number | null) => void;
+  placeholder?: string;
+  exclude?: number | null;
+  label?: string;
+}) {
+  const options = [...data.entries.keys()]
+    .filter((id) => id !== exclude)
+    .sort((x, y) => (data.labels.get(x) ?? "").localeCompare(data.labels.get(y) ?? ""));
+  return (
+    <select
+      className="select"
+      aria-label={label}
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
+    >
+      {placeholder !== undefined && <option value="">{placeholder}</option>}
+      {options.map((id) => (
+        <option key={id} value={id}>
+          {data.labels.get(id)}
+        </option>
+      ))}
+    </select>
+  );
+}

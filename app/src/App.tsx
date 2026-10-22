@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { countdown, upcomingDeadlines, type DeadlineKind } from "../../shared/deadlines";
 import { useLeagueData, type LeagueData } from "./data";
 import { DRAFT_VIEWS, DraftPage } from "./DraftPage";
-import { timeAgo } from "./format";
+import { deadlineTime, timeAgo } from "./format";
 import { useMyTeam } from "./myTeam";
 import { LEAGUE_VIEWS, LeaguePage } from "./LeaguePage";
 import { LIVE_VIEWS, LivePage } from "./LivePage";
@@ -29,7 +29,8 @@ interface Route {
 }
 
 function routeFromHash(): Route {
-  const [first, second] = window.location.hash.replace(/^#\/?/, "").split("/");
+  // Settings after a "?" (e.g. #/league/h2h?a=1&b=2) are read by the page itself, via hashParams.
+  const [first, second] = window.location.hash.replace(/^#\/?/, "").split("?")[0].split("/");
   // Old links (#/table, #/trades, #/waivers, #/players) still work.
   if (first === "table") return { page: "league", sub: "table" };
   if (first === "trades" || first === "waivers" || first === "players") return { page: "moves", sub: first };
@@ -193,20 +194,6 @@ function DeadlineBanner({ data }: { data: LeagueData }) {
       )}
     </section>
   );
-}
-
-/**
- * "Sat 11:00" when it's less than a week away (so the weekday can't be
- * mistaken), "Fri 23 Oct" further out. Kept short so three deadlines fit
- * side by side on a phone.
- */
-export function deadlineTime(iso: string, now: number): string {
-  const d = new Date(iso);
-  const weekday = d.toLocaleDateString("en-GB", { weekday: "short" });
-  if (d.getTime() - now >= 7 * 24 * 3600_000) {
-    return `${weekday} ${d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`;
-  }
-  return `${weekday} ${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 /** Back to wherever they tapped the name, or the home page if they arrived by a shared link. */

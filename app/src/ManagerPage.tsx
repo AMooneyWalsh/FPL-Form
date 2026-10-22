@@ -6,6 +6,7 @@ import { computeStandings } from "../../shared/standings";
 import { Manager, PlayerName, Pts, StatTile, useShownManager, type StatRank } from "./bits";
 import type { LeagueData } from "./data";
 import { ManagerOdds } from "./OddsPage";
+import { rivalryLink } from "./RivalryView";
 import { TradeCard } from "./TradesPage";
 
 /** One manager's page (#/manager/123): everything about them in one place. */
@@ -91,6 +92,17 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
             </span>
           </p>
         )}
+        {myTeam !== null && !mine ? (
+          <a className="link" href={rivalryLink(myTeam, id)}>
+            You v {who}: the rivalry
+          </a>
+        ) : (
+          next && (
+            <a className="link" href={rivalryLink(id, next.opponent)}>
+              {who} v {data.labels.get(next.opponent)}: the rivalry
+            </a>
+          )
+        )}
       </section>
 
       <ManagerOdds id={id} data={data} />
@@ -119,6 +131,12 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
 
       <section>
         <h2>Waivers</h2>
+        <p>
+          Waiver priority: <strong>{ordinal(entry.waiver_pick)}</strong> of {data.entries.size}.{" "}
+          <a className="link" href="#/moves/waivers">
+            Waiver order
+          </a>
+        </p>
         {waivers && waivers.claims + waivers.freeAgents > 0 ? (
           <p className="hint">
             Won {waivers.won} of {waivers.claims} waiver {waivers.claims === 1 ? "claim" : "claims"} ({waivers.outbid}{" "}
