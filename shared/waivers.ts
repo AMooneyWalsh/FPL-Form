@@ -58,9 +58,23 @@ export interface Suggestion {
 }
 
 /**
- * Free agents worth a look. Rating = 60% recent form + 40% points a game,
- * nudged up to 20% for easy fixtures (down for hard), and scaled by FPL's
- * chance of playing. Players who are out, or haven't played, are left out.
+ * How good a player looks for the next few weeks, to one decimal place. The
+ * one rating the whole site uses (waiver suggestions, trade checker, trade
+ * partners). 60% recent form + 40% points a game, nudged up to 20% for easy
+ * fixtures (down for hard), and scaled by FPL's chance of playing. Anyone
+ * who's out rates 0.
+ */
+export function playerRating(p: Player, fixtures: UpcomingFixture[], difficulty: Map<number, number>): number {
+  const run = fixtureRun(p.teamId, fixtures, difficulty);
+  const avg = run.length ? run.reduce((s, f) => s + f.difficulty, 0) / run.length : 3;
+  const chance = isOut(p) ? 0 : p.chanceNext === null ? 1 : p.chanceNext / 100;
+  const rating = (0.6 * p.form + 0.4 * p.pointsPerGame) * (1 + (3 - avg) * 0.1) * chance;
+  return Math.round(rating * 10) / 10;
+}
+
+/**
+ * Free agents worth a look, best rating first (see playerRating). Players
+ * who are out, or haven't played, are left out.
  */
 export function waiverSuggestions(
   players: Player[],
@@ -70,13 +84,11 @@ export function waiverSuggestions(
   const difficulty = clubDifficulty(players);
   return players
     .filter((p) => (owners.get(p.id) ?? null) === null && p.minutes > 0 && !isOut(p))
-    .map((p) => {
-      const run = fixtureRun(p.teamId, fixtures, difficulty);
-      const avg = run.length ? run.reduce((s, f) => s + f.difficulty, 0) / run.length : 3;
-      const chance = p.chanceNext === null ? 1 : p.chanceNext / 100;
-      const rating = (0.6 * p.form + 0.4 * p.pointsPerGame) * (1 + (3 - avg) * 0.1) * chance;
-      return { player: p, rating: Math.round(rating * 10) / 10, fixtures: run };
-    })
+    .map((p) => ({
+      player: p,
+      rating: playerRating(p, fixtures, difficulty),
+      fixtures: fixtureRun(p.teamId, fixtures, difficulty),
+    }))
     .sort((a, b) => b.rating - a.rating || b.player.totalPoints - a.player.totalPoints);
 }
 

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Player } from "../../shared/types";
-import { isOut, waiverSuggestions, weakestAt, type FixtureRunItem } from "../../shared/waivers";
-import { Explainer, PlayerName } from "./bits";
+import { isOut, waiverSuggestions, weakestAt } from "../../shared/waivers";
+import { Explainer, FixtureChips, PlayerName } from "./bits";
 import type { LeagueData } from "./data";
 
 const POSITIONS = ["All", "GKP", "DEF", "MID", "FWD"] as const;
@@ -67,7 +67,7 @@ export function SuggestionsPage({ data, myTeam }: { data: LeagueData; myTeam: nu
               </span>
             </div>
             <div className="sugg-stats">{stats(s.player)}</div>
-            <Fixtures run={s.fixtures} clubs={clubs} />
+            <FixtureChips run={s.fixtures} clubs={clubs} />
             {myTeam !== null && <Drop squad={mySquad} p={s.player} data={data} />}
           </article>
         ))}
@@ -93,19 +93,6 @@ function stats(p: Player): string {
   if (p.position !== "GKP") parts.push(`xGI ${(p.xg + p.xa).toFixed(1)}`);
   if (p.penaltiesOrder === 1) parts.push("on penalties");
   return parts.join(" · ");
-}
-
-function Fixtures({ run, clubs }: { run: FixtureRunItem[]; clubs: Map<number, string> }) {
-  if (run.length === 0) return null;
-  return (
-    <div>
-      {run.map((f) => (
-        <span key={`${f.event}-${f.opponent}`} className={`fdr fdr-${f.difficulty}`} title={`Gameweek ${f.event}`}>
-          {clubs.get(f.opponent) ?? "?"} ({f.home ? "H" : "A"})
-        </span>
-      ))}
-    </div>
-  );
 }
 
 function Drop({ squad, p, data }: { squad: Player[]; p: Player; data: LeagueData }) {

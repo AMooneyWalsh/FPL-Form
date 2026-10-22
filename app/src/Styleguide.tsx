@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { ShareCard } from "../../shared/share";
-import { isOut } from "../../shared/waivers";
+import { clubDifficulty, fixtureRun, isOut } from "../../shared/waivers";
 import {
   Explainer,
+  FixtureChips,
   FoldSection,
   Manager,
   ManagerSelect,
@@ -249,6 +250,11 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
           <span className="fdr fdr-4">ARS (A)</span>
           <span className="fdr fdr-5">MCI (A)</span>
         </p>
+        <p className="hint">Next fixtures for a player (FixtureChips):</p>
+        <FixtureChips
+          run={fixtureRun(players[0]?.teamId ?? 1, data.fixtures, clubDifficulty(players))}
+          clubs={new Map(players.map((p) => [p.teamId, p.team]))}
+        />
       </section>
 
       <section>
