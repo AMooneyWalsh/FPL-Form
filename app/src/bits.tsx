@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { Player } from "../../shared/types";
-import { isOut } from "../../shared/waivers";
+import { isOut, type FixtureRunItem } from "../../shared/waivers";
 import type { LeagueData } from "./data";
 
 export function PlayerName({ id, data, detail = true }: { id: number; data: LeagueData; detail?: boolean }) {
@@ -29,6 +29,20 @@ export function InjuryFlag({ p }: { p: Player }) {
     <Tag tone={out ? "bad" : "warn"} title={p.news || undefined} className="flag">
       {text}
     </Tag>
+  );
+}
+
+/** A player's next few fixtures, "ARS (H)", coloured by FPL's difficulty: green easy, red hard. */
+export function FixtureChips({ run, clubs }: { run: FixtureRunItem[]; clubs: Map<number, string> }) {
+  if (run.length === 0) return null;
+  return (
+    <div>
+      {run.map((f) => (
+        <span key={`${f.event}-${f.opponent}`} className={`fdr fdr-${f.difficulty}`} title={`Gameweek ${f.event}`}>
+          {clubs.get(f.opponent) ?? "?"} ({f.home ? "H" : "A"})
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -353,5 +367,54 @@ export function ManagerSelect({
         </option>
       ))}
     </select>
+  );
+}
+
+/**
+ * "‹ Gameweek 6 ›": step through gameweeks from `min` to `max`. Away from
+ * `home` (usually the latest), a link jumps back to it.
+ */
+export function GameweekPicker({
+  event,
+  min = 1,
+  max,
+  home,
+  onPick,
+}: {
+  event: number;
+  min?: number;
+  max: number;
+  home: number;
+  onPick: (n: number) => void;
+}) {
+  return (
+    <div className="gw-picker">
+      <button
+        type="button"
+        className="gw-step"
+        onClick={() => onPick(event - 1)}
+        disabled={event <= min}
+        aria-label="Previous gameweek"
+      >
+        ‹
+      </button>
+      <div className="gw-picker-mid">
+        <strong>Gameweek {event}</strong>
+        {event !== home && (
+          <button type="button" className="link" onClick={() => onPick(home)}>
+            Back to gameweek {home}
+          </button>
+        )}
+      </div>
+      <button
+        type="button"
+        className="gw-step"
+        onClick={() => onPick(event + 1)}
+        disabled={event >= max}
+        aria-label="Next gameweek"
+      >
+        ›
+      </button>
+    </div>
   );
 }

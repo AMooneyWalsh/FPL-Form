@@ -73,6 +73,7 @@ Weights: 400 body, 600 names and labels, 700 numbers that matter and headings, 8
 | `ShowFilter` | "Show: Everyone / Me / any manager" for long lists. Shared across pages. |
 | `PlayerName`, `Manager` | Every player and manager name, always a link to their page. Never inside a button. |
 | `Pts` | A points number; `signed` shows +/- in good/bad colours. |
+| `ShareButton` (`ShareButton.tsx`) | The small quiet "Share" pill. Draws a picture of a match, trade or manager and opens a preview with Share and Save image. Never inside a `.fold-btn` or a link. See `docs/share-cards.md`. |
 
 CSS-only patterns: `.card` (and `.mine-card`), `.table-wrap` + `table.data` (with `tr.mine`), `.notice` / `.notice.warn` / `.notice.error`, `.chips` + `.chip-btn`, `.form` + `.chip.W/D/L`, `.fdr-1..5`, `.hint`, `a.link`.
 

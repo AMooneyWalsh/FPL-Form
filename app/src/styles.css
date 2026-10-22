@@ -2768,6 +2768,114 @@ button.link.search-cancel {
 }
 
 /* ================================================================
+   Share cards (ShareButton.tsx, docs/share-cards.md): the small Share
+   button, and the full-screen preview it opens with Share and Save image.
+   The pictures themselves are drawn in share.ts from the light tokens.
+   ================================================================ */
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 32px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.share-icon {
+  flex: 0 0 auto;
+}
+
+/* Holds a Share button at the bottom right of a card. */
+.share-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--sp-2);
+}
+
+/* Live match cards: centred under the score, above the lineups. */
+.lv-share {
+  justify-content: center;
+  margin-top: calc(-1 * var(--sp-1));
+  padding: 0 var(--sp-3) var(--sp-3);
+}
+
+.share-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-y: auto;
+  padding: var(--sp-2) var(--sp-4) var(--sp-5);
+  background: var(--bg);
+}
+
+.share-sheet-inner {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.share-sheet-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+/* Link buttons are full width elsewhere; here Close only takes the room it needs. */
+button.link.share-close {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+/* Room for the picture while it's drawn, so the buttons don't jump. */
+.share-preview {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+}
+
+.share-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 62vh;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.share-actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.share-action {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ================================================================
    Group B: power rankings, waiver order, rivalry pages
    (PowerView.tsx, WaiversPage.tsx, RivalryView.tsx)
    ================================================================ */
@@ -2837,4 +2945,347 @@ button.link.search-cancel {
   font-size: var(--fs-xl);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* ================================================================
+   Trade tools (Moves > Trade checker, Trade partners)
+   ================================================================ */
+
+.tc-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  margin-bottom: var(--sp-2);
+}
+
+.tc-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.tc-pos {
+  margin-bottom: var(--sp-2);
+}
+
+.tc-pos-label {
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.chips.tc-chips {
+  margin-bottom: 0;
+}
+
+.tc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 32px;
+}
+
+.tc-chip .flag {
+  margin-left: 0;
+}
+
+.tc-chip-rating {
+  font-weight: 400;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-btn.active .tc-chip-rating {
+  color: inherit;
+  opacity: 0.75;
+}
+
+/* The answer sticks to the bottom of the screen while picking players. */
+.tc-bar {
+  position: sticky;
+  bottom: var(--sp-2);
+  z-index: 3;
+  margin: var(--sp-4) 0 var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+}
+
+.tc-bar.warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.tc-bar-xis {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.tc-bar-verdict {
+  margin-top: 2px;
+  color: var(--muted);
+}
+
+.tc-xi + .tc-xi {
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--line);
+}
+
+.tc-xi-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.tc-xi .hint,
+.tc-twist {
+  margin: 0;
+}
+
+.tc-twist {
+  margin-top: var(--sp-2);
+}
+
+.tp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 600;
+}
+
+.tp-why {
+  margin: var(--sp-1) 0 var(--sp-2);
+}
+
+.tp-xi {
+  margin: var(--sp-2) 0 0;
+  font-weight: 600;
+}
+
+.tp-open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.data td.tp-good {
+  background: var(--good-bg);
+  color: var(--good-text);
+}
+
+.data td.tp-bad {
+  background: var(--bad-bg);
+  color: var(--bad-text);
+}
+
+/* ================================================================
+   Trade grades over time (inside an opened trade card, TradeWeeks.tsx)
+   and the weekly recap (League > Recap, RecapPage.tsx)
+   ================================================================ */
+
+.trade-weeks {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--line);
+}
+
+.trade-weeks h3 {
+  margin: 0 0 var(--sp-1);
+}
+
+.tw-chart {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  touch-action: pan-y;
+  cursor: pointer;
+}
+
+.tw-chart .tw-zero {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.tw-chart .tw-bar {
+  fill: var(--neutral);
+}
+
+.tw-chart .tw-bar.s1 {
+  fill: var(--series-1);
+}
+
+.tw-chart .tw-bar.s2 {
+  fill: var(--series-2);
+}
+
+.tw-chart .tw-bar.faded {
+  opacity: 0.6;
+}
+
+.tw-chart .tw-name {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tw-chart .tw-ahead,
+.tw-chart .axis {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.tw-chart .tw-value {
+  fill: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tw-story {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.tw-detail {
+  margin: 0;
+}
+
+.turnarounds li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.turnarounds li:first-child {
+  border-top: 0;
+}
+
+.turnarounds .chip-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.recap-lead p {
+  margin: 0 0 var(--sp-2);
+}
+
+.recap-lead p:first-child {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.recap-lead p:last-child {
+  margin-bottom: 0;
+}
+
+.recap-results {
+  padding: 0;
+  overflow: hidden;
+}
+
+.recap-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+
+.recap-result:first-child {
+  border-top: 0;
+}
+
+.recap-result.is-mine {
+  box-shadow: inset 3px 0 0 var(--mine-edge);
+}
+
+.rr-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rr-home {
+  text-align: right;
+}
+
+.rr-score {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.recap-result .won,
+.recap-result .won .mgr {
+  font-weight: 700;
+}
+
+.recap-awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0 var(--sp-3);
+}
+
+.award {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--sp-3);
+  align-items: baseline;
+}
+
+.award-title {
+  grid-column: 1 / -1;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.award-who {
+  font-weight: 600;
+}
+
+.award-stat {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.award-stat.good {
+  color: var(--good);
+}
+
+.award-stat.bad {
+  color: var(--bad);
+}
+
+.award-line {
+  grid-column: 1 / -1;
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-sm);
+}
+
+/* Recap share button, under the headlines. */
+.recap-share {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--sp-2);
 }

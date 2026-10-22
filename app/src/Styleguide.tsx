@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { isOut } from "../../shared/waivers";
+import type { ShareCard } from "../../shared/share";
+import { clubDifficulty, fixtureRun, isOut } from "../../shared/waivers";
 import {
   Explainer,
+  FixtureChips,
   FoldSection,
+  GameweekPicker,
   Manager,
   ManagerSelect,
   RowNo,
@@ -16,6 +19,7 @@ import {
   type TagTone,
 } from "./bits";
 import type { LeagueData } from "./data";
+import { ShareButton } from "./ShareButton";
 
 /**
  * #/styleguide: every token and shared piece on one page, in whichever theme the
@@ -102,6 +106,7 @@ const TONES: TagTone[] = ["good", "warn", "bad", "neutral", "mine", "live"];
 export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [who, setWho] = useState<number | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
+  const [gw, setGw] = useState(5);
   const players = [...data.players.values()];
   const injured = players.find((p) => isOut(p));
   const doubtful = players.find((p) => p.status === "d");
@@ -247,6 +252,11 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
           <span className="fdr fdr-4">ARS (A)</span>
           <span className="fdr fdr-5">MCI (A)</span>
         </p>
+        <p className="hint">Next fixtures for a player (FixtureChips):</p>
+        <FixtureChips
+          run={fixtureRun(players[0]?.teamId ?? 1, data.fixtures, clubDifficulty(players))}
+          clubs={new Map(players.map((p) => [p.teamId, p.team]))}
+        />
       </section>
 
       <section>
@@ -275,6 +285,12 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
           <span className="chip-btn">Not selected</span>
           <span className="chip-btn">Another</span>
         </div>
+      </section>
+
+      <section>
+        <h2>Gameweek picker</h2>
+        <p className="hint">Steps through gameweeks, with a way back to the latest. Used by the weekly recap; the Live tab has the same look.</p>
+        <GameweekPicker event={gw} max={7} home={7} onPick={setGw} />
       </section>
 
       <section>
@@ -339,6 +355,16 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
       </section>
 
       <section>
+        <SectionHead title="Share button">
+          <ShareButton what="an example card" card={() => exampleShareCard(data)} />
+        </SectionHead>
+        <p className="hint">
+          Draws a picture and opens a preview with Share and Save image. On Live matches, opened trades and manager pages.
+          Never inside a card's tap area or a link.
+        </p>
+      </section>
+
+      <section>
         <h2>Cards and notices</h2>
         <div className="card">
           <h3 className="card-title">A card</h3>
@@ -354,4 +380,39 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
       </section>
     </>
   );
+}
+
+/** The share card blocks the match, trade and manager pictures don't use, so they can be checked here. */
+function exampleShareCard(data: LeagueData): ShareCard {
+  const [a = "Someone", b = "Someone else"] = [...data.labels.values()];
+  return {
+    kicker: data.league.league.name,
+    title: "Example card",
+    subtitle: "The blocks a picture can be made of",
+    tag: { text: "Live", tone: "live" },
+    blocks: [
+      { kind: "headline", text: `${a} +23`, tone: "good", detail: "A headline: one big statement, with a line or two under it." },
+      {
+        kind: "stats",
+        title: "Stat tiles",
+        items: [
+          { value: "1st", label: "Position" },
+          { value: "78", label: "Highest", rank: { text: "Best in league", tone: "good" } },
+          { value: "42", label: "Bench pts", rank: { text: "Most in league", tone: "bad" } },
+        ],
+      },
+      { kind: "form", label: "Last five", results: ["W", "W", "D", "L", "W"] },
+      {
+        kind: "lines",
+        title: "Lines",
+        rows: [
+          { label: `${a} beat ${b}`, value: "54-41" },
+          { label: "A row with a good number", value: "+12", tone: "good" },
+          { label: "A row with a name long enough to be cut short before the number", value: "-7", tone: "bad" },
+        ],
+      },
+    ],
+    caption: "An example share card.",
+    file: "example-card",
+  };
 }

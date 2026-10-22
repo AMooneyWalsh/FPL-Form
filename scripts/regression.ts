@@ -4,7 +4,8 @@
 import { buildGameweek, squadScore, type RawLive, type RawPicks } from "../shared/gameweek";
 import { draftGrades, draftOnlyTable, hindsightRedraft, pickReports, squadOrigins } from "../shared/draft";
 import { bonusTable, leagueOwners, liveMatches, toLiveGameweek, type LivePicks, type PlayerInfo, type RawLiveResponse } from "../shared/live";
-import { cancelReversals, playerJourney, Seasons, tradeLedger, tradeVerdicts, waiverBattles, waiverRecord } from "../shared/moves";
+import { cancelReversals, playerJourney, Seasons, tradeLedger, tradeTimeline, tradeVerdicts, waiverBattles, waiverRecord } from "../shared/moves";
+import { finishedGameweeks, gameweekRecap, recapWords } from "../shared/recap";
 import { fixtureLuck, positionsByGameweek, records, streaks } from "../shared/results";
 import { computeStandings } from "../shared/standings";
 import type { DraftChoice, GameStatus, LeagueDetails, PlayersPayload, Trade, Transaction } from "../shared/types";
@@ -86,6 +87,14 @@ check(verdicts.length === effective.length, `Trade verdicts for all ${effective.
 check(verdicts.every((v) => [v.offerer, v.receiver].every((s) => s.received.every((p) => Math.abs(p.value - (p.points + (p.onward?.value ?? 0))) < 1e-9))), "Every traded player's value = his points + onward share");
 const ledger = tradeLedger(verdicts, entries);
 check(ledger.reduce((s, r) => s + r.trades, 0) === verdicts.length * 2, "Trade ledger counts every trade twice");
+const timeline = tradeTimeline(effective, seasons, transactions);
+check(
+  verdicts.every((v) => {
+    const last = timeline.get(v.id)?.at(-1);
+    return v.pending ? !timeline.has(v.id) : last?.offerer === v.offerer.total && last.receiver === v.receiver.total && last.winner === v.winner && last.margin === v.margin;
+  }),
+  "Every trade's week-by-week timeline ends on its card's verdict",
+);
 
 // Waivers.
 const record = waiverRecord(transactions, seasons, entries);
@@ -120,6 +129,13 @@ const luck = fixtureLuck(league);
 check(luck.every((l) => l.wins === table.find((r) => r.entryId === l.entryId)!.won), "Fixture luck wins match the table");
 check(positionsByGameweek(league).at(-1)!.positions.get(table[0].entryId) === 1, "Position chart ends with the real leader top");
 check(streaks(league).length === entries.length && records(league).highest.length > 0, "Streaks and records build");
+const recaps = finishedGameweeks(league).map((n) => gameweekRecap({ league, seasons, trades: effective, transactions }, n));
+check(
+  recaps.every((f) => f.scores.length === entries.length && f.top.score === Math.max(...f.scores.map((s) => s.score)) && (f.bench === null || f.bench.points >= 5)),
+  `Weekly recap facts for all ${recaps.length} finished gameweeks`,
+);
+const names = { manager: (id: number) => String(id), player: (id: number) => String(id) };
+check(recaps.every((f) => { const w = recapWords(f, names); return w.headlines.length >= 2 && w.headlines.length <= 4; }), "Every recap has 2 to 4 headlines");
 
 console.log(`\n${failures === 0 ? "All checks passed" : `${failures} check(s) failed`}`);
 process.exit(failures ? 1 : 0);

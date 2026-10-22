@@ -14,11 +14,13 @@ import type { LeagueData } from "./data";
 import { OddsView } from "./OddsPage";
 import { PowerView } from "./PowerView";
 import { RivalryView } from "./RivalryView";
+import { RecapView } from "./RecapPage";
 import { StandingsTable } from "./StandingsTable";
 
 export const LEAGUE_VIEWS = [
   { id: "table", label: "Table" },
   { id: "power", label: "Power" },
+  { id: "recap", label: "Recap" },
   { id: "form", label: "Form" },
   { id: "luck", label: "Luck" },
   { id: "h2h", label: "Head to head" },
@@ -33,6 +35,7 @@ export function LeaguePage({ data, myTeam, view }: { data: LeagueData; myTeam: n
       <SubNav page="league" views={LEAGUE_VIEWS} current={view} label="League sections" />
       {view === "table" && <TableView data={data} myTeam={myTeam} />}
       {view === "power" && <PowerView data={data} myTeam={myTeam} />}
+      {view === "recap" && <RecapView data={data} myTeam={myTeam} />}
       {view === "form" && <FormView data={data} myTeam={myTeam} />}
       {view === "luck" && <LuckView data={data} myTeam={myTeam} />}
       {view === "h2h" && <RivalryView data={data} myTeam={myTeam} />}
