@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
+import { countdown, nextDeadline } from "../../shared/deadlines";
 import { waiverBattles, waiverRecord, type WaiverBattle } from "../../shared/moves";
+import { lastFinishedEvent } from "../../shared/results";
 import { freeAgentSignings } from "../../shared/waivers";
-import { Explainer, FoldSection, Manager, nobody, PlayerName, ScrollTable, SectionHead, ShowFilter, useShownManager } from "./bits";
+import { Explainer, FoldSection, Manager, nobody, PlayerName, RowNo, ScrollTable, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
+import { deadlineTime } from "./format";
 
 export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [who, setWho] = useShownManager();
@@ -16,6 +19,8 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
 
   return (
     <>
+      <WaiverOrder data={data} myTeam={myTeam} />
+
       <section>
         <h2>Waiver record</h2>
         <p className="hint">
@@ -110,15 +115,64 @@ export function WaiversPage({ data, myTeam }: { data: LeagueData; myTeam: number
   );
 }
 
-function Battle({ b, data, myTeam }: { b: WaiverBattle; data: LeagueData; myTeam: number | null }) {
+/** FPL's waiver order (`waiver_pick` on each league entry), first in line at the top. */
+function WaiverOrder({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
+  const order = [...data.league.league_entries].sort((a, b) => a.waiver_pick - b.waiver_pick);
+  const now = Date.now();
+  const next = nextDeadline(data.deadlines, "waivers", now);
+  const closes = next && `${deadlineTime(next.at, now)} (${countdown(next.at, now)})`;
+  // GWn's waivers go by the table after GWn-1, so the order can still change before they close.
+  const settled = next !== null && lastFinishedEvent(data.league) >= next.event - 1;
+  return (
+    <section>
+      <h2>Waiver order</h2>
+      <p className="hint">
+        {!next
+          ? "The order as FPL has it."
+          : settled
+            ? `For the GW${next.event} waivers, which close ${closes}.`
+            : `Reshuffled when GW${next.event - 1} finishes, before the GW${next.event} waivers close ${closes}.`}
+      </p>
+      <ol className="plain waiver-order" style={{ gridTemplateRows: `repeat(${Math.ceil(order.length / 2)}, auto)` }}>
+        {order.map((e) => (
+          <li key={e.entry_id} className={e.entry_id === myTeam ? "is-mine" : undefined}>
+            <RowNo>{e.waiver_pick}</RowNo>
+            <Manager id={e.entry_id} data={data} mine={myTeam} />
+          </li>
+        ))}
+      </ol>
+      <Explainer>
+        <p>
+          FPL sets this: bottom of the league table goes first and the top goes last, reshuffled after every gameweek.
+          When two managers claim the same player, whoever is higher up usually gets him.
+        </p>
+      </Explainer>
+    </section>
+  );
+}
+
+/** One player more than one manager claimed. `withEvent` adds the gameweek, for lists that aren't grouped by it. */
+export function Battle({
+  b,
+  data,
+  myTeam,
+  withEvent = false,
+}: {
+  b: WaiverBattle;
+  data: LeagueData;
+  myTeam: number | null;
+  withEvent?: boolean;
+}) {
   return (
     <article className="card battle">
       <div className="battle-head">
         <PlayerName id={b.element} data={data} />
-        {b.winner !== null && (
+        {(b.winner !== null || withEvent) && (
           <span className="battle-pts">
-            {b.winnerPoints} pts for {data.labels.get(b.winner)}
-            {!b.stillOwned && data.seasons.lastEvent >= b.event && " (since dropped)"}
+            {withEvent && `GW${b.event}`}
+            {withEvent && b.winner !== null && " · "}
+            {b.winner !== null && `${b.winnerPoints} pts for ${data.labels.get(b.winner)}`}
+            {b.winner !== null && !b.stillOwned && data.seasons.lastEvent >= b.event && " (since dropped)"}
           </span>
         )}
       </div>

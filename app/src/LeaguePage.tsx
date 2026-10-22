@@ -1,9 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   fixtureLuck,
-  headToHead,
   lastFinishedEvent,
-  nextMeeting,
   positionsByGameweek,
   records,
   streaks,
@@ -11,13 +9,16 @@ import {
   type Score,
 } from "../../shared/results";
 import { computeStandings } from "../../shared/standings";
-import { Explainer, Manager, Pts, ScrollTable, SectionHead, SubNav } from "./bits";
+import { Explainer, Manager, ManagerSelect, Pts, ScrollTable, SectionHead, SubNav } from "./bits";
 import type { LeagueData } from "./data";
 import { OddsView } from "./OddsPage";
+import { PowerView } from "./PowerView";
+import { RivalryView } from "./RivalryView";
 import { StandingsTable } from "./StandingsTable";
 
 export const LEAGUE_VIEWS = [
   { id: "table", label: "Table" },
+  { id: "power", label: "Power" },
   { id: "form", label: "Form" },
   { id: "luck", label: "Luck" },
   { id: "h2h", label: "Head to head" },
@@ -31,9 +32,10 @@ export function LeaguePage({ data, myTeam, view }: { data: LeagueData; myTeam: n
     <>
       <SubNav page="league" views={LEAGUE_VIEWS} current={view} label="League sections" />
       {view === "table" && <TableView data={data} myTeam={myTeam} />}
+      {view === "power" && <PowerView data={data} myTeam={myTeam} />}
       {view === "form" && <FormView data={data} myTeam={myTeam} />}
       {view === "luck" && <LuckView data={data} myTeam={myTeam} />}
-      {view === "h2h" && <HeadToHeadView data={data} myTeam={myTeam} />}
+      {view === "h2h" && <RivalryView data={data} myTeam={myTeam} />}
       {view === "records" && <RecordsView data={data} myTeam={myTeam} />}
       {view === "odds" && <OddsView data={data} myTeam={myTeam} />}
     </>
@@ -267,90 +269,6 @@ function WeekStrip({ row }: { row: LuckRow }) {
   );
 }
 
-// ---------------------------------------------------------------- head to head
-
-function HeadToHeadView({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
-  const ids = [...data.entries.keys()];
-  const [a, setA] = useState<number | null>(null);
-  const defaultOpponent = (me: number) => {
-    // Your next opponent, or the last one if the season's over.
-    const toEntry = new Map(data.league.league_entries.map((e) => [e.id, e.entry_id]));
-    const mine = data.league.matches
-      .filter((m) => toEntry.get(m.league_entry_1) === me || toEntry.get(m.league_entry_2) === me)
-      .sort((x, y) => x.event - y.event);
-    const m = mine.find((x) => !x.finished) ?? mine.at(-1);
-    if (!m) return undefined;
-    return toEntry.get(m.league_entry_1) === me ? toEntry.get(m.league_entry_2) : toEntry.get(m.league_entry_1);
-  };
-  const [b, setB] = useState<number | null>(null);
-  const first = a ?? myTeam ?? ids[0];
-  const second = b !== null && b !== first ? b : (defaultOpponent(first) ?? ids.find((id) => id !== first)!);
-  const h = headToHead(data.league, first, second);
-  const next = nextMeeting(data.league, first, second);
-  // The league feed shows this week's matches as 0-0 until the gameweek ends, so point to Live instead.
-  const playingNow = next !== null && data.inProgress && next === data.game.current_event;
-  return (
-    <section>
-      <h2>Head to head</h2>
-      <div className="h2h-pickers">
-        <ManagerSelect data={data} value={first} onChange={setA} label="First manager" />
-        <span className="muted">v</span>
-        <ManagerSelect data={data} value={second} onChange={setB} exclude={first} label="Second manager" />
-      </div>
-      <div className="card h2h-card">
-        <div className="h2h-score">
-          <span>{h.aWins}</span>
-          <span className="muted">–</span>
-          <span>{h.bWins}</span>
-        </div>
-        <div className="hint">
-          {h.matches.length === 0
-            ? playingNow
-              ? "No results between them yet."
-              : "They haven't played each other yet."
-            : `${h.matches.length} ${h.matches.length === 1 ? "meeting" : "meetings"}${h.draws ? `, ${h.draws} drawn` : ""} · points ${h.aPoints}–${h.bPoints}`}
-          {playingNow ? (
-            <>
-              {` They're playing each other now, in GW${next}. `}
-              <a className="link" href="#/live/matches">
-                Live score
-              </a>
-            </>
-          ) : (
-            next !== null && ` · next in GW${next}`
-          )}
-        </div>
-      </div>
-      {h.matches.length > 0 && (
-        <ScrollTable>
-          <table className="data">
-            <thead>
-              <tr>
-                <th className="left">GW</th>
-                <th className="num">{data.labels.get(first)}</th>
-                <th className="num">{data.labels.get(second)}</th>
-                <th className="left">Winner</th>
-              </tr>
-            </thead>
-            <tbody>
-              {h.matches.map((m) => (
-                <tr key={m.event}>
-                  <td className="left">GW{m.event}</td>
-                  <td className="num strong">{m.score}</td>
-                  <td className="num strong">{m.against}</td>
-                  <td className="left">
-                    {m.result === "D" ? "Draw" : data.labels.get(m.result === "W" ? first : second)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollTable>
-      )}
-    </section>
-  );
-}
-
 // ---------------------------------------------------------------- records
 
 function RecordsView({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
@@ -458,41 +376,6 @@ function RecordList({
 }
 
 // ---------------------------------------------------------------- bits
-
-function ManagerSelect({
-  data,
-  value,
-  onChange,
-  placeholder,
-  exclude,
-  label = "Manager",
-}: {
-  data: LeagueData;
-  value: number | null;
-  onChange: (id: number | null) => void;
-  placeholder?: string;
-  exclude?: number | null;
-  label?: string;
-}) {
-  const options = [...data.entries.keys()]
-    .filter((id) => id !== exclude)
-    .sort((x, y) => (data.labels.get(x) ?? "").localeCompare(data.labels.get(y) ?? ""));
-  return (
-    <select
-      className="select"
-      aria-label={label}
-      value={value ?? ""}
-      onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
-    >
-      {placeholder !== undefined && <option value="">{placeholder}</option>}
-      {options.map((id) => (
-        <option key={id} value={id}>
-          {data.labels.get(id)}
-        </option>
-      ))}
-    </select>
-  );
-}
 
 function ordinal(n: number): string {
   const s = ["th", "st", "nd", "rd"];

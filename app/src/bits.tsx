@@ -319,3 +319,39 @@ export function replaceHashParams(values: Record<string, string | number | null 
   const query = params.toString();
   window.history.replaceState(window.history.state, "", query ? `${base}?${query}` : base);
 }
+
+/** A dropdown of managers, A to Z, for picking one (compare with, head to head). Long lists use ShowFilter instead. */
+export function ManagerSelect({
+  data,
+  value,
+  onChange,
+  placeholder,
+  exclude,
+  label = "Manager",
+}: {
+  data: LeagueData;
+  value: number | null;
+  onChange: (id: number | null) => void;
+  placeholder?: string;
+  exclude?: number | null;
+  label?: string;
+}) {
+  const options = [...data.entries.keys()]
+    .filter((id) => id !== exclude)
+    .sort((x, y) => (data.labels.get(x) ?? "").localeCompare(data.labels.get(y) ?? ""));
+  return (
+    <select
+      className="select"
+      aria-label={label}
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
+    >
+      {placeholder !== undefined && <option value="">{placeholder}</option>}
+      {options.map((id) => (
+        <option key={id} value={id}>
+          {data.labels.get(id)}
+        </option>
+      ))}
+    </select>
+  );
+}

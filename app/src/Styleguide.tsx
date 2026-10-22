@@ -1,6 +1,20 @@
 import { useState } from "react";
 import { isOut } from "../../shared/waivers";
-import { Explainer, FoldSection, Manager, RowNo, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
+import {
+  Explainer,
+  FoldSection,
+  Manager,
+  ManagerSelect,
+  RowNo,
+  PlayerName,
+  Pts,
+  ScrollTable,
+  SectionHead,
+  ShowFilter,
+  StatTile,
+  Tag,
+  type TagTone,
+} from "./bits";
 import type { LeagueData } from "./data";
 
 /**
@@ -87,6 +101,7 @@ const TONES: TagTone[] = ["good", "warn", "bad", "neutral", "mine", "live"];
 
 export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [who, setWho] = useState<number | null>(null);
+  const [picked, setPicked] = useState<number | null>(null);
   const players = [...data.players.values()];
   const injured = players.find((p) => isOut(p));
   const doubtful = players.find((p) => p.status === "d");
@@ -245,6 +260,12 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
             A link to another page
           </a>
         </p>
+      </section>
+
+      <section>
+        <h2>Manager picker</h2>
+        <p className="hint">For picking one manager (compare with, head to head). Long lists use Show instead.</p>
+        <ManagerSelect data={data} value={picked} onChange={setPicked} placeholder="Compare with…" label="Compare with" />
       </section>
 
       <section>

@@ -38,3 +38,9 @@ export function countdown(iso: string, now = Date.now()): string {
   if (hours < 48) return `in ${hours} h`;
   return `in ${Math.round(hours / 24)} days`;
 }
+
+/** The next deadline of one kind still to come (e.g. the next waiver deadline), or null once the season's done. */
+export function nextDeadline(all: Deadlines[], kind: DeadlineKind, now = Date.now()): { event: number; at: string } | null {
+  const gw = [...all].sort((a, b) => a.event - b.event).find((d) => new Date(d[kind]).getTime() > now);
+  return gw ? { event: gw.event, at: gw[kind] } : null;
+}
