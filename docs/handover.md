@@ -89,7 +89,7 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 
 Owner picked backlog items 1, 2, 3, 5, 6, 7, 8, 10. All built:
 
-- **Moves > Trade checker / Trade partners** (`shared/trading.ts`, `docs/trade-tools.md`). Rating = the waiver suggestion formula (`playerRating` in `shared/waivers.ts`); best XI tries every legal formation. Trades must be like for like. Checker links carry the trade (`#/moves/checker?from=&with=&give=&get=`).
+- **Moves > Trade checker / Trade partners** (`shared/trading.ts`, `docs/trade-tools.md`). Rating = the waiver suggestion formula (`playerRating` in `shared/waivers.ts`) with pre-season draft rank mixed in, worth 4 starts and fading (`tradeBase`, owner's idea); best XI tries every legal formation. Trades must be like for like. Checker links carry the trade (`#/moves/checker?from=&with=&give=&get=`).
 - **League > Power** (`shared/power.ts`, `docs/power-and-rivalries.md`): z-scores of last-4 average 35%, season average 25%, all-play 20%, current squad's best XI over last 4 GWs 20%.
 - **Waiver order**: FPL's `waiver_pick` (confirmed = reverse H2H table after the last finished GW). Top of Moves > Waivers, and on manager pages.
 - **Rivalry pages**: League > Head to head (`shared/rivalry.ts`, `app/src/RivalryView.tsx`), pair in the link `#/league/h2h?a=&b=`.

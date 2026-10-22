@@ -4,7 +4,7 @@ Written 22 Oct 2026. Code: `shared/trading.ts` (tests in `shared/trading.test.ts
 
 ## The rating
 
-One number per player, the same everywhere (waiver suggestions, checker, partners): `playerRating(p, fixtures, difficulty)`.
+One number per player: `playerRating(p, fixtures, difficulty, base)`. Waiver suggestions use it as below; the trade tools mix draft rank into the base (next section).
 
 > (0.6 × form + 0.4 × points per game) × fixture factor × chance of playing
 
@@ -13,6 +13,18 @@ One number per player, the same everywhere (waiver suggestions, checker, partner
 - Rounded to one decimal. It's roughly the points he'd score in a game, so an XI's total is roughly a week's score.
 
 Moving the formula into `playerRating` left the waiver suggestions identical (checked against live data with three fixture sources).
+
+## Draft rank (owner's idea, 22 Oct)
+
+Early in the season a few games flatter or hide players, while FPL's pre-season draft rank still knows who's good. So the trade tools (not waiver suggestions) replace the "points a game" part of the rating with a mix, `tradeBase` in `shared/trading.ts`:
+
+> w × (what his draft rank says) + (1 − w) × (0.6 × form + 0.4 × points per game)
+> w = 4 / (4 + starts) × share of minutes played
+
+- **What his draft rank says** (`draftRankCurve`): a + b × ln(rank), fitted fresh each time to this season's players with 3+ starts, weighted by starts. After GW7: rank 1 ≈ 5.7 points a game, rank 10 ≈ 4.8, 50 ≈ 4.1, 200 ≈ 3.5, 600 ≈ 3.0. The link is real but loose (correlation about 0.3), strongest for the top 25 picks, which is why it's a log curve and not "rank 20 = 20th best".
+- **Weight**: the draft rank is worth 4 starts, so it fades as the season goes on (half after 4 starts, a tenth after 36). It's cut by the share of minutes he's played, so a highly ranked player who isn't getting games gets nothing from it, and one who just broke into the team keeps his form.
+- Then fixtures and fitness apply as before.
+- Effect after GW7: Bruno Fernandes 2.4 → 3.4, Gibbs-White 2.6 → 3.4, De Cuyper (ranked 459th) 8.7 → 6.7, Haaland 9.0 → 7.8 (still the top rating).
 
 ## Best XI
 

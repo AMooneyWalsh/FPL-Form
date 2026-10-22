@@ -4,6 +4,7 @@ import elementStatus from "../fixtures/element-status.json";
 import { trimPlayers } from "../worker/index";
 import {
   allRatings,
+  draftRankCurve,
   bestSwap,
   bestXI,
   compareSwaps,
@@ -12,6 +13,7 @@ import {
   POSITIONS,
   squadsByEntry,
   tradeEffect,
+  tradeBase,
   tradePartners,
   typicalShape,
   type Position,
@@ -25,7 +27,7 @@ const byId = new Map(players.map((p) => [p.id, p]));
 const owners = new Map(
   (elementStatus as { element_status: { element: number; owner: number | null }[] }).element_status.map((s) => [s.element, s.owner]),
 );
-const ratings = allRatings(players, fixtures);
+const ratings = allRatings(players, fixtures, 5);
 const squads = squadsByEntry(players, owners);
 const strength = leagueStrength(squads, ratings, rules);
 const ADAM = 1412;
@@ -47,8 +49,41 @@ function bruteForceBest(squad: Player[]): number {
 }
 
 describe("ratings", () => {
-  it("are the same numbers as the waiver suggestions", () => {
-    for (const s of waiverSuggestions(players, owners, fixtures)) expect(ratings.get(s.player.id)).toBe(s.rating);
+  it("are the waiver suggestion numbers once draft rank stops counting", () => {
+    // With a huge number of starts the draft rank weighs nothing.
+    const veterans = players.map((p) => ({ ...p, starts: 1e9 }));
+    const late = allRatings(veterans, fixtures, 5);
+    for (const s of waiverSuggestions(players, owners, fixtures)) {
+      // Within rounding: a sliver of draft rank is left, which can tip the last decimal.
+      expect(Math.abs(late.get(s.player.id)! - s.rating)).toBeLessThanOrEqual(0.1 + 1e-9);
+    }
+  });
+});
+
+describe("draft rank", () => {
+  const curve = draftRankCurve(players);
+  const base = (over: Partial<Player>) =>
+    tradeBase({ ...players[0], form: 4, pointsPerGame: 4, minutes: 450, starts: 5, ...over }, curve, 5);
+
+  it("expects more from a higher draft pick", () => {
+    expect(curve(1)).toBeGreaterThan(curve(50));
+    expect(curve(50)).toBeGreaterThan(curve(400));
+  });
+  it("lifts a highly ranked player's numbers and pulls a low ranked one's down", () => {
+    expect(base({ draftRank: 1 })).toBeGreaterThan(4);
+    expect(base({ draftRank: 600 })).toBeLessThan(4);
+  });
+  it("fades as the starts pile up", () => {
+    const gap = (starts: number) => base({ draftRank: 1, starts }) - base({ draftRank: 600, starts });
+    expect(gap(5)).toBeGreaterThan(gap(30));
+    expect(gap(30)).toBeGreaterThan(0);
+  });
+  it("gives nothing to a highly ranked player who isn't playing", () => {
+    expect(base({ draftRank: 1, form: 0, pointsPerGame: 0, minutes: 0, starts: 0 })).toBe(0);
+  });
+  it("counts the draft rank weighted 4 starts to his own starts", () => {
+    const own = 0.6 * 4 + 0.4 * 4;
+    expect(base({ draftRank: 10, starts: 4 })).toBeCloseTo((own + curve(10)) / 2, 6);
   });
   it("are 0 for anyone who's out", () => {
     for (const p of players.filter(isOut)) expect(ratings.get(p.id)).toBe(0);

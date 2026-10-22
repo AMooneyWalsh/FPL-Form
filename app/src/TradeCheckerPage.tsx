@@ -25,7 +25,7 @@ export const POSITION_WORDS: Record<Position, [string, string]> = {
 export function useTradeData(data: LeagueData) {
   return useMemo(
     () => ({
-      ratings: allRatings(data.playerList, data.fixtures),
+      ratings: allRatings(data.playerList, data.fixtures, data.seasons.lastEvent),
       squads: squadsByEntry(data.playerList, data.owners),
       clubs: new Map(data.playerList.map((p) => [p.teamId, p.team])),
     }),
@@ -188,9 +188,12 @@ export function TradeCheckerPage({ data, myTeam }: { data: LeagueData; myTeam: n
         </div>
         <Explainer>
           <p>
-            Each player's rating is the same one the waiver suggestions use: 60% recent form plus 40% points a game this
-            season, nudged up for easy fixtures over the next three gameweeks and down for hard ones, and cut by any
-            injury doubt. Anyone who's out rates 0. It works out at roughly the points he'd score in a game.
+            Each player's rating starts from 60% recent form plus 40% points a game this season. Early in the season a
+            few games can flatter or hide a player, so it also mixes in what his pre-season draft rank says: a player
+            ranked that high usually scores this much. The draft rank counts as much as four starts, so it fades as
+            the season goes on, and counts for less when he isn't getting many minutes. Then it's nudged up for easy fixtures
+            over the next three gameweeks and down for hard ones, and cut by any injury doubt. Anyone who's out rates
+            0. It works out at roughly the points he'd score in a game.
           </p>
           <p>
             A best XI is the highest-rated team each squad can put out under FPL's formation rules (1 keeper, 3 to 5
@@ -476,7 +479,8 @@ function TradePlayers({
             </span>
           </div>
           <div className="sugg-stats">
-            Form {p.form.toFixed(1)} · {p.pointsPerGame.toFixed(1)} a game · {p.totalPoints} pts this season
+            Form {p.form.toFixed(1)} · {p.pointsPerGame.toFixed(1)} a game · {p.totalPoints} pts this season · draft rank{" "}
+            {p.draftRank}
           </div>
           {p.news && <div className="sugg-stats">{p.news}</div>}
           <FixtureChips run={fixtureRun(p.teamId, data.fixtures, difficulty)} clubs={clubs} />

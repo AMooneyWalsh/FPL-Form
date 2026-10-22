@@ -90,8 +90,8 @@ export function TradePartnersPage({ data, myTeam }: { data: LeagueData; myTeam: 
           <Explainer>
             <p>
               Strength in each position is the average rating of a squad's best keeper, 4 defenders, 4 midfielders and 2
-              forwards (a typical XI), ranked against the other squads. Ratings are the same as the waiver suggestions and
-              the trade checker: roughly the points a player would score in a game.
+              forwards (a typical XI), ranked against the other squads. Ratings are the same as the trade checker's (form,
+              points a game and pre-season draft rank): roughly the points a player would score in a game.
             </p>
             <p>
               For every other manager, every one-for-one and two-for-two swap that keeps both squads' shape is tried, and
