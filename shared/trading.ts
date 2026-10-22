@@ -1,16 +1,73 @@
 // Trade tools: best starting XIs, how strong each squad is in each position,
-// and swaps worth offering. Every number is built on playerRating (the same
-// rating as waiver suggestions). See docs/trade-tools.md.
+// and swaps worth offering. Every number is built on playerRating (the waiver
+// suggestion rating) with FPL's pre-season draft rank mixed in early in the
+// season. See docs/trade-tools.md.
 import type { Player, SquadRules, UpcomingFixture } from "./types";
 import { clubDifficulty, isOut, playerRating } from "./waivers";
 
 export type Position = Player["position"];
 export const POSITIONS: Position[] = ["GKP", "DEF", "MID", "FWD"];
 
-/** Every player's rating, keyed by id. Work it out once per page and share it. */
-export function allRatings(players: Player[], fixtures: UpcomingFixture[]): Map<number, number> {
+/**
+ * Every player's trade rating, keyed by id. Work it out once per page and
+ * share it. `gameweeks` is how many have been played (for tradeBase).
+ */
+export function allRatings(players: Player[], fixtures: UpcomingFixture[], gameweeks: number): Map<number, number> {
   const difficulty = clubDifficulty(players);
-  return new Map(players.map((p) => [p.id, playerRating(p, fixtures, difficulty)]));
+  const curve = draftRankCurve(players);
+  return new Map(players.map((p) => [p.id, playerRating(p, fixtures, difficulty, tradeBase(p, curve, gameweeks))]));
+}
+
+// ---------------------------------------------------------------- draft rank
+//
+// Early on, a few good or bad games say little; FPL's pre-season draft rank
+// still knows who the good players are. So a trade rating mixes the two, and
+// the draft rank fades as the games pile up.
+
+/** How many starts a draft rank is worth: after 4 starts, his own points count twice as much as where he was ranked, and so on. */
+export const DRAFT_RANK_STARTS = 4;
+/** Players with fewer starts than this are left out of fitting the curve. */
+const CURVE_MIN_STARTS = 3;
+
+/**
+ * Points a game a player at each draft rank is scoring this season:
+ * a + b × ln(rank), fitted to the regular starters (weighted by starts). Refits
+ * itself every time, so it follows the season. Flat at the average when
+ * there's too little to fit.
+ */
+export function draftRankCurve(players: Player[]): (rank: number) => number {
+  const regulars = players.filter((p) => p.starts >= CURVE_MIN_STARTS && p.draftRank > 0);
+  const total = regulars.reduce((s, p) => s + p.starts, 0);
+  if (regulars.length < 10) {
+    const avg = total ? regulars.reduce((s, p) => s + p.starts * p.pointsPerGame, 0) / total : 0;
+    return () => avg;
+  }
+  const mx = regulars.reduce((s, p) => s + p.starts * Math.log(p.draftRank), 0) / total;
+  const my = regulars.reduce((s, p) => s + p.starts * p.pointsPerGame, 0) / total;
+  let sxy = 0;
+  let sxx = 0;
+  for (const p of regulars) {
+    const dx = Math.log(p.draftRank) - mx;
+    sxy += p.starts * dx * (p.pointsPerGame - my);
+    sxx += p.starts * dx * dx;
+  }
+  const b = sxx > 0 ? sxy / sxx : 0;
+  return (rank) => Math.max(0, my + b * (Math.log(Math.max(1, rank)) - mx));
+}
+
+/**
+ * Points a game before fixtures and fitness, for the trade tools: his own
+ * numbers (60% form, 40% points a game) mixed with what his draft rank says,
+ * weighted DRAFT_RANK_STARTS : starts. The draft rank's say is cut by the
+ * share of minutes he's played, so a highly ranked player who isn't getting
+ * games is judged on his own (empty) numbers, and one who has just broken
+ * into the team keeps his form.
+ */
+export function tradeBase(p: Player, curve: (rank: number) => number, gameweeks: number): number {
+  const own = 0.6 * p.form + 0.4 * p.pointsPerGame;
+  const playing = gameweeks > 0 ? Math.min(1, p.minutes / (90 * gameweeks)) : 1;
+  const w = (DRAFT_RANK_STARTS / (DRAFT_RANK_STARTS + p.starts)) * playing;
+  return (1 - w) * own + w * curve(p.draftRank);
 }
 
 /** Each manager's current squad (from ownership), keyed by entry_id. */

@@ -59,16 +59,22 @@ export interface Suggestion {
 
 /**
  * How good a player looks for the next few weeks, to one decimal place. The
- * one rating the whole site uses (waiver suggestions, trade checker, trade
- * partners). 60% recent form + 40% points a game, nudged up to 20% for easy
+ * rating behind waiver suggestions and (with draft rank mixed in, see
+ * tradeBase) the trade tools. 60% recent form + 40% points a game, nudged up to 20% for easy
  * fixtures (down for hard), and scaled by FPL's chance of playing. Anyone
  * who's out rates 0.
  */
-export function playerRating(p: Player, fixtures: UpcomingFixture[], difficulty: Map<number, number>): number {
+export function playerRating(
+  p: Player,
+  fixtures: UpcomingFixture[],
+  difficulty: Map<number, number>,
+  /** Points a game before fixtures and fitness. The trade tools mix in draft rank here (see tradeBase). */
+  base = 0.6 * p.form + 0.4 * p.pointsPerGame,
+): number {
   const run = fixtureRun(p.teamId, fixtures, difficulty);
   const avg = run.length ? run.reduce((s, f) => s + f.difficulty, 0) / run.length : 3;
   const chance = isOut(p) ? 0 : p.chanceNext === null ? 1 : p.chanceNext / 100;
-  const rating = (0.6 * p.form + 0.4 * p.pointsPerGame) * (1 + (3 - avg) * 0.1) * chance;
+  const rating = base * (1 + (3 - avg) * 0.1) * chance;
   return Math.round(rating * 10) / 10;
 }
 
