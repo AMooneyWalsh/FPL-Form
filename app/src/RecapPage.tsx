@@ -1,7 +1,9 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { finishedGameweeks, gameweekRecap, recapWords, type RecapAward, type RecapMatch } from "../../shared/recap";
+import { recapCard } from "../../shared/share";
 import { Explainer, GameweekPicker, hashParams, Manager, replaceHashParams } from "./bits";
 import type { LeagueData } from "./data";
+import { ShareButton, shareNames } from "./ShareButton";
 
 /**
  * League > Recap (#/league/recap?gw=7): an auto-written roundup of one
@@ -46,6 +48,12 @@ export function RecapView({ data, myTeam }: { data: LeagueData; myTeam: number |
           {words.headlines.map((h) => (
             <p key={h}>{h}</p>
           ))}
+        </div>
+        <div className="recap-share">
+          <ShareButton
+            what={`the gameweek ${event} recap`}
+            card={() => recapCard(event, facts.matches, words, shareNames(data))}
+          />
         </div>
       </section>
 

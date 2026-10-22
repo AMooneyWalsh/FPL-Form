@@ -6,6 +6,7 @@ import transactionsJson from "../fixtures/transactions.json";
 import type { Gameweek } from "./gameweek";
 import { cancelReversals, Seasons, tradeTimeline } from "./moves";
 import { finishedGameweeks, gameweekRecap, listOf, recapWords, type RecapFacts, type RecapNames } from "./recap";
+import { recapCard } from "./share";
 import { managerLabels } from "./standings";
 import type { LeagueDetails, Match, Transaction } from "./types";
 
@@ -197,5 +198,34 @@ describe("ties and missing squads", () => {
     expect(listOf(["Ben"])).toBe("Ben");
     expect(listOf(["Ben", "Daire"])).toBe("Ben and Daire");
     expect(listOf(["Ben", "Daire", "Ross"])).toBe("Ben, Daire and Ross");
+  });
+});
+
+describe("GW5 recap picture", () => {
+  const f = gameweekRecap(src, 5);
+  const words = recapWords(f, names);
+  const card = recapCard(5, f.matches, words, {
+    league: "Drafty In Here",
+    managers: labels,
+    teams: new Map(),
+    players: new Map(),
+  });
+
+  it("leads with the first headline, then every result and up to six awards", () => {
+    const [headline, results, awards] = card.blocks;
+    expect(headline).toMatchObject({ kind: "headline", text: "Adam · 60 pts", detail: words.headlines.slice(0, 2).join(" ") });
+    expect(results.kind === "lines" && results.rows).toHaveLength(7);
+    expect(awards.kind === "lines" && awards.rows.length).toBe(Math.min(6, words.awards.length));
+  });
+
+  it("names the winner first in each result", () => {
+    const results = card.blocks[1];
+    if (results.kind !== "lines") throw new Error("expected lines");
+    f.matches.forEach((m, i) => {
+      const row = results.rows[i];
+      if (m.winner === null) return expect(row.label).toContain("drew with");
+      expect(row.label.startsWith(`${labels.get(m.winner)} beat`)).toBe(true);
+      expect(row.value).toBe(`${Math.max(m.homeScore, m.awayScore)}-${Math.min(m.homeScore, m.awayScore)}`);
+    });
   });
 });

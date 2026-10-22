@@ -3282,3 +3282,10 @@ button.link.share-close {
   margin: var(--sp-1) 0 0;
   font-size: var(--fs-sm);
 }
+
+/* Recap share button, under the headlines. */
+.recap-share {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--sp-2);
+}

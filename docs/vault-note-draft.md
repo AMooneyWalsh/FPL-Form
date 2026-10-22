@@ -102,3 +102,16 @@ League > Odds plays the rest of the season 10,000 times and shows each manager's
 - Live scores refresh every 30 seconds during games (was every minute, and could lag up to 3 minutes). Coming back to the tab fetches fresh scores straight away.
 - The Live tab has a gameweek picker (‹ Gameweek 6 ›) to look back at any past week or ahead to the next one. It follows FPL's current gameweek, which moves on at each deadline.
 - Every page has a banner in the header with the next trade, waiver and team deadlines, shown in each person's own time zone, with a countdown.
+
+## 22 Oct 2026: eight backlog features built
+
+Owner picked 1, 2, 3, 5, 6, 7, 8 and 10 from the backlog. Now live:
+
+- **Trade checker** (Moves): pick players on both sides and see form, fixtures and what it does to each starting XI. The link can be sent to the other manager.
+- **Trade partners** (Moves): who is strong where you're weak, with a suggested swap that helps both teams.
+- **Power rankings** (League > Power): recent scores, season average, an all-play record (takes fixture luck out) and squad strength now.
+- **Waiver order**: who's next in line, straight from FPL (it's the league table upside down after each gameweek).
+- **Trade week by week**: each trade card shows who was ahead after every gameweek.
+- **Weekly recap** (League > Recap): auto-written roundup and awards for any finished gameweek.
+- **Share cards**: a Share button on Live matches, trades, manager pages and the recap makes a picture for WhatsApp.
+- **Rivalry pages** (League > Head to head): everything between two managers, including trades and waiver battles.

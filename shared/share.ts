@@ -4,6 +4,7 @@
 
 import type { LiveMatch, LiveSquad } from "./live";
 import type { TradeSide, TradeVerdict } from "./moves";
+import type { RecapMatch, RecapWords } from "./recap";
 
 // ---------------------------------------------------------------- what a card holds
 
@@ -214,6 +215,54 @@ export function tradeCard(v: TradeVerdict, names: ShareNames): ShareCard {
     caption: `${pair}'s gameweek ${v.event} trade: ${winner === null || v.pending ? verdict.toLowerCase() : `${verdict} so far`}.`,
     file: slug(`trade gw${v.event} ${who(v.offerer)} ${who(v.receiver)}`),
   };
+}
+
+// ---------------------------------------------------------------- weekly recap
+
+/** Awards on a recap picture. The rest are on the site; the picture stays phone-sized. */
+const RECAP_AWARDS = 6;
+
+/** A gameweek's recap: the headline, every result and the top awards. */
+export function recapCard(event: number, matches: RecapMatch[], words: RecapWords, names: ShareNames): ShareCard {
+  const who = (id: number) => names.managers.get(id) ?? "Someone";
+  const lead = words.headlines[0];
+  // The big line only fits a few words, so it's the week's top score; the sentences go under it.
+  const top = words.awards.find((a) => a.id === "top");
+  const detail = words.headlines.slice(0, 2).join(" ") || undefined;
+  return {
+    kicker: `${names.league} · Recap`,
+    title: `Gameweek ${event}`,
+    blocks: [
+      ...(top ? [{ kind: "headline" as const, text: `${listNames(top.entryIds, false, who)} · ${top.stat}`, tone: "good" as const, detail }] : []),
+      {
+        kind: "lines",
+        title: "Results",
+        rows: matches.map((m) => {
+          const [a, b] = m.winner === m.away ? [m.away, m.home] : [m.home, m.away];
+          const [sa, sb] = a === m.home ? [m.homeScore, m.awayScore] : [m.awayScore, m.homeScore];
+          return { label: `${who(a)} ${m.winner === null ? "drew with" : "beat"} ${who(b)}`, value: `${sa}-${sb}` };
+        }),
+      },
+      {
+        kind: "lines",
+        title: "Awards",
+        rows: words.awards.slice(0, RECAP_AWARDS).map((a) => ({
+          label: `${a.title}: ${listNames(a.entryIds, a.versus ?? false, who)}`,
+          value: a.stat,
+          tone: a.tone,
+        })),
+      },
+    ],
+    caption: `Gameweek ${event} recap. ${lead ?? ""}`.trim(),
+    file: slug(`recap gw${event}`),
+  };
+}
+
+/** "Joe", "Ross and Peter", or "Daire v Mark" for an award about a match. */
+function listNames(ids: number[], versus: boolean, who: (id: number) => string): string {
+  if (versus) return `${who(ids[0])} v ${who(ids[1])}`;
+  const all = ids.map(who);
+  return all.length <= 1 ? (all[0] ?? "") : `${all.slice(0, -1).join(", ")} and ${all.at(-1)}`;
 }
 
 // ---------------------------------------------------------------- text that fits

@@ -85,6 +85,20 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Live > Bonus lists defensive contributions per match: who has earned the 2 points and who is within 3 (`defconTable` in `shared/live.ts`). Thresholds come from FPL's `settings.scoring` (DEF 10, MID/FWD 12, GK none). Checked against FPL's own breakdown on GW6.
 - Header search (`app/src/Search.tsx`): a magnifier opens a full-screen sheet (rendered into `document.body` so it covers the sticky tabs) that finds managers and any player and links to their pages. `foldText` in `bits.tsx` handles Ø/æ/ß/ł as well as accents, so "odegaard" finds Ødegaard (the Moves > Players search had the same gap).
 
+## Backlog batch (21-22 Oct 2026, `docs/build-plan-2026-10.md`)
+
+Owner picked backlog items 1, 2, 3, 5, 6, 7, 8, 10. All built:
+
+- **Moves > Trade checker / Trade partners** (`shared/trading.ts`, `docs/trade-tools.md`). Rating = the waiver suggestion formula (`playerRating` in `shared/waivers.ts`); best XI tries every legal formation. Trades must be like for like. Checker links carry the trade (`#/moves/checker?from=&with=&give=&get=`).
+- **League > Power** (`shared/power.ts`, `docs/power-and-rivalries.md`): z-scores of last-4 average 35%, season average 25%, all-play 20%, current squad's best XI over last 4 GWs 20%.
+- **Waiver order**: FPL's `waiver_pick` (confirmed = reverse H2H table after the last finished GW). Top of Moves > Waivers, and on manager pages.
+- **Rivalry pages**: League > Head to head (`shared/rivalry.ts`, `app/src/RivalryView.tsx`), pair in the link `#/league/h2h?a=&b=`.
+- **Trade week by week**: `tradeTimeline` in `shared/moves.ts` replays verdicts with the season cut at each GW; last point always equals the card. Plus "Biggest turnarounds" on Trades.
+- **League > Recap** (`shared/recap.ts`, `docs/recap.md`): facts and words for any finished GW, `#/league/recap?gw=`. Wording varies by GW number, never on refresh.
+- **Share cards** (`shared/share.ts` content, `app/src/share.ts` canvas drawing, `ShareButton`, `docs/share-cards.md`): Live matches, trade cards, manager pages, recap. Preview first, then the phone share sheet or Save image. Not yet tried on a real phone.
+- Links can carry settings after `?`: `hashParams()` / `replaceHashParams()` in `bits.tsx`.
+- Tidy-ups left: `rankOf`/`ordinal` duplicated in `ManagerPage.tsx` and `TradePartnersPage.tsx`; Live has its own gameweek picker (could use `GameweekPicker` from bits).
+
 ## UX review (10 Oct)
 
 - Findings and the agreed plan: `docs/ux-review-2026-10-10.md`. The two live-gameweek wording bugs are fixed.
@@ -112,7 +126,8 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 3. Waiver suggestions are new. Ask whether the ratings and drop picks look sensible against the owner's own judgement.
 4. Gameweek 6 (from Sat 10 Oct) is the Live tab's first real in-play run, especially the "Will come on for X" projections. Ask the owner for screenshots.
 5. Awards graphic: offer a fresh one after each gameweek (`scripts/awards/`).
-6. Ideas raised but not built: season xG over/under-performance from per-gameweek live stats, showing the current waiver order.
+6. Ideas raised but not built: season xG over/under-performance from per-gameweek live stats.
+7. Ask the owner to try a Share button on their phone (only tested in a headless browser).
 
 ## Known limits
 
