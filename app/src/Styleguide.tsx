@@ -5,6 +5,7 @@ import {
   Explainer,
   FixtureChips,
   FoldSection,
+  GameweekPicker,
   Manager,
   ManagerSelect,
   RowNo,
@@ -105,6 +106,7 @@ const TONES: TagTone[] = ["good", "warn", "bad", "neutral", "mine", "live"];
 export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
   const [who, setWho] = useState<number | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
+  const [gw, setGw] = useState(5);
   const players = [...data.players.values()];
   const injured = players.find((p) => isOut(p));
   const doubtful = players.find((p) => p.status === "d");
@@ -283,6 +285,12 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
           <span className="chip-btn">Not selected</span>
           <span className="chip-btn">Another</span>
         </div>
+      </section>
+
+      <section>
+        <h2>Gameweek picker</h2>
+        <p className="hint">Steps through gameweeks, with a way back to the latest. Used by the weekly recap; the Live tab has the same look.</p>
+        <GameweekPicker event={gw} max={7} home={7} onPick={setGw} />
       </section>
 
       <section>

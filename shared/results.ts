@@ -110,7 +110,7 @@ export function fixtureLuck(details: LeagueDetails, from = 1, to = Infinity): Lu
   return [...rows.values()].sort((a, b) => b.expectedWins - a.expectedWins || b.wins - a.wins || b.pointsFor - a.pointsFor);
 }
 
-function medianOf(values: number[]): number {
+export function medianOf(values: number[]): number {
   const v = [...values].sort((a, b) => a - b);
   const mid = Math.floor(v.length / 2);
   return v.length % 2 === 0 ? (v[mid - 1] + v[mid]) / 2 : v[mid];

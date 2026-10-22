@@ -369,3 +369,52 @@ export function ManagerSelect({
     </select>
   );
 }
+
+/**
+ * "‹ Gameweek 6 ›": step through gameweeks from `min` to `max`. Away from
+ * `home` (usually the latest), a link jumps back to it.
+ */
+export function GameweekPicker({
+  event,
+  min = 1,
+  max,
+  home,
+  onPick,
+}: {
+  event: number;
+  min?: number;
+  max: number;
+  home: number;
+  onPick: (n: number) => void;
+}) {
+  return (
+    <div className="gw-picker">
+      <button
+        type="button"
+        className="gw-step"
+        onClick={() => onPick(event - 1)}
+        disabled={event <= min}
+        aria-label="Previous gameweek"
+      >
+        ‹
+      </button>
+      <div className="gw-picker-mid">
+        <strong>Gameweek {event}</strong>
+        {event !== home && (
+          <button type="button" className="link" onClick={() => onPick(home)}>
+            Back to gameweek {home}
+          </button>
+        )}
+      </div>
+      <button
+        type="button"
+        className="gw-step"
+        onClick={() => onPick(event + 1)}
+        disabled={event >= max}
+        aria-label="Next gameweek"
+      >
+        ›
+      </button>
+    </div>
+  );
+}
