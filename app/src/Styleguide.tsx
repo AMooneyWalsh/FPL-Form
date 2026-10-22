@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { isOut } from "../../shared/waivers";
-import { Explainer, FoldSection, Manager, RowNo, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
+import { clubDifficulty, fixtureRun, isOut } from "../../shared/waivers";
+import { Explainer, FixtureChips, FoldSection, Manager, RowNo, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, StatTile, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
 
 /**
@@ -232,6 +232,11 @@ export function Styleguide({ data, myTeam }: { data: LeagueData; myTeam: number 
           <span className="fdr fdr-4">ARS (A)</span>
           <span className="fdr fdr-5">MCI (A)</span>
         </p>
+        <p className="hint">Next fixtures for a player (FixtureChips):</p>
+        <FixtureChips
+          run={fixtureRun(players[0]?.teamId ?? 1, data.fixtures, clubDifficulty(players))}
+          clubs={new Map(players.map((p) => [p.teamId, p.team]))}
+        />
       </section>
 
       <section>
