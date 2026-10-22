@@ -2,10 +2,12 @@ import { useMemo } from "react";
 import { draftGrades, pickReports, squadOrigins } from "../../shared/draft";
 import { tradeLedger, tradeVerdicts, waiverRecord } from "../../shared/moves";
 import { fixtureLuck, headToHead, scores, streaks, type Score } from "../../shared/results";
-import { computeStandings } from "../../shared/standings";
-import { Manager, PlayerName, Pts, StatTile, useShownManager, type StatRank } from "./bits";
+import { slug, type ShareBlock, type ShareCard, type ShareStat } from "../../shared/share";
+import { computeStandings, type StandingRow } from "../../shared/standings";
+import { Manager, PlayerName, Pts, SectionHead, StatTile, useShownManager, type StatRank } from "./bits";
 import type { LeagueData } from "./data";
 import { ManagerOdds } from "./OddsPage";
+import { ShareButton } from "./ShareButton";
 import { TradeCard } from "./TradesPage";
 
 /** One manager's page (#/manager/123): everything about them in one place. */
@@ -48,10 +50,16 @@ export function ManagerPage({ id, data, myTeam }: { id: number; data: LeagueData
   return (
     <>
       <section>
-        <h2>
-          {who}
-          {mine && <span className="verdict"> (you)</span>}
-        </h2>
+        <SectionHead
+          title={
+            <>
+              {who}
+              {mine && <span className="verdict"> (you)</span>}
+            </>
+          }
+        >
+          {standing && <ShareButton what={who ?? "this manager"} card={() => managerShareCard(data, id, standing, season, rank)} />}
+        </SectionHead>
         <p className="hint">{entry.entry_name}</p>
         {standing && (
           <div className="stat-row">
@@ -447,4 +455,50 @@ function SeasonSummary({
 
 function round1(n: number): number {
   return Math.round(n * 10) / 10;
+}
+
+// ---------------------------------------------------------------- share picture
+
+/** The manager card for the Share button: where they stand, last five, and four numbers from the season with their league ranks. */
+function managerShareCard(data: LeagueData, id: number, standing: StandingRow, s: Summary | null, rank: RankFn): ShareCard {
+  const who = data.labels.get(id) ?? "Someone";
+  const ranked = (r: Rank | undefined): ShareStat["rank"] => r && { text: r.text, tone: r.tone === "meh" ? "neutral" : r.tone };
+  const record = `${standing.won}-${standing.drawn}-${standing.lost}`;
+  const blocks: ShareBlock[] = [
+    {
+      kind: "stats",
+      items: [
+        { label: "Position", value: ordinal(standing.rank) },
+        { label: "Record", value: record },
+        { label: "Points", value: String(standing.total) },
+        { label: "Scored", value: String(standing.pointsFor), rank: ranked(rank((x) => x.pointsFor, "high", ["highest", "lowest"])) },
+      ],
+    },
+  ];
+  if (standing.results.length > 0) blocks.push({ kind: "form", label: "Last five", results: standing.results.slice(-5) });
+  if (s) {
+    // The same numbers, labels and ranks as "Season in numbers" below.
+    blocks.push({
+      kind: "stats",
+      title: "Season in numbers",
+      items: [
+        { label: `Highest (GW${s.high.event})`, value: String(s.high.score), rank: ranked(rank((x) => x.high.score, "high")) },
+        {
+          label: "Luck",
+          value: `${s.luck.value > 0 ? "+" : ""}${round1(s.luck.value)}`,
+          rank: ranked(rank((x) => x.luck.value, "high", ["luckiest", "unluckiest"])),
+        },
+        { label: "Trade net", value: `${s.tradeNet > 0 ? "+" : ""}${s.tradeNet}`, rank: ranked(rank((x) => x.tradeNet, "high")) },
+        { label: "Bench pts", value: String(s.benchPoints), rank: ranked(rank((x) => x.benchPoints, "low", ["fewest", "most"])) },
+      ],
+    });
+  }
+  return {
+    kicker: data.league.league.name,
+    title: who,
+    subtitle: data.entries.get(id)?.entry_name,
+    blocks,
+    caption: `${who}: ${ordinal(standing.rank)} in ${data.league.league.name}, ${record}.`,
+    file: slug(`${who} season`),
+  };
 }

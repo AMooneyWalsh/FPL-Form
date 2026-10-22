@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { tradeLedger, tradeVerdicts, type TradedPlayer, type TradeSide, type TradeVerdict } from "../../shared/moves";
+import { tradeCard } from "../../shared/share";
 import { Explainer, Manager, nobody, PlayerName, Pts, ScrollTable, SectionHead, ShowFilter, useShownManager } from "./bits";
 import type { LeagueData } from "./data";
+import { ShareButton, shareNames } from "./ShareButton";
 import { TradeNetwork } from "./TradeNetwork";
 
 export function TradesPage({ data, myTeam }: { data: LeagueData; myTeam: number | null }) {
@@ -171,6 +173,9 @@ export function TradeCard({
             ), so they're left out of this trade.
           </p>
         ))}
+      <div className="share-row">
+        <ShareButton what={`the gameweek ${v.event} trade`} card={() => tradeCard(v, shareNames(data))} />
+      </div>
     </article>
   );
 }

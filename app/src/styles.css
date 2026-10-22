@@ -2766,3 +2766,111 @@ button.link.search-cancel {
   font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
 }
+
+/* ================================================================
+   Share cards (ShareButton.tsx, docs/share-cards.md): the small Share
+   button, and the full-screen preview it opens with Share and Save image.
+   The pictures themselves are drawn in share.ts from the light tokens.
+   ================================================================ */
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 32px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.share-icon {
+  flex: 0 0 auto;
+}
+
+/* Holds a Share button at the bottom right of a card. */
+.share-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--sp-2);
+}
+
+/* Live match cards: centred under the score, above the lineups. */
+.lv-share {
+  justify-content: center;
+  margin-top: calc(-1 * var(--sp-1));
+  padding: 0 var(--sp-3) var(--sp-3);
+}
+
+.share-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-y: auto;
+  padding: var(--sp-2) var(--sp-4) var(--sp-5);
+  background: var(--bg);
+}
+
+.share-sheet-inner {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.share-sheet-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+/* Link buttons are full width elsewhere; here Close only takes the room it needs. */
+button.link.share-close {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+/* Room for the picture while it's drawn, so the buttons don't jump. */
+.share-preview {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+}
+
+.share-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 62vh;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.share-actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.share-action {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}

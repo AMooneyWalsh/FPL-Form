@@ -22,11 +22,13 @@ import {
   type SheetLookup,
   type SheetSpot,
 } from "../../shared/live";
+import { matchCard } from "../../shared/share";
 import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope, Player, TeamSheets } from "../../shared/types";
 import { useApi } from "./api";
 import { Explainer, InjuryFlag, Manager, PlayerName, SectionHead, SubNav, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
+import { ShareButton, shareNames } from "./ShareButton";
 import { StandingsTable } from "./StandingsTable";
 
 export const LIVE_VIEWS = [
@@ -337,6 +339,14 @@ function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: b
         </span>
         <MatchSide entry={m.awayEntry} squad={m.away} ctx={ctx} right />
       </button>
+      {m.home && m.away && phase !== "upcoming" && (
+        <div className="share-row lv-share">
+          <ShareButton
+            what={`${ctx.data.labels.get(m.homeEntry)} v ${ctx.data.labels.get(m.awayEntry)}`}
+            card={() => matchCard(m, ctx.gw.event, final ? "final" : decided ? "done" : "live", shareNames(ctx.data))}
+          />
+        </div>
+      )}
       {open && m.home && m.away && (
 <Lineups home={m.home} away={m.away} ctx={ctx} />
       )}
