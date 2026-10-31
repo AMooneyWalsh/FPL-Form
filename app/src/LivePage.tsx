@@ -196,7 +196,7 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
   const { gw, phase, data, myTeam } = ctx;
   const played = gw.fixtures.filter((f) => f.finishedProvisional).length;
   const mine = (m: LiveMatch) => m.homeEntry === myTeam || m.awayEntry === myTeam;
-  const ordered = [...ctx.matches].sort((a, b) => Number(mine(b)) - Number(mine(a)));
+  const ordered = [...ctx.matches].sort((a, b) => Number(mine(b)) - Number(mine(a))).map((m) => mineOnLeft(m, myTeam));
   const hasLineups = Object.keys(gw.picks).length > 0;
 
   return (
@@ -281,8 +281,9 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
                 .filter((m) => m.event === next.event)
                 .map((m) => {
                   const toEntry = (id: number) => data.league.league_entries.find((e) => e.id === id)?.entry_id ?? 0;
-                  const a = toEntry(m.league_entry_1);
-                  const b = toEntry(m.league_entry_2);
+                  const [a, b] = [toEntry(m.league_entry_1), toEntry(m.league_entry_2)].sort(
+                    (x, y) => Number(y === myTeam) - Number(x === myTeam),
+                  );
                   return (
                     <li key={`${a}-${b}`} className={a === myTeam || b === myTeam ? "is-mine" : undefined}>
                       <Manager id={a} data={data} /> <span className="muted">v</span> <Manager id={b} data={data} />
@@ -306,6 +307,12 @@ function isDecided(m: LiveMatch, phase: Phase): boolean {
 function gwConfirmed(ctx: Ctx): boolean {
   const { current_event, current_event_finished } = ctx.data.game;
   return ctx.gw.event < current_event || (ctx.gw.event === current_event && current_event_finished);
+}
+
+/** The viewer's own match, turned round so their team is on the left. */
+function mineOnLeft(m: LiveMatch, myTeam: number | null): LiveMatch {
+  if (myTeam === null || m.awayEntry !== myTeam) return m;
+  return { home: m.away, away: m.home, homeEntry: m.awayEntry, awayEntry: m.homeEntry };
 }
 
 function MatchCard({ m, ctx, startOpen }: { m: LiveMatch; ctx: Ctx; startOpen: boolean }) {
