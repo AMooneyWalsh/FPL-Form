@@ -230,25 +230,54 @@ interface PulseFixture {
   id: number;
   status: string;
   kickoff?: { millis?: number };
-  teams: { team: { id: number; club: { abbr: string } } }[];
-  teamLists?: { teamId: number; lineup?: { altIds?: { opta?: string } }[]; substitutes?: { altIds?: { opta?: string } }[] }[];
+  teams?: { team?: { id?: number; club?: { abbr?: string } } }[];
+  teamLists?: { teamId: number; lineup?: { altIds?: { opta?: unknown } }[]; substitutes?: { altIds?: { opta?: unknown } }[] }[];
 }
 
-/** Turns the Premier League's fixture details into who's starting and who's on the bench. */
-export function toTeamSheets(details: PulseFixture[]): TeamSheets {
+/**
+ * Turns the Premier League's fixture details into who's starting and who's on
+ * the bench. The feed's shape shifts in the hour before team news (half-filled
+ * lists, missing clubs), so every field is checked and each match is read on
+ * its own: one odd match never costs the others their team news.
+ */
+export function toTeamSheets(details: unknown[]): TeamSheets {
   const out: TeamSheets = { announced: [], players: {} };
-  const code = (p: { altIds?: { opta?: string } }) => Number(p.altIds?.opta?.replace(/^p/, ""));
   for (const f of details) {
-    const clubs = new Map(f.teams.map((t) => [t.team.id, t.team.club.abbr]));
-    for (const list of f.teamLists ?? []) {
-      if (!list.lineup?.length) continue;
-      const club = clubs.get(list.teamId);
-      if (club) out.announced.push(club);
-      for (const p of list.lineup) if (code(p)) out.players[code(p)] = "start";
-      for (const p of list.substitutes ?? []) if (code(p)) out.players[code(p)] = "bench";
+    try {
+      addTeamSheet(f as PulseFixture, out);
+    } catch (err) {
+      console.error(`Skipping an unreadable team sheet (fixture ${(f as PulseFixture | null)?.id}):`, err);
     }
   }
   return out;
+}
+
+const arr = <T>(x: T[] | undefined | null): T[] => (Array.isArray(x) ? x : []);
+
+function playerCode(p: { altIds?: { opta?: unknown } } | null | undefined): number {
+  const opta = p?.altIds?.opta;
+  const n = Number(typeof opta === "string" ? opta.replace(/^p/, "") : opta);
+  return Number.isInteger(n) && n > 0 ? n : 0;
+}
+
+function addTeamSheet(f: PulseFixture, out: TeamSheets): void {
+  const clubs = new Map<number, string>();
+  for (const t of arr(f?.teams)) {
+    const id = t?.team?.id;
+    const abbr = t?.team?.club?.abbr;
+    if (id != null && typeof abbr === "string") clubs.set(id, abbr);
+  }
+  for (const list of arr(f?.teamLists)) {
+    const lineup = arr(list?.lineup);
+    const club = clubs.get(list?.teamId);
+    // Only trust a full XI, so a half-published list doesn't mark the rest "Not in squad".
+    if (lineup.length < 11 || !club) continue;
+    const starters = lineup.map(playerCode).filter(Boolean);
+    if (starters.length < 11) continue;
+    if (!out.announced.includes(club)) out.announced.push(club);
+    for (const c of starters) out.players[c] = "start";
+    for (const c of arr(list?.substitutes).map(playerCode)) if (c) out.players[c] = "bench";
+  }
 }
 
 /**
@@ -272,16 +301,17 @@ async function serveTeamSheets(event: number, env: Env, ctx: ExecutionContext): 
         await fetchPulse(`fixtures?comps=1&compSeasons=${seasonId}&gameweeks=${week.id}&pageSize=40&altIds=true`),
       ) as { content: PulseFixture[] };
       const now = Date.now();
-      const soon = list.content.filter((f) => f.status !== "U" || (f.kickoff?.millis ?? Infinity) - now < SHEET_WINDOW_MS);
-      const details = await Promise.all(
+      const soon = arr(list.content).filter((f) => f.status !== "U" || (f.kickoff?.millis ?? Infinity) - now < SHEET_WINDOW_MS);
+      // One match failing to load mustn't hide the others' team news.
+      const details = await Promise.allSettled(
         soon.map(async (f) => {
           // A finished match's sheet never changes.
           const key = `pulse:fixture:${f.id}`;
           const ttl = f.status === "C" ? FOREVER : MINUTE;
-          return JSON.parse((await cached(key, ttl, env, ctx, () => fetchPulse(`fixtures/${f.id}?altIds=true`))).value.body) as PulseFixture;
+          return JSON.parse((await cached(key, ttl, env, ctx, () => fetchPulse(`fixtures/${f.id}?altIds=true`))).value.body) as unknown;
         }),
       );
-      return JSON.stringify(toTeamSheets(details));
+      return JSON.stringify(toTeamSheets(details.flatMap((d) => (d.status === "fulfilled" ? [d.value] : []))));
     });
   });
 }
