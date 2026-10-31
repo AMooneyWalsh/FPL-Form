@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import bootstrap from "../fixtures/bootstrap-static.json";
 import classic from "../fixtures/classic-2757.json";
-import worker, { resetCachesForTests, trimClassic, trimPlayers, type Env } from "./index";
+import worker, { resetCachesForTests, toTeamSheets, trimClassic, trimPlayers, type Env } from "./index";
 
 class FakeKv {
   store = new Map<string, string>();
@@ -350,6 +350,7 @@ describe("trimClassic", () => {
 
 describe("team sheets route", () => {
   const player = (code: number) => ({ altIds: { opta: `p${code}` } });
+  const eleven = (from: number) => Array.from({ length: 11 }, (_, i) => player(from + i));
   const fixture = (id: number, status: string, kickoff: string, withLists: boolean) => ({
     id,
     status,
@@ -358,8 +359,8 @@ describe("team sheets route", () => {
     ...(withLists
       ? {
           teamLists: [
-            { teamId: 1, lineup: [player(101), player(102)], substitutes: [player(103)] },
-            { teamId: 2, lineup: [player(201)], substitutes: [] },
+            { teamId: 1, lineup: eleven(101), substitutes: [player(150)] },
+            { teamId: 2, lineup: eleven(201), substitutes: [] },
           ],
         }
       : {}),
@@ -382,7 +383,11 @@ describe("team sheets route", () => {
     fakePulse([f], { 9: f });
     const body = (await (await get("/api/teamsheets/6", makeEnv())).json()) as { data: Record<string, any> };
     expect(body.data.announced).toEqual(["ARS", "LEE"]);
-    expect(body.data.players).toEqual({ 101: "start", 102: "start", 103: "bench", 201: "start" });
+    expect(body.data.players[101]).toBe("start");
+    expect(body.data.players[111]).toBe("start");
+    expect(body.data.players[150]).toBe("bench");
+    expect(body.data.players[211]).toBe("start");
+    expect(Object.keys(body.data.players)).toHaveLength(23);
   });
 
   it("doesn't ask about matches that are hours away", async () => {
@@ -398,5 +403,38 @@ describe("team sheets route", () => {
     fakePulse([f], { 9: f });
     const body = (await (await get("/api/teamsheets/6", makeEnv())).json()) as { data: Record<string, any> };
     expect(body.data).toEqual({ announced: [], players: {} });
+  });
+});
+
+describe("toTeamSheets", () => {
+  const xi = (start: number) => Array.from({ length: 11 }, (_, i) => ({ altIds: { opta: `p${start + i}` } }));
+  const teams = [
+    { team: { id: 1, club: { abbr: "ARS" } } },
+    { team: { id: 2, club: { abbr: "CHE" } } },
+  ];
+  const good = { id: 10, teams, teamLists: [{ teamId: 1, lineup: xi(100), substitutes: [{ altIds: { opta: "p200" } }] }] };
+
+  it("reads starters and subs", () => {
+    const out = toTeamSheets([good]);
+    expect(out.announced).toEqual(["ARS"]);
+    expect(out.players[100]).toBe("start");
+    expect(out.players[200]).toBe("bench");
+  });
+
+  it("keeps the good matches when others are half-published or oddly shaped", () => {
+    const odd = [
+      null,
+      "nonsense",
+      { id: 11 },
+      { id: 12, teams: null, teamLists: [{ teamId: 1, lineup: xi(300) }] },
+      { id: 13, teams: [{}, { team: { id: 2 } }], teamLists: [{ teamId: 2, lineup: xi(400) }] },
+      { id: 14, teams, teamLists: { not: "a list" } },
+      { id: 15, teams, teamLists: [null, { teamId: 2, lineup: xi(500).slice(0, 4) }] },
+      { id: 16, teams, teamLists: [{ teamId: 2, lineup: xi(600).map(() => ({ altIds: { opta: { odd: true } } })), substitutes: "x" }] },
+    ];
+    const out = toTeamSheets([...odd, good]);
+    expect(out.announced).toEqual(["ARS"]);
+    expect(out.players[100]).toBe("start");
+    expect(out.players[500]).toBeUndefined();
   });
 });
