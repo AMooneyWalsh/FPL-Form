@@ -387,11 +387,11 @@ body {
   color: var(--muted);
 }
 
-.standings .week {
+.standings .gw-cell {
   white-space: nowrap;
 }
 
-.standings .week .chip {
+.standings .gw-cell .chip {
   width: 16px;
   height: 16px;
   font-size: var(--fs-xs);

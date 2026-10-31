@@ -62,7 +62,7 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
                   </span>
                 </td>
                 {live && (
-                  <td className="num week">
+                  <td className="num gw-cell">
                     {wk && res ? (
                       <>
                         <span className={`chip ${res}`}>{res}</span>
