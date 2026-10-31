@@ -132,4 +132,4 @@ Owner picked backlog items 1, 2, 3, 5, 6, 7, 8, 10. All built:
 ## Known limits
 
 - KV storage isn't set up (harmless). Cloudflare PR preview builds fail for an unknown reason; ignore them.
-- Vault note updates go in `docs/vault-note-draft.md`, because the cloud session can't reach the owner's Obsidian vault.
+- The project note lives in the vault repo (`amooneywalsh/second-brain`, `01-Projects/Draft FPL/Draft FPL.md`). Cloud sessions update it directly and push to the vault's `main`; see `CLAUDE.md` for the steps. `docs/vault-note-draft.md` is only a fallback for when the vault can't be reached.

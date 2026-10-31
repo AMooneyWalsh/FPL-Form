@@ -4,11 +4,13 @@ A website for a group of friends who play Fantasy Premier League Draft. Planning
 
 ## Where things live
 
-- **Planning, decisions, open questions, progress:** vault note `01-Projects/Draft FPL.md` in the owner's Obsidian vault ("Second Brain", on their Mac, inside iCloud).
+- **Planning, decisions, open questions, progress:** vault note `01-Projects/Draft FPL/Draft FPL.md` in the owner's Obsidian vault ("Second Brain"). The vault is the private GitHub repo `amooneywalsh/second-brain`; the owner's Mac syncs its `main` both ways every 5 minutes, so a push to `main` reaches Obsidian on its own.
   - Read it before asking the owner something that might already be answered.
-  - Update it after every significant decision (stack, hosting, scope, scoring rules, etc.).
-  - Do NOT follow the vault's own CLAUDE.md routing rules. They are for note management, not this project.
-  - If the vault isn't reachable (e.g. a cloud session), say so and put the update text in `docs/vault-note-draft.md` for the owner to paste in.
+  - Update it after every significant decision (stack, hosting, scope, scoring rules, etc.) and when a batch of features ships (add a line under History).
+  - How: if the vault isn't already cloned in the session (usually `/home/user/second-brain`), attach it with `add_repo` (owner `amooneywalsh`, repo `second-brain`, push access). Then `git pull --rebase`, edit the note, add a line under `## Vault Activity` in today's daily note `07-Daily/YYYY-MM-DD.md` (format: `- Updated: [[01-Projects/Draft FPL/Draft FPL|Draft FPL]]: what changed`), commit and push straight to `main`. Never use a branch or pull request there, and never force-push; if a push is rejected, pull with rebase and push again.
+  - Never write `- [ ]` checkboxes in vault notes (tasks live in Todoist). Use plain bullets.
+  - Follow the vault's own CLAUDE.md only for how to write and push notes. Its agent routing rules are for note management, not this project.
+  - Only if the vault can't be reached at all, say so and put the update text in `docs/vault-note-draft.md` for the owner (or the next session) to add.
 - **Technical docs** (setup, architecture, API notes): in this repo under `docs/`.
 
 ## Current state
