@@ -10,6 +10,8 @@ export interface LiveExtras {
 /**
  * The league table. Place and team stay frozen on the left; points come next
  * so they're always on screen, then form, and the rest scrolls on a phone.
+ * The Live tab's version adds this week's score before points and keeps every
+ * other column, so it scrolls sideways the same way.
  */
 export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; myTeam: number | null; live?: LiveExtras }) {
   return (
@@ -20,18 +22,12 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
             <th className="left">Team</th>
             {live && <th className="num">GW</th>}
             <th className="num">Pts</th>
-            {live ? (
-              <th className="num">W-D-L</th>
-            ) : (
-              <>
-                <th className="left form-col">Form</th>
-                <th className="num">W</th>
-                <th className="num">D</th>
-                <th className="num">L</th>
-                <th className="num">+/-</th>
-                <th className="num">Scored</th>
-              </>
-            )}
+            <th className="left form-col">Form</th>
+            <th className="num">W</th>
+            <th className="num">D</th>
+            <th className="num">L</th>
+            <th className="num">+/-</th>
+            <th className="num">Scored</th>
           </tr>
         </thead>
         <tbody>
@@ -76,28 +72,20 @@ export function StandingsTable({ rows, myTeam, live }: { rows: StandingRow[]; my
                   </td>
                 )}
                 <td className="num pts">{r.total}</td>
-                {live ? (
-                  <td className="num rec">
-                    {r.won}-{r.drawn}-{r.lost}
-                  </td>
-                ) : (
-                  <>
-                    <td className="left form-col">
-                      <span className="form">
-                        {r.results.slice(-5).map((res, i) => (
-                          <span key={i} className={`chip ${res}`}>
-                            {res}
-                          </span>
-                        ))}
+                <td className="left form-col">
+                  <span className="form">
+                    {r.results.slice(-5).map((res, i) => (
+                      <span key={i} className={`chip ${res}`}>
+                        {res}
                       </span>
-                    </td>
-                    <td className="num">{r.won}</td>
-                    <td className="num">{r.drawn}</td>
-                    <td className="num">{r.lost}</td>
-                    <td className="num">{diff > 0 ? `+${diff}` : diff}</td>
-                    <td className="num">{r.pointsFor}</td>
-                  </>
-                )}
+                    ))}
+                  </span>
+                </td>
+                <td className="num">{r.won}</td>
+                <td className="num">{r.drawn}</td>
+                <td className="num">{r.lost}</td>
+                <td className="num">{diff > 0 ? `+${diff}` : diff}</td>
+                <td className="num">{r.pointsFor}</td>
               </tr>
             );
           })}
