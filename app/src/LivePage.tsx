@@ -582,7 +582,8 @@ function statParts(p: LivePlayer): string[] {
   if (s.minutes) out.push(`${s.minutes}\u00a0MP`);
   if (s.goals_scored) out.push(`${s.goals_scored}\u00a0GS`);
   if (s.assists) out.push(`${s.assists}\u00a0A`);
-  if (s.clean_sheets) out.push(`${s.clean_sheets}\u00a0CS`);
+  // FPL records a clean sheet for anyone on the pitch, but forwards get no points for it.
+  if (s.clean_sheets && p.position !== "FWD") out.push(`${s.clean_sheets}\u00a0CS`);
   if (s.goals_conceded && (p.position === "GKP" || p.position === "DEF")) out.push(`${s.goals_conceded}\u00a0GC`);
   if (s.saves) out.push(`${s.saves}\u00a0S`);
   if (s.penalties_saved) out.push(`${s.penalties_saved}\u00a0PS`);
