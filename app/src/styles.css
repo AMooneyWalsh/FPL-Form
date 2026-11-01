@@ -363,11 +363,6 @@ body {
 }
 
 /* Live table: places moved this week and this week's score. */
-.standings.live th,
-.standings.live td {
-  padding: 9px 5px;
-}
-
 .standings .move {
   display: block;
   font-size: var(--fs-xs);
@@ -399,8 +394,7 @@ body {
   vertical-align: -2px;
 }
 
-.standings .week-score,
-.standings .rec {
+.standings .week-score {
   font-size: var(--fs-sm);
   font-weight: 400;
 }
