@@ -85,6 +85,10 @@ Read `CLAUDE.md` first, then this. The owner is not technical: explain in plain 
 - Live > Bonus lists defensive contributions per match: who has earned the 2 points and who is within 3 (`defconTable` in `shared/live.ts`). Thresholds come from FPL's `settings.scoring` (DEF 10, MID/FWD 12, GK none). Checked against FPL's own breakdown on GW6.
 - Header search (`app/src/Search.tsx`): a magnifier opens a full-screen sheet (rendered into `document.body` so it covers the sticky tabs) that finds managers and any player and links to their pages. `foldText` in `bits.tsx` handles Ø/æ/ß/ł as well as accents, so "odegaard" finds Ødegaard (the Moves > Players search had the same gap).
 
+### Your week strip (8 Nov)
+
+- Live > Matches shows your score, how far you are from the league median, and your place this week ("7th of 14"), above the match cards once games start. `weekStanding` in `shared/live.ts`. Owner's idea.
+
 ## Backlog batch (21-22 Oct 2026, `docs/build-plan-2026-10.md`)
 
 Owner picked backlog items 1, 2, 3, 5, 6, 7, 8, 10. All built:

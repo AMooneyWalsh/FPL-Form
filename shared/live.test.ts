@@ -19,9 +19,12 @@ import {
   toLiveGameweek,
   topPerformers,
   type LivePicks,
+  type LiveMatch,
   type LivePlayer,
+  type LiveSquad,
   type PlayerInfo,
   type RawLiveResponse,
+  weekStanding,
 } from "./live";
 import { computeStandings } from "./standings";
 import type { LeagueDetails, PlayersPayload } from "./types";
@@ -445,5 +448,32 @@ describe("bonus status", () => {
     expect(provisionalBonus(gw).size).toBe(0);
     const impacts = fixtureImpacts(fixture, gw, info, { GKP: 0, DEF: 10, MID: 12, FWD: 12 });
     expect([...impacts.home, ...impacts.away].some((i) => i.bonus > 0 && i.bonusProvisional)).toBe(true);
+  });
+});
+
+describe("weekStanding", () => {
+  it("matches GW5's real scores: median of all 14 and the place each one ranks", () => {
+    const matches = liveMatches(league, gw, info, rules);
+    const scores = [...realScores.values()].sort((a, b) => a - b);
+    const median = (scores[6] + scores[7]) / 2;
+    for (const [entry, score] of realScores) {
+      const w = weekStanding(matches, entry)!;
+      expect(w.score).toBe(score);
+      expect(w.median).toBe(median);
+      expect(w.of).toBe(14);
+      expect(w.rank).toBe(scores.filter((s) => s > score).length + 1);
+      expect(w.tied).toBe(scores.filter((s) => s === score).length > 1);
+    }
+  });
+
+  it("gives tied scores the same place", () => {
+    const sq = (score: number) => ({ score }) as unknown as LiveSquad;
+    const matches: LiveMatch[] = [
+      { homeEntry: 1, awayEntry: 2, home: sq(50), away: sq(40) },
+      { homeEntry: 3, awayEntry: 4, home: sq(50), away: sq(30) },
+    ];
+    expect(weekStanding(matches, 3)).toEqual({ score: 50, median: 45, rank: 1, tied: true, of: 4 });
+    expect(weekStanding(matches, 4)).toMatchObject({ rank: 4, tied: false });
+    expect(weekStanding(matches, 9)).toBeNull();
   });
 });
