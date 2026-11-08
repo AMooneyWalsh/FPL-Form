@@ -21,12 +21,14 @@ import {
   type PlayerInfo,
   type SheetLookup,
   type SheetSpot,
+  weekStanding,
 } from "../../shared/live";
 import { matchCard } from "../../shared/share";
 import { computeStandings, type StandingRow } from "../../shared/standings";
 import type { Envelope, Player, TeamSheets } from "../../shared/types";
 import { useApi } from "./api";
-import { Explainer, InjuryFlag, Manager, PlayerName, SectionHead, SubNav, Tag, type TagTone } from "./bits";
+import { ordinal } from "../../shared/recap";
+import { Explainer, InjuryFlag, Manager, PlayerName, SectionHead, StatTile, SubNav, Tag, type TagTone } from "./bits";
 import type { LeagueData } from "./data";
 import { ShareButton, shareNames } from "./ShareButton";
 import { StandingsTable } from "./StandingsTable";
@@ -253,6 +255,7 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
             after this week's waivers and trades.
           </p>
         )}
+        {phase !== "upcoming" && <YourWeek ctx={ctx} />}
         {ordered.map((m) => (
           <MatchCard key={`${m.homeEntry}-${m.awayEntry}`} m={m} ctx={ctx} startOpen={mine(m)} />
         ))}
@@ -295,6 +298,32 @@ function MatchesView({ ctx, next }: { ctx: Ctx; next: LiveGameweek | null }) {
         </section>
       )}
     </>
+  );
+}
+
+/** The viewer's score this week against the rest of the league: the median and their place. */
+function YourWeek({ ctx }: { ctx: Ctx }) {
+  if (ctx.myTeam === null) return null;
+  const w = weekStanding(ctx.matches, ctx.myTeam);
+  if (!w) return null;
+  const diff = w.score - w.median;
+  const third = w.of / 3;
+  const placeTone = w.rank <= third ? "good" : w.rank > w.of - third ? "bad" : "meh";
+  const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+  return (
+    <div className="stat-row your-week" aria-label="Your week so far">
+      <StatTile label="Your score" value={String(w.score)} />
+      <StatTile
+        label="vs median"
+        value={diff === 0 ? "Level" : `${diff > 0 ? "+" : ""}${fmt(diff)}`}
+        rank={{ text: `Median ${fmt(w.median)}`, tone: diff > 0 ? "good" : diff < 0 ? "bad" : "meh" }}
+      />
+      <StatTile
+        label="This week"
+        value={`${w.tied ? "=" : ""}${ordinal(w.rank)}`}
+        rank={{ text: `of ${w.of}`, tone: placeTone }}
+      />
+    </div>
   );
 }
 

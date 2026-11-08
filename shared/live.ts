@@ -709,3 +709,35 @@ export function fixtureImpacts(
   const strip = ({ home: _h, ...rest }: Impact & { home: boolean }): Impact => rest;
   return { home: all.filter((i) => i.home).map(strip), away: all.filter((i) => !i.home).map(strip) };
 }
+
+export interface WeekStanding {
+  score: number;
+  /** The league's median score this week (half-points when the league has an even number). */
+  median: number;
+  /** 1 = top score this week. Tied managers share a place. */
+  rank: number;
+  tied: boolean;
+  /** How many managers have a score. */
+  of: number;
+}
+
+/** One manager's score this week against everyone else's: the median and where it ranks. */
+export function weekStanding(matches: LiveMatch[], entry: number): WeekStanding | null {
+  const scores = new Map<number, number>();
+  for (const m of matches) {
+    if (m.home) scores.set(m.homeEntry, m.home.score);
+    if (m.away) scores.set(m.awayEntry, m.away.score);
+  }
+  const score = scores.get(entry);
+  if (score === undefined) return null;
+  const all = [...scores.values()].sort((a, b) => a - b);
+  const mid = Math.floor(all.length / 2);
+  const median = all.length % 2 === 0 ? (all[mid - 1] + all[mid]) / 2 : all[mid];
+  return {
+    score,
+    median,
+    rank: all.filter((s) => s > score).length + 1,
+    tied: all.filter((s) => s === score).length > 1,
+    of: all.length,
+  };
+}
